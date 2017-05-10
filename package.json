@@ -1,0 +1,11 @@
+{
+  "name": "flipper-typescript",
+  "description": "Flipper implemented in TypeScript.",
+  "version": "0.0.1",
+  "author": "Jonathan Hoyt",
+  "license": "MIT",
+  "devDependencies": {
+  },
+  "scripts": {
+  }
+}
