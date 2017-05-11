@@ -1,12 +1,12 @@
 import Feature from './Feature'
-import MemoryAdapter from './MemoryAdapter'
+import Adapter from './Adapter'
 
 interface MemoizedFeatures {
   [index: string]: Feature
 }
 
 class Dsl {
-  adapter: MemoryAdapter;
+  adapter: Adapter;
   _memoized_features: MemoizedFeatures
 
   constructor(adapter) {
