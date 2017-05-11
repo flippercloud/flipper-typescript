@@ -13,6 +13,6 @@
     "typings": "^2.1.1"
   },
   "scripts": {
-    "test": "mocha -r ts-node/register src/**/*_test.ts"
+    "test": "mocha -u tdd -r ts-node/register src/**/*_test.ts"
   }
 }

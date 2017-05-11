@@ -7,26 +7,26 @@ let flipper: Flipper
 const feature1 = {name: 'feature-1', value: false}
 const feature2 = {name: 'feature-2', value: false}
 
-describe('Flipper', () => {
-  beforeEach(() => {
+suite('Flipper', () => {
+  setup(() => {
     const adapter = new MemoryAdapter()
     flipper = new Flipper(adapter)
   })
 
-  it('can enable feature', () => {
+  test('can enable feature', () => {
     assert.equal(flipper.isFeatureEnabled(feature1), false)
     flipper.enableFeature(feature1)
     assert.equal(flipper.isFeatureEnabled(feature1), true)
   })
 
-  it('can disable an enabled feature', () => {
+  test('can disable an enabled feature', () => {
     flipper.enableFeature(feature1)
     assert.equal(flipper.isFeatureEnabled(feature1), true)
     flipper.disableFeature(feature1)
     assert.equal(flipper.isFeatureEnabled(feature1), false)
   })
 
-  it('can enable and disable features independently', () => {
+  test('can enable and disable features independently', () => {
     flipper.enableFeature(feature1)
     flipper.disableFeature(feature2)
     assert.equal(flipper.isFeatureEnabled(feature1), true)
