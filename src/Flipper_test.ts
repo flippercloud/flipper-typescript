@@ -1,30 +1,35 @@
 import Flipper from './Flipper'
-import { expect } from 'chai'
+import MemoryAdapter from './MemoryAdapter'
+import { assert } from 'chai'
 import 'mocha'
 
-describe('Flipper', () => {
-  it('should start with feature in disabled state', () => {
-    const flipper = new Flipper()
-    expect(flipper.isFeatureEnabled('feature-1')).to.be.false
+let flipper: Flipper
+const feature1 = {name: 'feature-1', value: false}
+const feature2 = {name: 'feature-2', value: false}
+
+suite('Flipper', () => {
+  setup(() => {
+    const adapter = new MemoryAdapter()
+    flipper = new Flipper(adapter)
   })
 
-  it('can enable feature', () => {
-    const flipper = new Flipper()
-    flipper.enableFeature('feature-1')
-    expect(flipper.isFeatureEnabled('feature-1')).to.be.true
+  test('can enable feature', () => {
+    assert.equal(flipper.isFeatureEnabled(feature1), false)
+    flipper.enableFeature(feature1)
+    assert.equal(flipper.isFeatureEnabled(feature1), true)
   })
 
-  it('can disable an enabled feature', () => {
-    const flipper = new Flipper()
-    flipper.enableFeature('feature-1')
-    flipper.disableFeature('feature-1')
-    expect(flipper.isFeatureEnabled('feature-1')).to.be.false
+  test('can disable an enabled feature', () => {
+    flipper.enableFeature(feature1)
+    assert.equal(flipper.isFeatureEnabled(feature1), true)
+    flipper.disableFeature(feature1)
+    assert.equal(flipper.isFeatureEnabled(feature1), false)
   })
 
-  it('can enable one feature without enabling another feature', () => {
-    const flipper = new Flipper()
-    flipper.enableFeature('feature-1')
-    expect(flipper.isFeatureEnabled('feature-1')).to.be.true
-    expect(flipper.isFeatureEnabled('feature-2')).to.be.false
+  test('can enable and disable features independently', () => {
+    flipper.enableFeature(feature1)
+    flipper.disableFeature(feature2)
+    assert.equal(flipper.isFeatureEnabled(feature1), true)
+    assert.equal(flipper.isFeatureEnabled(feature2), false)
   })
 })

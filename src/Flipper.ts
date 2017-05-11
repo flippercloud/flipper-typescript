@@ -1,24 +1,31 @@
-interface Features {
-  [index: string]: boolean;
-}
+import Feature from './Feature'
+import MemoryAdapter from './MemoryAdapter'
 
 class Flipper {
-  features: Features;
+  adapter: MemoryAdapter;
 
-  constructor() {
-    this.features = {}
+  constructor(adapter) {
+    this.adapter = adapter
   }
 
-  isFeatureEnabled(featureName: string): boolean {
-    return this.features[featureName] || false
+  isFeatureEnabled(feature: Feature): boolean {
+    const featureFromAdapter = this.adapter.get(feature)
+
+    if (featureFromAdapter === undefined) {
+      return false
+    } else {
+      return featureFromAdapter.value
+    }
   }
 
-  enableFeature(featureName: string) {
-    this.features[featureName] = true
+  enableFeature(feature: Feature) {
+    this.adapter.enable(feature)
+    return true
   }
 
-  disableFeature(featureName: string) {
-    this.features[featureName] = false
+  disableFeature(feature: Feature) {
+    this.adapter.disable(feature)
+    return true
   }
 }
 
