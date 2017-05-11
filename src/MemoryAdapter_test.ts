@@ -1,12 +1,15 @@
 import MemoryAdapter from './MemoryAdapter'
+import Feature from './Feature'
 import { assert } from 'chai'
 import 'mocha'
 
 let adapter: MemoryAdapter
+let feature: Feature
 
 suite('MemoryAdapter', () => {
   setup(() => {
     adapter = new MemoryAdapter()
+    feature = new Feature('feature-1', adapter)
   })
 
   test('has a name', () => {
@@ -19,41 +22,28 @@ suite('MemoryAdapter', () => {
   })
 
   test('adds feature', () => {
-    const feature = {name: 'feature-1', value: false}
     adapter.add(feature)
     assert.lengthOf(adapter.features(), 1)
     assert.equal(adapter.features()[0], feature)
   })
 
-  test('removes feature', () => {
-    const feature = {name: 'feature-1', value: false}
+  test('removes feature and clears gate', () => {
     adapter.add(feature)
+    adapter.enable(feature)
     assert.lengthOf(adapter.features(), 1)
+    assert.equal(adapter.get(feature), true)
     adapter.remove(feature)
     assert.lengthOf(adapter.features(), 0)
+    assert.equal(adapter.get(feature), undefined)
   })
 
-  test('gets feature', () => {
-    const feature = {name: 'feature-1', value: false}
-    adapter.add(feature)
-    const featureFromAdapter = adapter.get(feature)
-    assert.equal(featureFromAdapter.name, 'feature-1')
-    assert.equal(featureFromAdapter.value, false)
-  })
-
-  test('enables feature', () => {
-    const feature = {name: 'feature-1', value: false}
+  test('gets, enables, disables, and clears feature gate', () => {
+    assert.equal(adapter.get(feature), undefined)
     adapter.enable(feature)
-    const featureFromAdapter = adapter.get(feature)
-    assert.equal(featureFromAdapter.name, 'feature-1')
-    assert.equal(featureFromAdapter.value, true)
-  })
-
-  test('disables feature', () => {
-    const feature = {name: 'feature-1', value: true}
+    assert.equal(adapter.get(feature), true)
     adapter.disable(feature)
-    const featureFromAdapter = adapter.get(feature)
-    assert.equal(featureFromAdapter.name, 'feature-1')
-    assert.equal(featureFromAdapter.value, false)
+    assert.equal(adapter.get(feature), false)
+    adapter.clear(feature)
+    assert.equal(adapter.get(feature), undefined)
   })
 })

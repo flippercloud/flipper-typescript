@@ -1,31 +1,41 @@
 import Feature from './Feature'
 import MemoryAdapter from './MemoryAdapter'
 
+interface MemoizedFeatures {
+  [index: string]: Feature
+}
+
 class Flipper {
   adapter: MemoryAdapter;
+  _memoized_features: MemoizedFeatures
 
   constructor(adapter) {
     this.adapter = adapter
+    this._memoized_features = {}
   }
 
-  isFeatureEnabled(feature: Feature): boolean {
-    const featureFromAdapter = this.adapter.get(feature)
+  isFeatureEnabled(featureName: string): boolean {
+    return this.feature(featureName).isEnabled()
+  }
 
-    if (featureFromAdapter === undefined) {
-      return false
-    } else {
-      return featureFromAdapter.value
+  enableFeature(featureName: string) {
+    this.feature(featureName).enable()
+    return true
+  }
+
+  disableFeature(featureName: string) {
+    this.feature(featureName).disable()
+    return true
+  }
+
+  feature(featureName: string) {
+    let feature = this._memoized_features[featureName]
+
+    if(feature === undefined) {
+      feature = new Feature(featureName, this.adapter)
     }
-  }
 
-  enableFeature(feature: Feature) {
-    this.adapter.enable(feature)
-    return true
-  }
-
-  disableFeature(feature: Feature) {
-    this.adapter.disable(feature)
-    return true
+    return feature
   }
 }
 
