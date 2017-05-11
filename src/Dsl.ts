@@ -5,7 +5,7 @@ interface MemoizedFeatures {
   [index: string]: Feature
 }
 
-class Flipper {
+class Dsl {
   adapter: MemoryAdapter;
   _memoized_features: MemoizedFeatures
 
@@ -39,4 +39,4 @@ class Flipper {
   }
 }
 
-export default Flipper;
+export default Dsl;
