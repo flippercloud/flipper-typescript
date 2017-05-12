@@ -1,4 +1,5 @@
 import MemoryAdapter from './MemoryAdapter'
+import BooleanGate from './BooleanGate'
 import Feature from './Feature'
 import { assert } from 'chai'
 import 'mocha'
@@ -27,23 +28,33 @@ suite('MemoryAdapter', () => {
     assert.equal(adapter.features()[0], feature)
   })
 
-  test('removes feature and clears gate', () => {
+  test('adds and removes feature and clears feature gates', () => {
+    let gates
+    const gate = new BooleanGate()
     adapter.add(feature)
-    adapter.enable(feature)
+    adapter.enable(feature, gate, true)
     assert.lengthOf(adapter.features(), 1)
-    assert.equal(adapter.get(feature), true)
+    gates = adapter.get(feature)
+    assert.equal(gates['boolean'], 'true')
     adapter.remove(feature)
     assert.lengthOf(adapter.features(), 0)
-    assert.equal(adapter.get(feature), undefined)
+    gates = adapter.get(feature)
+    assert.equal(gates['boolean'], undefined)
+    assert.lengthOf(Object.keys(gates['actors']), 0)
   })
 
-  test('gets, enables, disables, and clears feature gate', () => {
-    assert.equal(adapter.get(feature), undefined)
-    adapter.enable(feature)
-    assert.equal(adapter.get(feature), true)
-    adapter.disable(feature)
-    assert.equal(adapter.get(feature), false)
+  test('gets, enables, disables, and clears boolean feature gate', () => {
+    let gates
+    const gate = new BooleanGate()
+    adapter.enable(feature, gate, true)
+    gates = adapter.get(feature)
+    assert.equal(gates['boolean'], 'true')
+    adapter.disable(feature, gate, true)
+    gates = adapter.get(feature)
+    assert.equal(gates['boolean'], undefined)
     adapter.clear(feature)
-    assert.equal(adapter.get(feature), undefined)
+    gates = adapter.get(feature)
+    assert.equal(gates['boolean'], undefined)
+    assert.lengthOf(Object.keys(gates['actors']), 0)
   })
 })
