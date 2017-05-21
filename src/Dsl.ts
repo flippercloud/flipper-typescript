@@ -1,4 +1,5 @@
 import Feature from './Feature'
+import Actor from './Actor'
 import Adapter from './Adapter'
 
 interface MemoizedFeatures {
@@ -14,8 +15,8 @@ class Dsl {
     this._memoized_features = {}
   }
 
-  isFeatureEnabled(featureName: string): boolean {
-    return this.feature(featureName).isEnabled()
+  isFeatureEnabled(featureName: string, thing?: any): boolean {
+    return this.feature(featureName).isEnabled(thing)
   }
 
   enableFeature(featureName: string) {
@@ -23,8 +24,18 @@ class Dsl {
     return true
   }
 
+  enableFeatureForActor(featureName: string, actor: Actor) {
+    this.feature(featureName).enableActor(actor)
+    return true
+  }
+
   disableFeature(featureName: string) {
     this.feature(featureName).disable()
+    return true
+  }
+
+  disableFeatureForActor(featureName: string, actor: Actor) {
+    this.feature(featureName).disableActor(actor)
     return true
   }
 
