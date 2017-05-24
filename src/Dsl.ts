@@ -19,22 +19,22 @@ class Dsl {
     return this.feature(featureName).isEnabled(thing)
   }
 
-  enableFeature(featureName: string) {
+  enable(featureName: string) {
     this.feature(featureName).enable()
     return true
   }
 
-  enableFeatureForActor(featureName: string, actor: Actor) {
+  enableActor(featureName: string, actor: Actor) {
     this.feature(featureName).enableActor(actor)
     return true
   }
 
-  disableFeature(featureName: string) {
+  disable(featureName: string) {
     this.feature(featureName).disable()
     return true
   }
 
-  disableFeatureForActor(featureName: string, actor: Actor) {
+  disableActor(featureName: string, actor: Actor) {
     this.feature(featureName).disableActor(actor)
     return true
   }

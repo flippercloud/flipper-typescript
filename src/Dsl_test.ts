@@ -13,8 +13,8 @@ suite('Dsl', () => {
   })
 
   test('enables and disables the feature', () => {
-    dsl.enableFeature('feature-1')
-    dsl.disableFeature('feature-2')
+    dsl.enable('feature-1')
+    dsl.disable('feature-2')
     assert.equal(dsl.isFeatureEnabled('feature-1'), true)
     assert.equal(dsl.isFeatureEnabled('feature-2'), false)
   })
@@ -24,9 +24,9 @@ suite('Dsl', () => {
     const feature = dsl.feature('feature-1')
 
     assert.lengthOf(feature.actorsValue(), 0)
-    dsl.enableFeatureForActor('feature-1', actor)
+    dsl.enableActor('feature-1', actor)
     assert.equal(dsl.isFeatureEnabled('feature-1', actor), true)
-    dsl.disableFeatureForActor('feature-1', actor)
+    dsl.disableActor('feature-1', actor)
     assert.equal(dsl.isFeatureEnabled('feature-1', actor), false)
   })
 })
