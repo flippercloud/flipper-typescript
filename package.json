@@ -14,5 +14,9 @@
   },
   "scripts": {
     "test": "mocha -u tdd -r ts-node/register src/**/*_test.ts"
+  },
+  "dependencies": {
+    "@types/crc": "^3.4.0",
+    "crc": "^3.4.4"
   }
 }
