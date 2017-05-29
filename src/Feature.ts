@@ -3,6 +3,7 @@ import Actor from './Actor'
 import Gate from './Gate'
 import BooleanGate from './BooleanGate'
 import ActorGate from './ActorGate'
+import PercentageOfActorsGate from './PercentageOfActorsGate'
 import FeatureCheckContext from './FeatureCheckContext'
 
 class Feature {
@@ -18,32 +19,35 @@ class Feature {
     this.adapter = adapter
     this.gates = [
       new BooleanGate(),
-      new ActorGate()
+      new ActorGate(),
+      new PercentageOfActorsGate()
     ]
   }
 
-  enable() {
+  enable(thing?: any) {
+    if (thing === undefined || thing === null) thing = true
     this.adapter.add(this)
-    const thing = true
     const gate = this.gateFor(thing)
     return this.adapter.enable(this, gate, thing)
   }
 
   enableActor(actor: Actor) {
-    const gate = this.gateFor(actor)
-    return this.adapter.enable(this, gate, actor)
+    return this.enable(actor)
   }
 
-  disable() {
+  enablePercentageOfActors(percentage: number) {
+    return this.enable(percentage)
+  }
+
+  disable(thing?: any) {
+    if (thing === undefined || thing === null) thing = true
     this.adapter.add(this)
-    const thing = true
     const gate = this.gateFor(thing)
     return this.adapter.disable(this, gate, thing)
   }
 
   disableActor(actor: Actor) {
-    const gate = this.gateFor(actor)
-    return this.adapter.disable(this, gate, actor)
+    return this.disable(actor)
   }
 
   isEnabled(thing?: any) {

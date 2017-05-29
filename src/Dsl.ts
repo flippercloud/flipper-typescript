@@ -29,6 +29,10 @@ class Dsl {
     return true
   }
 
+  enablePercentageOfActors(featureName: string, percentage: number) {
+    this.feature(featureName).enablePercentageOfActors(percentage)
+  }
+
   disable(featureName: string) {
     this.feature(featureName).disable()
     return true
