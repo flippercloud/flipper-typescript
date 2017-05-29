@@ -48,6 +48,10 @@ class MemoryAdapter {
           result[gate.key] = this.read(this.key(feature, gate))
           break
         }
+        case 'number': {
+          result[gate.key] = this.read(this.key(feature, gate))
+          break
+        }
         case 'set': {
           result[gate.key] = this.setMembers(this.key(feature, gate))
           break
@@ -67,6 +71,10 @@ class MemoryAdapter {
         this.write(this.key(feature, gate), String(true))
         break
       }
+      case 'number': {
+        this.write(this.key(feature, gate), thing)
+        break
+      }
       case 'set': {
         this.setAdd(this.key(feature, gate), String(thing.value))
         break
@@ -81,6 +89,10 @@ class MemoryAdapter {
   disable(feature: Feature, gate: Gate, thing: any) {
     switch (gate.dataType) {
       case 'boolean': {
+        this.clear(feature)
+        break
+      }
+      case 'number': {
         this.clear(feature)
         break
       }

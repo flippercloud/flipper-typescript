@@ -16,6 +16,10 @@ class FeatureCheckContext {
   get actorsValue(): any {
     return this.values.actors
   }
+
+  get percentageOfActorsValue(): number {
+    return this.values.percentageOfActorsValue
+  }
 }
 
 export default FeatureCheckContext
