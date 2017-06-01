@@ -1,7 +1,12 @@
 import {crc32} from 'crc'
-import Actor from './Actor'
+import { Actor } from './interfaces'
+import ActorType from './ActorType'
 import Gate from './Gate'
 import FeatureCheckContext from './FeatureCheckContext'
+
+function instanceOfActor(thing: any): thing is Actor {
+  return 'flipperId' in thing
+}
 
 class PercentageOfActorsGate implements Gate {
   name: string
@@ -15,9 +20,10 @@ class PercentageOfActorsGate implements Gate {
   }
 
   isOpen(context: FeatureCheckContext): boolean {
-    if(context.thing instanceof Actor) {
+    if(context.thing && instanceOfActor(context.thing)) {
+      const actorType = ActorType.wrap(context.thing)
       const percentage = context.values[this.key]
-      const id = `${context.featureName}${context.thing.value}`
+      const id = `${context.featureName}${actorType.value}`
       return crc32(id).valueOf() % 100 < percentage
     } else {
       return false

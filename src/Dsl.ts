@@ -1,6 +1,6 @@
 import Feature from './Feature'
-import Actor from './Actor'
 import Adapter from './Adapter'
+import { Actor } from './interfaces'
 
 interface MemoizedFeatures {
   [index: string]: Feature

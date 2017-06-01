@@ -1,5 +1,5 @@
 import Adapter from './Adapter'
-import Actor from './Actor'
+import { Actor } from './interfaces'
 import Gate from './Gate'
 import BooleanGate from './BooleanGate'
 import ActorGate from './ActorGate'

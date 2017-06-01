@@ -1,3 +1,4 @@
+import { Actor } from './interfaces'
 import Gate from './Gate'
 import FeatureCheckContext from './FeatureCheckContext'
 
@@ -17,8 +18,8 @@ class ActorGate implements Gate {
       return false
     } else {
       if(this.protectsThing(context.thing)) {
-        const enabledActorIds = context.values[this.key]
-        return enabledActorIds.has(String(context.thing.flipperId))
+        const enabledActors = context.values[this.key]
+        return enabledActors.has(String(context.thing.value))
       } else {
         return false
       }
@@ -26,7 +27,8 @@ class ActorGate implements Gate {
   }
 
   protectsThing(thing: any) {
-    return thing && typeof(thing.flipperId) !== 'undefined'
+    if(thing === undefined) { return false }
+    return typeof(thing.flipperId) !== 'undefined'
   }
 }
 
