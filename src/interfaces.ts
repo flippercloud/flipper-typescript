@@ -3,5 +3,5 @@ export interface Actor {
 }
 
 export interface Type {
-  value: number | string
+  value: boolean | number | string
 }

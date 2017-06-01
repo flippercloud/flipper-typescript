@@ -22,7 +22,6 @@ suite('Dsl', () => {
     const actor = makeActor(5)
     const feature = dsl.feature('feature-1')
 
-    assert.lengthOf(feature.actorsValue(), 0)
     dsl.enableActor('feature-1', actor)
     assert.equal(dsl.isFeatureEnabled('feature-1', actor), true)
     dsl.disableActor('feature-1', actor)

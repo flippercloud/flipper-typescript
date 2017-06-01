@@ -1,18 +1,20 @@
 import { Actor, Type } from './interfaces'
 
 class ActorType implements Type {
+  public thing: any
   public value: string
 
-  static wrap(thing : Actor | ActorType) {
-    if(thing instanceof ActorType) {
-      return thing
-    } else {
-      return new ActorType(thing)
-    }
+  static wrap(thing: Actor | ActorType): ActorType {
+    if(thing instanceof ActorType) { return thing }
+    return new ActorType(thing)
   }
 
   constructor(thing: any) {
-    this.value = thing.flipperId
+    if(typeof(thing) === 'undefined') {
+      this.value = undefined
+    } else {
+      this.value = thing.flipperId
+    }
   }
 }
 

@@ -72,7 +72,7 @@ class MemoryAdapter {
         break
       }
       case 'number': {
-        this.write(this.key(feature, gate), thing)
+        this.write(this.key(feature, gate), String(thing.value))
         break
       }
       case 'set': {

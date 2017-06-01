@@ -1,4 +1,5 @@
 import { Actor } from './interfaces'
+import ActorType from './ActorType'
 import Gate from './Gate'
 import FeatureCheckContext from './FeatureCheckContext'
 
@@ -27,8 +28,13 @@ class ActorGate implements Gate {
   }
 
   protectsThing(thing: any) {
-    if(thing === undefined) { return false }
-    return typeof(thing.flipperId) !== 'undefined'
+    if(thing instanceof ActorType) { return true }
+    if(typeof(thing) === 'object' && typeof(thing.flipperId) !== 'undefined') { return true }
+    return false
+  }
+
+  wrap(thing: any) {
+    return ActorType.wrap(thing)
   }
 }
 

@@ -1,3 +1,4 @@
+import BooleanType from './BooleanType'
 import Gate from './Gate'
 import FeatureCheckContext from './FeatureCheckContext'
 
@@ -17,7 +18,14 @@ class BooleanGate implements Gate {
   }
 
   protectsThing(thing: any) {
-    return thing && typeof(thing) === 'boolean'
+    if(thing instanceof BooleanType) { return true }
+    if(thing === true) { return true }
+    if(thing === false) { return true }
+    return false
+  }
+
+  wrap(thing: any) {
+    return BooleanType.wrap(thing)
   }
 }
 
