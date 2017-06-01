@@ -3,8 +3,7 @@ import { Type } from './interfaces'
 class PercentageOfActorsType implements Type {
   public value: number
 
-  static wrap(thing: number | PercentageOfActorsType) {
-    if(typeof(thing) === 'undefined') { return thing }
+  static wrap(thing: number | PercentageOfActorsType): PercentageOfActorsType {
     if(thing instanceof PercentageOfActorsType) { return thing }
     return new PercentageOfActorsType(thing)
   }

@@ -14,7 +14,7 @@ class BooleanGate implements Gate {
   }
 
   isOpen(context: FeatureCheckContext): boolean {
-    return context.booleanValue === 'true'
+    return context.booleanValue === true
   }
 
   protectsThing(thing: any) {

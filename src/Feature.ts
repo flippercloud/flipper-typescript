@@ -7,6 +7,7 @@ import ActorGate from './ActorGate'
 import PercentageOfActorsGate from './PercentageOfActorsGate'
 import FeatureCheckContext from './FeatureCheckContext'
 import PercentageOfActorsType from './PercentageOfActorsType'
+import GateValues from './GateValues'
 
 class Feature {
   name: string;
@@ -71,7 +72,7 @@ class Feature {
   }
 
   gateValues() {
-    return this.adapter.get(this)
+    return new GateValues(this.adapter.get(this))
   }
 
   gateFor(thing: any) {

@@ -19,7 +19,7 @@ class ActorGate implements Gate {
       return false
     } else {
       if(this.protectsThing(context.thing)) {
-        const enabledActors = context.values[this.key]
+        const enabledActors = context.actorsValue
         return enabledActors.has(String(context.thing.value))
       } else {
         return false

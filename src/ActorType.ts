@@ -1,7 +1,6 @@
 import { Actor, Type } from './interfaces'
 
 class ActorType implements Type {
-  public thing: any
   public value: string
 
   static wrap(thing: Actor | ActorType): ActorType {

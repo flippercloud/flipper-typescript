@@ -15,8 +15,8 @@ class PercentageOfActorsGate implements Gate {
   dataType: string
 
   constructor() {
-    this.name = 'percentage_of_actors'
-    this.key = 'percentage_of_actors'
+    this.name = 'percentageOfActors'
+    this.key = 'percentageOfActors'
     this.dataType = 'number'
   }
 
@@ -28,7 +28,7 @@ class PercentageOfActorsGate implements Gate {
     if(!usable) { return false }
 
     const actorType = ActorType.wrap(context.thing)
-    const percentage = context.values[this.key]
+    const percentage = context.percentageOfActorsValue
     const id = `${context.featureName}${actorType.value}`
     return crc32(id).valueOf() % 100 < percentage
   }
