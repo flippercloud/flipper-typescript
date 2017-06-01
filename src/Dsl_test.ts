@@ -1,8 +1,7 @@
+import { assert, suite, test } from './test_helper'
 import Dsl from './Dsl'
 import MemoryAdapter from './MemoryAdapter'
 import Actor from './Actor'
-import { assert } from 'chai'
-import 'mocha'
 
 let dsl: Dsl
 
