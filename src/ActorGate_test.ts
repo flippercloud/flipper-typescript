@@ -1,6 +1,5 @@
+import { assert, suite, test } from './test_helper'
 import ActorGate from './ActorGate'
-import { assert } from 'chai'
-import 'mocha'
 
 const gate = new ActorGate()
 

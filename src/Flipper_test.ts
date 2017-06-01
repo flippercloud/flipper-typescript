@@ -1,8 +1,7 @@
+import { assert, suite, test } from './test_helper'
 import Flipper from './Flipper'
 import Dsl from './Dsl'
 import MemoryAdapter from './MemoryAdapter'
-import { assert } from 'chai'
-import 'mocha'
 
 suite('Flipper', () => {
   test('constructor returns Dsl instance', () => {

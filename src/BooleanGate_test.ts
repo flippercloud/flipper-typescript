@@ -1,6 +1,5 @@
+import { assert, suite, test } from './test_helper'
 import BooleanGate from './BooleanGate'
-import { assert } from 'chai'
-import 'mocha'
 
 const gate = new BooleanGate()
 

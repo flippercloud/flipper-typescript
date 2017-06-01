@@ -1,6 +1,5 @@
+import { assert, suite, test } from './test_helper'
 import PercentageOfActorsGate from './PercentageOfActorsGate'
-import { assert } from 'chai'
-import 'mocha'
 
 const gate = new PercentageOfActorsGate()
 

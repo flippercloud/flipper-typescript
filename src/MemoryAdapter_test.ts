@@ -1,8 +1,7 @@
+import { assert, suite, test } from './test_helper'
 import MemoryAdapter from './MemoryAdapter'
 import BooleanGate from './BooleanGate'
 import Feature from './Feature'
-import { assert } from 'chai'
-import 'mocha'
 
 let adapter: MemoryAdapter
 let feature: Feature
