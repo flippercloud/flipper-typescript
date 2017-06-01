@@ -8,12 +8,17 @@ interface ProtectsThingFunction {
   (thing: any)
 }
 
+interface WrapFunction {
+  (thing: any)
+}
+
 interface Gate {
   name: string
   key: string
   dataType: string
   isOpen(IsOpenFunction)
   protectsThing(ProtectsThingFunction)
+  wrap(WrapFunction)
 }
 
 export default Gate

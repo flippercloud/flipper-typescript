@@ -9,16 +9,16 @@ class FeatureCheckContext {
     this.thing = thing
   }
 
-  get booleanValue(): string {
+  get booleanValue(): boolean {
     return this.values.boolean
   }
 
-  get actorsValue(): any {
+  get actorsValue(): Set<string> {
     return this.values.actors
   }
 
   get percentageOfActorsValue(): number {
-    return this.values.percentageOfActorsValue
+    return this.values.percentageOfActors
   }
 }
 
