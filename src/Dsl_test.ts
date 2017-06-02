@@ -28,11 +28,29 @@ suite('Dsl', () => {
     assert.equal(dsl.isFeatureEnabled('feature-1', actor), false)
   })
 
-  test('enables and disables feature for percentage of actors', () => {
+  test('enables feature for percentage of actors', () => {
     const feature = dsl.feature('feature-1')
     dsl.enablePercentageOfActors('feature-1', 50)
 
     assert.equal(dsl.isFeatureEnabled('feature-1', makeActor(5)), true)
     assert.equal(dsl.isFeatureEnabled('feature-1', makeActor(8)), false)
+  })
+
+  test('enables feature for percentage of time', () => {
+    const feature = dsl.feature('feature-1')
+    dsl.enablePercentageOfTime('feature-1', 50)
+
+    let trueCount = 0
+    let falseCount = 0
+
+    for (let i = 0; i < 100; i++) {
+      if (dsl.isFeatureEnabled('feature-1', makeActor(1))) {
+        trueCount++
+      } else {
+        falseCount++
+      }
+    }
+
+    assert.closeTo(trueCount, falseCount, 30) // could be flaky
   })
 })

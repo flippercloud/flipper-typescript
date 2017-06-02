@@ -32,6 +32,10 @@ class Dsl {
     this.feature(featureName).enablePercentageOfActors(percentage)
   }
 
+  public enablePercentageOfTime(featureName: string, percentage: number) {
+    this.feature(featureName).enablePercentageOfTime(percentage)
+  }
+
   public disable(featureName: string) {
     this.feature(featureName).disable()
     return true
