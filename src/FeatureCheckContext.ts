@@ -17,6 +17,10 @@ class FeatureCheckContext {
     return this.values.actors
   }
 
+  get groupsValue(): Set<string> {
+    return this.values.groups
+  }
+
   get percentageOfActorsValue(): number {
     return this.values.percentageOfActors
   }

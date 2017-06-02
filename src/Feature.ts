@@ -3,6 +3,8 @@ import ActorType from './ActorType'
 import BooleanGate from './BooleanGate'
 import FeatureCheckContext from './FeatureCheckContext'
 import GateValues from './GateValues'
+import GroupGate from './GroupGate'
+import GroupType from './GroupType'
 import { IActor, IAdapter, IGate } from './interfaces'
 import PercentageOfActorsGate from './PercentageOfActorsGate'
 import PercentageOfActorsType from './PercentageOfActorsType'
@@ -15,13 +17,14 @@ class Feature {
   public gates: [IGate]
   private adapter: IAdapter
 
-  constructor(name: string, adapter: IAdapter) {
+  constructor(name: string, adapter: IAdapter, groups: any) {
     this.name = name
     this.key = name
     this.adapter = adapter
     this.gates = [
-      new BooleanGate(),
       new ActorGate(),
+      new BooleanGate(),
+      new GroupGate(groups),
       new PercentageOfActorsGate(),
       new PercentageOfTimeGate(),
     ]
@@ -37,6 +40,10 @@ class Feature {
 
   public enableActor(actor: IActor) {
     return this.enable(ActorType.wrap(actor))
+  }
+
+  public enableGroup(groupName: string) {
+    return this.enable(GroupType.wrap(groupName))
   }
 
   public enablePercentageOfActors(percentage: number) {
@@ -57,6 +64,10 @@ class Feature {
 
   public disableActor(actor: IActor) {
     return this.disable(ActorType.wrap(actor))
+  }
+
+  public disableGroup(groupName: string) {
+    return this.disable(GroupType.wrap(groupName))
   }
 
   public isEnabled(thing?: any) {

@@ -53,4 +53,31 @@ suite('Dsl', () => {
 
     assert.closeTo(trueCount, falseCount, 30) // could be flaky
   })
+
+  test('enables and disables the feature for group', () => {
+    const groupName = 'admins'
+    const adminCheck = (actor) => {
+      return actor.isAdmin
+    }
+    const admin = makeActor(1, true)
+    const user = makeActor(2, false)
+    const feature = dsl.feature('feature-1')
+    dsl.register(groupName, adminCheck)
+
+    dsl.enableGroup('feature-1', groupName)
+    assert.equal(dsl.isFeatureEnabled('feature-1', admin), true)
+    assert.equal(dsl.isFeatureEnabled('feature-1', user), false)
+    dsl.disableGroup('feature-1', groupName)
+    assert.equal(dsl.isFeatureEnabled('feature-1', admin), false)
+    assert.equal(dsl.isFeatureEnabled('feature-1', user), false)
+  })
+
+  test('registers group', () => {
+    const groupName = 'admins'
+    const adminCheck = (actor) => {
+      return actor.isAdmin
+    }
+    dsl.register(groupName, adminCheck)
+    assert.equal(dsl.groups[groupName].callback, adminCheck)
+  })
 })

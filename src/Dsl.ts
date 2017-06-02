@@ -1,16 +1,15 @@
 import Feature from './Feature'
+import GroupType from './GroupType'
 import { IActor, IAdapter } from './interfaces'
-
-interface IMemoizedFeatures {
-  [index: string]: Feature
-}
 
 class Dsl {
   public adapter: IAdapter
-  private memoizedFeatures: IMemoizedFeatures
+  public groups: {}
+  private memoizedFeatures: {}
 
   constructor(adapter) {
     this.adapter = adapter
+    this.groups = {}
     this.memoizedFeatures = {}
   }
 
@@ -25,6 +24,11 @@ class Dsl {
 
   public enableActor(featureName: string, actor: IActor) {
     this.feature(featureName).enableActor(actor)
+    return true
+  }
+
+  public enableGroup(featureName: string, groupName: string) {
+    this.feature(featureName).enableGroup(groupName)
     return true
   }
 
@@ -46,14 +50,23 @@ class Dsl {
     return true
   }
 
+  public disableGroup(featureName: string, groupName: string) {
+    this.feature(featureName).disableGroup(groupName)
+    return true
+  }
+
   public feature(featureName: string) {
     let feature = this.memoizedFeatures[featureName]
 
     if (feature === undefined) {
-      feature = new Feature(featureName, this.adapter)
+      feature = new Feature(featureName, this.adapter, this.groups)
     }
 
     return feature
+  }
+
+  public register(groupName: string, callback: any) {
+    this.groups[groupName] = new GroupType(groupName, callback)
   }
 }
 
