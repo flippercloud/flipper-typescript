@@ -6,6 +6,8 @@ import GateValues from './GateValues'
 import { IActor, IAdapter, IGate } from './interfaces'
 import PercentageOfActorsGate from './PercentageOfActorsGate'
 import PercentageOfActorsType from './PercentageOfActorsType'
+import PercentageOfTimeGate from './PercentageOfTimeGate'
+import PercentageOfTimeType from './PercentageOfTimeType'
 
 class Feature {
   public name: string
@@ -21,6 +23,7 @@ class Feature {
       new BooleanGate(),
       new ActorGate(),
       new PercentageOfActorsGate(),
+      new PercentageOfTimeGate(),
     ]
   }
 
@@ -38,6 +41,10 @@ class Feature {
 
   public enablePercentageOfActors(percentage: number) {
     return this.enable(PercentageOfActorsType.wrap(percentage))
+  }
+
+  public enablePercentageOfTime(percentage: number) {
+    return this.enable(PercentageOfTimeType.wrap(percentage))
   }
 
   public disable(thing?: any) {
