@@ -6,9 +6,11 @@ class ActorType implements IType {
     return new ActorType(thing)
   }
 
+  public thing: any
   public value: string
 
   constructor(thing: any) {
+    this.thing = thing
     this.value = typeof(thing) === 'undefined' ? undefined : thing.flipperId
   }
 }
