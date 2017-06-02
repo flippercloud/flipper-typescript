@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-const {suite, test} = require('mocha')
+const { suite, test } = require('mocha')
 
 function makeActor(id: number) {
   return { flipperId: `actor:${id}` }
@@ -8,6 +8,6 @@ function makeActor(id: number) {
 export {
   assert,
   makeActor,
+  test,
   suite,
-  test
 }

@@ -1,49 +1,49 @@
 import Feature from './Feature'
-import Gate from './Gate'
+import { IGate } from './interfaces'
 
-interface Features {
+interface IFeatures {
   [index: string]: Feature
 }
 
-interface FeatureGates {
+interface IFeatureGates {
   [index: string]: any
 }
 
 class MemoryAdapter {
-  name: string;
-  private _features: Features
-  private _source: FeatureGates
+  public name: string
+  private featuresStore: IFeatures
+  private sourceStore: IFeatureGates
 
   constructor() {
     this.name = 'memory'
-    this._features = {}
-    this._source = {}
+    this.featuresStore = {}
+    this.sourceStore = {}
   }
 
-  features() {
-    return Object.keys(this._features).map((key, _) => {
-      return this._features[key]
+  public features() {
+    return Object.keys(this.featuresStore).map((key, _) => {
+      return this.featuresStore[key]
     })
   }
 
-  add(feature: Feature) {
-    if(this._features[feature.name] === undefined) {
-      this._features[feature.name] = feature
+  public add(feature: Feature) {
+    if (this.featuresStore[feature.name] === undefined) {
+      this.featuresStore[feature.name] = feature
     }
     return true
   }
 
-  remove(feature: Feature) {
-    delete this._features[feature.name]
+  public remove(feature: Feature) {
+    delete this.featuresStore[feature.name]
     this.clear(feature)
     return true
   }
 
-  get(feature: Feature) {
+  public get(feature: Feature) {
     const result = {}
 
     feature.gates.forEach((gate) => {
-      switch(gate.dataType) {
+      switch (gate.dataType) {
         case 'boolean': {
           result[gate.key] = this.read(this.key(feature, gate))
           break
@@ -57,7 +57,7 @@ class MemoryAdapter {
           break
         }
         default: {
-          throw `${gate} is not supported by this adapter yet`
+          throw new Error(`${gate} is not supported by this adapter yet`)
         }
       }
     })
@@ -65,7 +65,7 @@ class MemoryAdapter {
     return result
   }
 
-  enable(feature: Feature, gate: Gate, thing: any) {
+  public enable(feature: Feature, gate: IGate, thing: any) {
     switch (gate.dataType) {
       case 'boolean': {
         this.write(this.key(feature, gate), String(true))
@@ -80,13 +80,13 @@ class MemoryAdapter {
         break
       }
       default: {
-        throw `${gate} is not supported by this adapter yet`
+        throw new Error(`${gate} is not supported by this adapter yet`)
       }
     }
     return true
   }
 
-  disable(feature: Feature, gate: Gate, thing: any) {
+  public disable(feature: Feature, gate: IGate, thing: any) {
     switch (gate.dataType) {
       case 'boolean': {
         this.clear(feature)
@@ -101,53 +101,53 @@ class MemoryAdapter {
         break
       }
       default: {
-        throw `${gate} is not supported by this adapter yet`
+        throw new Error(`${gate} is not supported by this adapter yet`)
       }
     }
     return true
   }
 
-  clear(feature: Feature) {
+  public  clear(feature: Feature) {
     feature.gates.forEach((gate) => {
       this.delete(this.key(feature, gate))
     })
     return true
   }
 
-  private key(feature: Feature, gate: Gate) {
+  private key(feature: Feature, gate: IGate) {
     return `${feature.key}/${gate.key}`
   }
 
   private read(key: string) {
-    return this._source[key]
+    return this.sourceStore[key]
   }
 
   private write(key: string, value: string) {
-    return this._source[key] = value
+    return this.sourceStore[key] = value
   }
 
   private delete(key: string) {
-    delete this._source[key]
+    delete this.sourceStore[key]
   }
 
   private setAdd(key: string, value: string) {
     this.ensure_set_initialized(key)
-    this._source[key].add(value)
+    this.sourceStore[key].add(value)
   }
 
   private setDelete(key: string, value: string) {
     this.ensure_set_initialized(key)
-    this._source[key].delete(value)
+    this.sourceStore[key].delete(value)
   }
 
   private setMembers(key: string) {
     this.ensure_set_initialized(key)
-    return this._source[key]
+    return this.sourceStore[key]
   }
 
   private ensure_set_initialized(key: string) {
-    if(this._source[key] === undefined) {
-      this._source[key] = new Set()
+    if (this.sourceStore[key] === undefined) {
+      this.sourceStore[key] = new Set()
     }
   }
 }

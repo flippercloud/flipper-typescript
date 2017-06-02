@@ -1,12 +1,11 @@
-import { Actor } from './interfaces'
 import ActorType from './ActorType'
-import Gate from './Gate'
 import FeatureCheckContext from './FeatureCheckContext'
+import { IGate } from './interfaces'
 
-class ActorGate implements Gate {
-  name: string
-  key: string
-  dataType: string
+class ActorGate implements IGate {
+  public name: string
+  public key: string
+  public dataType: string
 
   constructor() {
     this.name = 'actor'
@@ -14,11 +13,11 @@ class ActorGate implements Gate {
     this.dataType = 'set'
   }
 
-  isOpen(context: FeatureCheckContext): boolean {
-    if(context.thing === 'undefined') {
+  public isOpen(context: FeatureCheckContext): boolean {
+    if (context.thing === 'undefined') {
       return false
     } else {
-      if(this.protectsThing(context.thing)) {
+      if (this.protectsThing(context.thing)) {
         const enabledActors = context.actorsValue
         return enabledActors.has(String(context.thing.value))
       } else {
@@ -27,13 +26,13 @@ class ActorGate implements Gate {
     }
   }
 
-  protectsThing(thing: any) {
-    if(thing instanceof ActorType) { return true }
-    if(typeof(thing) === 'object' && typeof(thing.flipperId) !== 'undefined') { return true }
+  public protectsThing(thing: any) {
+    if (thing instanceof ActorType) { return true }
+    if (typeof(thing) === 'object' && typeof(thing.flipperId) !== 'undefined') { return true }
     return false
   }
 
-  wrap(thing: any) {
+  public wrap(thing: any) {
     return ActorType.wrap(thing)
   }
 }

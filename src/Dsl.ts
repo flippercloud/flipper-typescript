@@ -1,52 +1,51 @@
 import Feature from './Feature'
-import Adapter from './Adapter'
-import { Actor } from './interfaces'
+import { IActor, IAdapter } from './interfaces'
 
-interface MemoizedFeatures {
+interface IMemoizedFeatures {
   [index: string]: Feature
 }
 
 class Dsl {
-  adapter: Adapter;
-  _memoized_features: MemoizedFeatures
+  public adapter: IAdapter
+  private memoizedFeatures: IMemoizedFeatures
 
   constructor(adapter) {
     this.adapter = adapter
-    this._memoized_features = {}
+    this.memoizedFeatures = {}
   }
 
-  isFeatureEnabled(featureName: string, thing?: any): boolean {
+  public isFeatureEnabled(featureName: string, thing?: any): boolean {
     return this.feature(featureName).isEnabled(thing)
   }
 
-  enable(featureName: string) {
+  public enable(featureName: string) {
     this.feature(featureName).enable()
     return true
   }
 
-  enableActor(featureName: string, actor: Actor) {
+  public enableActor(featureName: string, actor: IActor) {
     this.feature(featureName).enableActor(actor)
     return true
   }
 
-  enablePercentageOfActors(featureName: string, percentage: number) {
+  public enablePercentageOfActors(featureName: string, percentage: number) {
     this.feature(featureName).enablePercentageOfActors(percentage)
   }
 
-  disable(featureName: string) {
+  public disable(featureName: string) {
     this.feature(featureName).disable()
     return true
   }
 
-  disableActor(featureName: string, actor: Actor) {
+  public disableActor(featureName: string, actor: IActor) {
     this.feature(featureName).disableActor(actor)
     return true
   }
 
-  feature(featureName: string) {
-    let feature = this._memoized_features[featureName]
+  public feature(featureName: string) {
+    let feature = this.memoizedFeatures[featureName]
 
-    if(feature === undefined) {
+    if (feature === undefined) {
       feature = new Feature(featureName, this.adapter)
     }
 
@@ -54,4 +53,4 @@ class Dsl {
   }
 }
 
-export default Dsl;
+export default Dsl

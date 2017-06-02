@@ -1,11 +1,11 @@
 import BooleanType from './BooleanType'
-import Gate from './Gate'
 import FeatureCheckContext from './FeatureCheckContext'
+import { IGate } from './interfaces'
 
-class BooleanGate implements Gate {
-  name: string
-  key: string
-  dataType: string
+class BooleanGate implements IGate {
+  public name: string
+  public key: string
+  public dataType: string
 
   constructor() {
     this.name = 'boolean'
@@ -13,18 +13,18 @@ class BooleanGate implements Gate {
     this.dataType = 'boolean'
   }
 
-  isOpen(context: FeatureCheckContext): boolean {
+  public isOpen(context: FeatureCheckContext): boolean {
     return context.booleanValue === true
   }
 
-  protectsThing(thing: any) {
-    if(thing instanceof BooleanType) { return true }
-    if(thing === true) { return true }
-    if(thing === false) { return true }
+  public protectsThing(thing: any) {
+    if (thing instanceof BooleanType) { return true }
+    if (thing === true) { return true }
+    if (thing === false) { return true }
     return false
   }
 
-  wrap(thing: any) {
+  public wrap(thing: any) {
     return BooleanType.wrap(thing)
   }
 }

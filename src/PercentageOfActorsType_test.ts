@@ -1,5 +1,5 @@
-import { assert, suite, test } from './test_helper'
 import PercentageOfActorsType from './PercentageOfActorsType'
+import { assert, suite, test } from './test_helper'
 
 const percentage = 50
 const wrapped = PercentageOfActorsType.wrap(percentage)
@@ -14,10 +14,10 @@ suite('PercentageOfActorsType', () => {
   })
 
   test('throws exception if percentage is out of bounds', () => {
-    const below = function() {
+    const below = () => {
       PercentageOfActorsType.wrap(-1)
     }
-    const above = function() {
+    const above = () => {
       PercentageOfActorsType.wrap(101)
     }
     assert.throws(below, 'value must be a positive number less than or equal to 100, but was -1')

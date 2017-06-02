@@ -1,7 +1,7 @@
-import { assert, suite, test } from './test_helper'
-import Flipper from './Flipper'
 import Dsl from './Dsl'
+import Flipper from './Flipper'
 import MemoryAdapter from './MemoryAdapter'
+import { assert, suite, test } from './test_helper'
 
 suite('Flipper', () => {
   test('constructor returns Dsl instance', () => {

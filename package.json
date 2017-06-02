@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@types/crc": "^3.4.0",
-    "crc": "^3.4.4"
+    "crc": "^3.4.4",
+    "tslint": "^5.4.2"
   }
 }

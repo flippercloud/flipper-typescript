@@ -1,20 +1,20 @@
 class Typecast {
-  static  truthMap = {
-    'true': true,
-    '1': true
-  }
-
-  static toBoolean(value) {
+  public static toBoolean(value) {
     return !!this.truthMap[value]
   }
 
-  static toSet(value) {
-    if(value instanceof Set) { return value }
+  public static toSet(value) {
+    if (value instanceof Set) { return value }
     return new Set(value)
   }
 
-  static toNumber(value) {
+  public static toNumber(value) {
     return parseInt(value, 10)
+  }
+
+  private static truthMap = {
+    true: true,
+    1: true,
   }
 }
 

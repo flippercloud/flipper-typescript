@@ -1,7 +1,7 @@
-import { assert, makeActor, suite, test } from './test_helper'
 import Dsl from './Dsl'
+import { IActor } from './interfaces'
 import MemoryAdapter from './MemoryAdapter'
-import { Actor } from './interfaces'
+import { assert, makeActor, suite, test } from './test_helper'
 
 let dsl: Dsl
 

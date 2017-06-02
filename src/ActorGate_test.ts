@@ -1,5 +1,5 @@
-import { assert, suite, test } from './test_helper'
 import ActorGate from './ActorGate'
+import { assert, suite, test } from './test_helper'
 
 const gate = new ActorGate()
 
