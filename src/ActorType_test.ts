@@ -1,5 +1,5 @@
-import { assert, makeActor, suite, test } from './test_helper'
 import ActorType from './ActorType'
+import { assert, makeActor, suite, test } from './test_helper'
 
 const actor = makeActor(1)
 const wrapped = ActorType.wrap(actor)

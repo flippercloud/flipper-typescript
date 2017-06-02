@@ -1,7 +1,7 @@
-import { assert, makeActor, suite, test } from './test_helper'
 import Feature from './Feature'
+import { IActor } from './interfaces'
 import MemoryAdapter from './MemoryAdapter'
-import { Actor } from './interfaces'
+import { assert, makeActor, suite, test } from './test_helper'
 
 let adapter: MemoryAdapter
 let feature: Feature
@@ -14,10 +14,6 @@ suite('Feature', () => {
 
   test('has name', () => {
     assert.equal(feature.name, 'feature-1')
-  })
-
-  test('has adapter', () => {
-    assert.equal(feature.adapter, adapter)
   })
 
   test('enable and disable feature', () => {

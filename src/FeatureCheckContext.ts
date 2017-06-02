@@ -1,7 +1,7 @@
 class FeatureCheckContext {
-  featureName: string
-  values: any
-  thing: any
+  public featureName: string
+  public values: any
+  public thing: any
 
   constructor(featureName: string, values: any, thing: any) {
     this.featureName = featureName

@@ -1,18 +1,17 @@
-import {crc32} from 'crc'
-import { Actor } from './interfaces'
+import { crc32 } from 'crc'
 import ActorType from './ActorType'
-import Gate from './Gate'
 import FeatureCheckContext from './FeatureCheckContext'
+import { IActor, IGate } from './interfaces'
 import PercentageOfActorsType from './PercentageOfActorsType'
 
-function instanceOfActor(thing: any): thing is Actor {
+function instanceOfActor(thing: any): thing is IActor {
   return 'flipperId' in thing
 }
 
-class PercentageOfActorsGate implements Gate {
-  name: string
-  key: string
-  dataType: string
+class PercentageOfActorsGate implements IGate {
+  public name: string
+  public key: string
+  public dataType: string
 
   constructor() {
     this.name = 'percentageOfActors'
@@ -20,12 +19,12 @@ class PercentageOfActorsGate implements Gate {
     this.dataType = 'number'
   }
 
-  isOpen(context: FeatureCheckContext): boolean {
+  public isOpen(context: FeatureCheckContext): boolean {
     let usable = false
-    if(typeof(context.thing) === 'undefined') { return false }
-    if(!usable && context.thing instanceof ActorType) { usable = true }
-    if(!usable && instanceOfActor(context.thing)) { usable = true }
-    if(!usable) { return false }
+    if (typeof(context.thing) === 'undefined') { return false }
+    if (!usable && context.thing instanceof ActorType) { usable = true }
+    if (!usable && instanceOfActor(context.thing)) { usable = true }
+    if (!usable) { return false }
 
     const actorType = ActorType.wrap(context.thing)
     const percentage = context.percentageOfActorsValue
@@ -33,12 +32,12 @@ class PercentageOfActorsGate implements Gate {
     return crc32(id).valueOf() % 100 < percentage
   }
 
-  protectsThing(thing: any) {
-    if(thing instanceof PercentageOfActorsType) { return true }
+  public protectsThing(thing: any) {
+    if (thing instanceof PercentageOfActorsType) { return true }
     return false
   }
 
-  wrap(thing: any) {
+  public wrap(thing: any) {
     return PercentageOfActorsType.wrap(thing)
   }
 }
