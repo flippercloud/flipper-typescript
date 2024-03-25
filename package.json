@@ -5,19 +5,19 @@
   "author": "Jonathan Hoyt",
   "license": "MIT",
   "devDependencies": {
-    "@types/chai": "^3.5.2",
-    "@types/mocha": "^2.2.41",
-    "chai": "^3.5.0",
-    "mocha": "^3.3.0",
-    "ts-node": "^3.0.4",
+    "@types/chai": "^4.3.14",
+    "@types/mocha": "^10.0.6",
+    "chai": "^5.1.0",
+    "mocha": "^10.3.0",
+    "ts-node": "^10.9.2",
     "typings": "^2.1.1"
   },
   "scripts": {
     "test": "mocha -u tdd -r ts-node/register src/**/*_test.ts"
   },
   "dependencies": {
-    "@types/crc": "^3.4.0",
-    "crc": "^3.4.4",
-    "tslint": "^5.4.2"
+    "@types/crc": "^3.8.3",
+    "crc": "^4.3.2",
+    "tslint": "^5.20.1"
   }
 }
