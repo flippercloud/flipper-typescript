@@ -4,20 +4,16 @@
   "version": "0.0.1",
   "author": "Jonathan Hoyt",
   "license": "MIT",
-  "devDependencies": {
-    "@types/chai": "^4.3.14",
-    "@types/mocha": "^10.0.6",
-    "chai": "^5.1.0",
-    "mocha": "^10.3.0",
-    "ts-node": "^10.9.2",
-    "typings": "^2.1.1"
-  },
   "scripts": {
     "test": "mocha -u tdd -r ts-node/register src/**/*_test.ts"
   },
   "dependencies": {
+    "crc": "^4.3.2"
+  },
+  "devDependencies": {
     "@types/crc": "^3.8.3",
-    "crc": "^4.3.2",
-    "tslint": "^5.20.1"
+    "ts-node": "^10.9.2",
+    "tslint": "^5.20.1",
+    "typings": "^2.1.1"
   }
 }
