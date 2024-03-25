@@ -1,35 +1,35 @@
 import Feature from './Feature'
 import { IActor } from './interfaces'
 import MemoryAdapter from './MemoryAdapter'
-import { assert, makeActor, suite, test } from './test_helper'
+import { makeActor } from './test_helper'
 
 let adapter: MemoryAdapter
 let feature: Feature
 
-suite('Feature', () => {
-  setup(() => {
+describe('Feature', () => {
+  beforeEach(() => {
     adapter = new MemoryAdapter()
-    feature = new Feature('feature-1', adapter)
+    feature = new Feature('feature-1', adapter, {})
   })
 
   test('has name', () => {
-    assert.equal(feature.name, 'feature-1')
+    expect(feature.name).toEqual('feature-1')
   })
 
   test('enable and disable feature', () => {
-    assert.equal(feature.isEnabled(), false)
+    expect(feature.isEnabled()).toEqual(false)
     feature.enable()
-    assert.equal(feature.isEnabled(), true)
+    expect(feature.isEnabled()).toEqual(true)
     feature.disable()
-    assert.equal(feature.isEnabled(), false)
+    expect(feature.isEnabled()).toEqual(false)
   })
 
   test('enable and disable feature for actor', () => {
     const actor = makeActor(5)
-    assert.equal(feature.isEnabled(actor), false)
+    expect(feature.isEnabled(actor)).toEqual(false)
     feature.enableActor(actor)
-    assert.equal(feature.isEnabled(actor), true)
+    expect(feature.isEnabled(actor)).toEqual(true)
     feature.disableActor(actor)
-    assert.equal(feature.isEnabled(actor), false)
+    expect(feature.isEnabled(actor)).toEqual(false)
   })
 })

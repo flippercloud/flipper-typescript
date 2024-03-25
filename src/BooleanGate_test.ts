@@ -1,12 +1,11 @@
 import BooleanGate from './BooleanGate'
-import { assert, suite, test } from './test_helper'
 
 const gate = new BooleanGate()
 
-suite('BooleanGate', () => {
+describe('BooleanGate', () => {
   test('has name, key, and dataType', () => {
-    assert.equal(gate.name, 'boolean')
-    assert.equal(gate.key, 'boolean')
-    assert.equal(gate.dataType, 'boolean')
+    expect(gate.name).toBe('boolean')
+    expect(gate.key).toBe('boolean')
+    expect(gate.dataType).toBe('boolean')
   })
 })

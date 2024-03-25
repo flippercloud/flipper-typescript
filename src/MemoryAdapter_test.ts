@@ -1,4 +1,3 @@
-import { assert, suite, test } from './test_helper'
 import MemoryAdapter from './MemoryAdapter'
 import BooleanGate from './BooleanGate'
 import Feature from './Feature'
@@ -6,25 +5,25 @@ import Feature from './Feature'
 let adapter: MemoryAdapter
 let feature: Feature
 
-suite('MemoryAdapter', () => {
-  setup(() => {
+describe('MemoryAdapter', () => {
+  beforeEach(() => {
     adapter = new MemoryAdapter()
-    feature = new Feature('feature-1', adapter)
+    feature = new Feature('feature-1', adapter, {})
   })
 
   test('has a name', () => {
-    assert.equal(adapter.name, 'memory')
+    expect(adapter.name).toBe('memory')
   })
 
   test('starts with no features', () => {
-    assert.typeOf(adapter.features(), 'array')
-    assert.lengthOf(adapter.features(), 0)
+    expect(adapter.features()).toBeInstanceOf(Array)
+    expect(adapter.features()).toHaveLength(0)
   })
 
   test('adds feature', () => {
     adapter.add(feature)
-    assert.lengthOf(adapter.features(), 1)
-    assert.equal(adapter.features()[0], feature)
+    expect(adapter.features()).toHaveLength(1)
+    expect(adapter.features()[0]).toBe(feature)
   })
 
   test('adds and removes feature and clears feature gates', () => {
@@ -32,14 +31,14 @@ suite('MemoryAdapter', () => {
     const gate = new BooleanGate()
     adapter.add(feature)
     adapter.enable(feature, gate, true)
-    assert.lengthOf(adapter.features(), 1)
+    expect(adapter.features()).toHaveLength(1)
     gates = adapter.get(feature)
-    assert.equal(gates['boolean'], 'true')
+    expect(gates['boolean']).toBe('true')
     adapter.remove(feature)
-    assert.lengthOf(adapter.features(), 0)
+    expect(adapter.features()).toHaveLength(0)
     gates = adapter.get(feature)
-    assert.equal(gates['boolean'], undefined)
-    assert.lengthOf(Object.keys(gates['actors']), 0)
+    expect(gates['boolean']).toBeUndefined()
+    expect(Object.keys(gates['actors'])).toHaveLength(0)
   })
 
   test('gets, enables, disables, and clears boolean feature gate', () => {
@@ -47,13 +46,13 @@ suite('MemoryAdapter', () => {
     const gate = new BooleanGate()
     adapter.enable(feature, gate, true)
     gates = adapter.get(feature)
-    assert.equal(gates['boolean'], 'true')
+    expect(gates['boolean']).toBe('true')
     adapter.disable(feature, gate, true)
     gates = adapter.get(feature)
-    assert.equal(gates['boolean'], undefined)
+    expect(gates['boolean']).toBeUndefined()
     adapter.clear(feature)
     gates = adapter.get(feature)
-    assert.equal(gates['boolean'], undefined)
-    assert.lengthOf(Object.keys(gates['actors']), 0)
+    expect(gates['boolean']).toBeUndefined()
+    expect(Object.keys(gates['actors'])).toHaveLength(0)
   })
 })

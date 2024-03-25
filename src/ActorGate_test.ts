@@ -1,12 +1,11 @@
 import ActorGate from './ActorGate'
-import { assert, suite, test } from './test_helper'
 
 const gate = new ActorGate()
 
-suite('ActorGate', () => {
+describe('ActorGate', () => {
   test('has name, key, and dataType', () => {
-    assert.equal(gate.name, 'actor')
-    assert.equal(gate.key, 'actors')
-    assert.equal(gate.dataType, 'set')
+    expect(gate.name).toEqual('actor')
+    expect(gate.key).toEqual('actors')
+    expect(gate.dataType).toEqual('set')
   })
 })

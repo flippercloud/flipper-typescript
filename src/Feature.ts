@@ -14,7 +14,7 @@ import PercentageOfTimeType from './PercentageOfTimeType'
 class Feature {
   public name: string
   public key: string
-  public gates: [IGate]
+  public gates: [ActorGate, BooleanGate, GroupGate, PercentageOfActorsGate, PercentageOfTimeGate]
   private adapter: IAdapter
 
   constructor(name: string, adapter: IAdapter, groups: any) {
