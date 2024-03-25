@@ -3,13 +3,9 @@
   "extends": ["tslint:latest"],
   "jsRules": {},
   "rules": {
-    // use single quotes
     "quotemark": [true, "single"],
-    // I prefer no semi colons :)
     "semicolon": [true, "never"],
-    // This rule enforces objects to always have keys in alphabetical order
     "object-literal-sort-keys": false,
-    // Disallows the use of require statements except in import statements
     "no-var-requires": false
   },
   "rulesDirectory": []
