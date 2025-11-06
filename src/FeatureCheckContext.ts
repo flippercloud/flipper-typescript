@@ -1,9 +1,11 @@
+import GateValues from './GateValues'
+
 class FeatureCheckContext {
   public featureName: string
-  public values: any
-  public thing: any
+  public values: GateValues
+  public thing: unknown
 
-  constructor(featureName: string, values: any, thing: any) {
+  constructor(featureName: string, values: GateValues, thing: unknown) {
     this.featureName = featureName
     this.values = values
     this.thing = thing

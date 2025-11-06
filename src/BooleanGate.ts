@@ -1,6 +1,6 @@
 import BooleanType from './BooleanType'
 import FeatureCheckContext from './FeatureCheckContext'
-import { IGate } from './interfaces'
+import { IGate, IType } from './interfaces'
 
 class BooleanGate implements IGate {
   public name: string
@@ -17,14 +17,14 @@ class BooleanGate implements IGate {
     return context.booleanValue === true
   }
 
-  public protectsThing(thing: any) {
+  public protectsThing(thing: unknown): boolean {
     if (thing instanceof BooleanType) { return true }
     if (thing === true) { return true }
     if (thing === false) { return true }
     return false
   }
 
-  public wrap(thing: any) {
+  public wrap(thing: unknown): IType {
     return BooleanType.wrap(thing)
   }
 }

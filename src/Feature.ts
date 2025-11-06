@@ -5,7 +5,7 @@ import FeatureCheckContext from './FeatureCheckContext'
 import GateValues from './GateValues'
 import GroupGate from './GroupGate'
 import GroupType from './GroupType'
-import { IActor, IAdapter, IGate } from './interfaces'
+import { IActor, IAdapter } from './interfaces'
 import PercentageOfActorsGate from './PercentageOfActorsGate'
 import PercentageOfActorsType from './PercentageOfActorsType'
 import PercentageOfTimeGate from './PercentageOfTimeGate'
@@ -14,10 +14,10 @@ import PercentageOfTimeType from './PercentageOfTimeType'
 class Feature {
   public name: string
   public key: string
-  public gates: [ActorGate, BooleanGate, GroupGate, PercentageOfActorsGate, PercentageOfTimeGate]
+  public gates: Array<ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate>
   private adapter: IAdapter
 
-  constructor(name: string, adapter: IAdapter, groups: any) {
+  constructor(name: string, adapter: IAdapter, groups: Record<string, GroupType>) {
     this.name = name
     this.key = name
     this.adapter = adapter
@@ -30,10 +30,11 @@ class Feature {
     ]
   }
 
-  public enable(thing?: any) {
+  public enable(thing?: unknown): boolean {
     if (thing === undefined || thing === null) { thing = true }
     this.adapter.add(this)
     const gate = this.gateFor(thing)
+    if (!gate) { throw new Error('No gate found for thing') }
     const thingType = gate.wrap(thing)
     return this.adapter.enable(this, gate, thingType)
   }
@@ -54,10 +55,11 @@ class Feature {
     return this.enable(PercentageOfTimeType.wrap(percentage))
   }
 
-  public disable(thing?: any) {
+  public disable(thing?: unknown): boolean {
     if (thing === undefined || thing === null) { thing = true }
     this.adapter.add(this)
     const gate = this.gateFor(thing)
+    if (!gate) { throw new Error('No gate found for thing') }
     const thingType = gate.wrap(thing)
     return this.adapter.disable(this, gate, thingType)
   }
@@ -70,13 +72,14 @@ class Feature {
     return this.disable(GroupType.wrap(groupName))
   }
 
-  public isEnabled(thing?: any) {
+  public isEnabled(thing?: unknown): boolean {
     const values = this.gateValues()
     let isEnabled = false
 
     this.gates.some((gate) => {
-      let thingType = thing
-      if (typeof(thingType) !== 'undefined') { thingType = this.gate('actor').wrap(thing) }
+      let thingType: unknown = thing
+      const actorGate = this.gate('actor')
+      if (typeof(thingType) !== 'undefined' && actorGate) { thingType = actorGate.wrap(thing) }
       const context = new FeatureCheckContext(this.name, values, thingType)
       const isOpen = gate.isOpen(context)
       if (isOpen) { isEnabled = true }
@@ -90,8 +93,8 @@ class Feature {
     return new GateValues(this.adapter.get(this))
   }
 
-  private gateFor(thing: any) {
-    let returnGate
+  private gateFor(thing: unknown): ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate | undefined {
+    let returnGate: ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate | undefined
 
     this.gates.some((gate) => {
       const protectsThing = gate.protectsThing(thing)
@@ -102,7 +105,7 @@ class Feature {
     return returnGate
   }
 
-  private gate(name: string) {
+  private gate(name: string): ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate | undefined {
     return this.gates.find((gate) => {
       return gate.name === name
     })

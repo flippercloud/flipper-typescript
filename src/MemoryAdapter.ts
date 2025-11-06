@@ -1,12 +1,14 @@
 import Feature from './Feature'
-import { IGate } from './interfaces'
+import { IGate, IType } from './interfaces'
 
 interface IFeatures {
   [index: string]: Feature
 }
 
+type StorageValue = string | Set<string> | undefined
+
 interface IFeatureGates {
-  [index: string]: any
+  [index: string]: StorageValue
 }
 
 class MemoryAdapter {
@@ -20,10 +22,10 @@ class MemoryAdapter {
     this.sourceStore = {}
   }
 
-  public features() {
-    return Object.keys(this.featuresStore).map((key, _) => {
-      return this.featuresStore[key]
-    })
+  public features(): Feature[] {
+    return Object.keys(this.featuresStore)
+      .map((key) => this.featuresStore[key])
+      .filter((feature): feature is Feature => feature !== undefined)
   }
 
   public add(feature: Feature) {
@@ -39,8 +41,8 @@ class MemoryAdapter {
     return true
   }
 
-  public get(feature: Feature) {
-    const result = {}
+  public get(feature: Feature): Record<string, unknown> {
+    const result: Record<string, unknown> = {}
 
     feature.gates.forEach((gate) => {
       switch (gate.dataType) {
@@ -57,7 +59,7 @@ class MemoryAdapter {
           break
         }
         default: {
-          throw new Error(`${gate} is not supported by this adapter yet`)
+          throw new Error(`${gate.name} is not supported by this adapter yet`)
         }
       }
     })
@@ -65,7 +67,7 @@ class MemoryAdapter {
     return result
   }
 
-  public enable(feature: Feature, gate: IGate, thing: any) {
+  public enable(feature: Feature, gate: IGate, thing: IType): boolean {
     switch (gate.dataType) {
       case 'boolean': {
         this.write(this.key(feature, gate), String(true))
@@ -80,13 +82,13 @@ class MemoryAdapter {
         break
       }
       default: {
-        throw new Error(`${gate} is not supported by this adapter yet`)
+        throw new Error(`${gate.name} is not supported by this adapter yet`)
       }
     }
     return true
   }
 
-  public disable(feature: Feature, gate: IGate, thing: any) {
+  public disable(feature: Feature, gate: IGate, thing: IType): boolean {
     switch (gate.dataType) {
       case 'boolean': {
         this.clear(feature)
@@ -101,7 +103,7 @@ class MemoryAdapter {
         break
       }
       default: {
-        throw new Error(`${gate} is not supported by this adapter yet`)
+        throw new Error(`${gate.name} is not supported by this adapter yet`)
       }
     }
     return true
@@ -118,7 +120,7 @@ class MemoryAdapter {
     return `${feature.key}/${gate.key}`
   }
 
-  private read(key: string) {
+  private read(key: string): StorageValue {
     return this.sourceStore[key]
   }
 
@@ -130,23 +132,30 @@ class MemoryAdapter {
     delete this.sourceStore[key]
   }
 
-  private setAdd(key: string, value: string) {
+  private setAdd(key: string, value: string): void {
     this.ensure_set_initialized(key)
-    this.sourceStore[key].add(value)
+    const set = this.sourceStore[key]
+    if (set instanceof Set) {
+      set.add(value)
+    }
   }
 
-  private setDelete(key: string, value: string) {
+  private setDelete(key: string, value: string): void {
     this.ensure_set_initialized(key)
-    this.sourceStore[key].delete(value)
+    const set = this.sourceStore[key]
+    if (set instanceof Set) {
+      set.delete(value)
+    }
   }
 
-  private setMembers(key: string) {
+  private setMembers(key: string): Set<string> {
     this.ensure_set_initialized(key)
-    return this.sourceStore[key]
+    const set = this.sourceStore[key]
+    return set instanceof Set ? set : new Set()
   }
 
-  private ensure_set_initialized(key: string) {
-    if (this.sourceStore[key] === undefined) {
+  private ensure_set_initialized(key: string): void {
+    if (!(this.sourceStore[key] instanceof Set)) {
       this.sourceStore[key] = new Set()
     }
   }
