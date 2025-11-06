@@ -171,6 +171,29 @@ class Feature {
     return this.adapter.clear(this)
   }
 
+  public enabledGates(): Array<ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate> {
+    const values = this.gateValues()
+    return this.gates.filter(gate => {
+      const gateKey = gate.key as keyof GateValues
+      const value: boolean | Set<string> | number = values[gateKey]
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      return gate.isEnabled(value)
+    })
+  }
+
+  public disabledGates(): Array<ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate> {
+    const enabled = this.enabledGates()
+    return this.gates.filter(gate => !enabled.includes(gate))
+  }
+
+  public enabledGateNames(): string[] {
+    return this.enabledGates().map(gate => gate.name)
+  }
+
+  public disabledGateNames(): string[] {
+    return this.disabledGates().map(gate => gate.name)
+  }
+
   private gateValues() {
     return new GateValues(this.adapter.get(this))
   }

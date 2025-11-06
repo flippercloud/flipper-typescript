@@ -433,4 +433,118 @@ describe('Feature', () => {
       })
     })
   })
+
+  describe('gate access methods', () => {
+    describe('enabledGates', () => {
+      test('returns empty array when no gates enabled', () => {
+        expect(feature.enabledGates()).toEqual([])
+      })
+
+      test('returns array with boolean gate when fully enabled', () => {
+        feature.enable()
+        const enabled = feature.enabledGates()
+        expect(enabled).toHaveLength(1)
+        expect(enabled[0]?.name).toEqual('boolean')
+      })
+
+      test('returns array with actor gate when actor enabled', () => {
+        feature.enableActor(makeActor(1))
+        const enabled = feature.enabledGates()
+        expect(enabled).toHaveLength(1)
+        expect(enabled[0]?.name).toEqual('actor')
+      })
+
+      test('returns array with group gate when group enabled', () => {
+        feature.enableGroup('admins')
+        const enabled = feature.enabledGates()
+        expect(enabled).toHaveLength(1)
+        expect(enabled[0]?.name).toEqual('group')
+      })
+
+      test('returns array with percentage of actors gate when enabled', () => {
+        feature.enablePercentageOfActors(25)
+        const enabled = feature.enabledGates()
+        expect(enabled).toHaveLength(1)
+        expect(enabled[0]?.name).toEqual('percentageOfActors')
+      })
+
+      test('returns array with percentage of time gate when enabled', () => {
+        feature.enablePercentageOfTime(50)
+        const enabled = feature.enabledGates()
+        expect(enabled).toHaveLength(1)
+        expect(enabled[0]?.name).toEqual('percentageOfTime')
+      })
+
+      test('returns multiple gates when multiple enabled', () => {
+        feature.enableActor(makeActor(1))
+        feature.enableGroup('admins')
+        feature.enablePercentageOfActors(25)
+        const enabled = feature.enabledGates()
+        expect(enabled).toHaveLength(3)
+        const names = enabled.map(g => g.name)
+        expect(names).toContain('actor')
+        expect(names).toContain('group')
+        expect(names).toContain('percentageOfActors')
+      })
+    })
+
+    describe('disabledGates', () => {
+      test('returns all gates when none enabled', () => {
+        const disabled = feature.disabledGates()
+        expect(disabled).toHaveLength(5)
+      })
+
+      test('returns 4 gates when boolean enabled', () => {
+        feature.enable()
+        const disabled = feature.disabledGates()
+        expect(disabled).toHaveLength(4)
+        const names = disabled.map(g => g.name)
+        expect(names).not.toContain('boolean')
+      })
+
+      test('returns empty array when all gates enabled', () => {
+        feature.enable()
+        feature.enableActor(makeActor(1))
+        feature.enableGroup('admins')
+        feature.enablePercentageOfActors(25)
+        feature.enablePercentageOfTime(50)
+        const disabled = feature.disabledGates()
+        expect(disabled).toEqual([])
+      })
+    })
+
+    describe('enabledGateNames', () => {
+      test('returns empty array when no gates enabled', () => {
+        expect(feature.enabledGateNames()).toEqual([])
+      })
+
+      test('returns gate names when enabled', () => {
+        feature.enableActor(makeActor(1))
+        feature.enableGroup('admins')
+        expect(feature.enabledGateNames()).toEqual(['actor', 'group'])
+      })
+    })
+
+    describe('disabledGateNames', () => {
+      test('returns all gate names when none enabled', () => {
+        const names = feature.disabledGateNames()
+        expect(names).toHaveLength(5)
+        expect(names).toContain('actor')
+        expect(names).toContain('boolean')
+        expect(names).toContain('group')
+        expect(names).toContain('percentageOfActors')
+        expect(names).toContain('percentageOfTime')
+      })
+
+      test('returns remaining gate names when some enabled', () => {
+        feature.enable()
+        feature.enableActor(makeActor(1))
+        const names = feature.disabledGateNames()
+        expect(names).toHaveLength(3)
+        expect(names).toContain('group')
+        expect(names).toContain('percentageOfActors')
+        expect(names).toContain('percentageOfTime')
+      })
+    })
+  })
 })
