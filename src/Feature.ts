@@ -89,6 +89,42 @@ class Feature {
     return isEnabled
   }
 
+  public state(): 'on' | 'off' | 'conditional' {
+    const values = this.gateValues()
+    const booleanGate = this.gate('boolean')
+    const nonBooleanGates = this.gates.filter(gate => gate !== booleanGate)
+
+    // Fully on if boolean gate is enabled or percentage of time is 100
+    if (values.boolean || values.percentageOfTime === 100) {
+      return 'on'
+    }
+
+    // Conditional if any non-boolean gate is enabled
+    const hasEnabledNonBooleanGate = nonBooleanGates.some(gate => {
+      const gateKey = gate.key as keyof GateValues
+      const value = values[gateKey]
+      return gate.isEnabled(value)
+    })
+
+    if (hasEnabledNonBooleanGate) {
+      return 'conditional'
+    }
+
+    return 'off'
+  }
+
+  public isOn(): boolean {
+    return this.state() === 'on'
+  }
+
+  public isOff(): boolean {
+    return this.state() === 'off'
+  }
+
+  public isConditional(): boolean {
+    return this.state() === 'conditional'
+  }
+
   private gateValues() {
     return new GateValues(this.adapter.get(this))
   }

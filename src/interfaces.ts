@@ -20,6 +20,7 @@ export interface IGate {
   key: string
   dataType: string
   isOpen: (context: FeatureCheckContext) => boolean
+  isEnabled: (value: unknown) => boolean
   protectsThing: (thing: unknown) => boolean
   wrap: (thing: unknown) => IType
 }

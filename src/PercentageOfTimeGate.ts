@@ -13,6 +13,10 @@ class PercentageOfTimeGate implements IGate {
     this.dataType = 'number'
   }
 
+  public isEnabled(value: unknown): boolean {
+    return typeof value === 'number' && value > 0
+  }
+
   public isOpen(context: FeatureCheckContext): boolean {
     return Math.random() < (context.percentageOfTimeValue / 100)
   }
