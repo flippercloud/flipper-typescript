@@ -1,6 +1,6 @@
 import ActorType from './ActorType'
 import FeatureCheckContext from './FeatureCheckContext'
-import { IGate } from './interfaces'
+import { IGate, IType } from './interfaces'
 
 class ActorGate implements IGate {
   public name: string
@@ -33,7 +33,7 @@ class ActorGate implements IGate {
     return false
   }
 
-  public wrap(thing: unknown) {
+  public wrap(thing: unknown): IType {
     return ActorType.wrap(thing)
   }
 }

@@ -154,8 +154,8 @@ class MemoryAdapter {
     return set instanceof Set ? set : new Set()
   }
 
-  private ensure_set_initialized(key: string) {
-    if (this.sourceStore[key] === undefined) {
+  private ensure_set_initialized(key: string): void {
+    if (!(this.sourceStore[key] instanceof Set)) {
       this.sourceStore[key] = new Set()
     }
   }

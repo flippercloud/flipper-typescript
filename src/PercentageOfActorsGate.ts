@@ -1,7 +1,7 @@
 import { crc32 } from 'crc'
 import ActorType from './ActorType'
 import FeatureCheckContext from './FeatureCheckContext'
-import { IActor, IGate } from './interfaces'
+import { IActor, IGate, IType } from './interfaces'
 import PercentageOfActorsType from './PercentageOfActorsType'
 
 function instanceOfActor(thing: unknown): thing is IActor {
@@ -37,7 +37,7 @@ class PercentageOfActorsGate implements IGate {
     return false
   }
 
-  public wrap(thing: unknown) {
+  public wrap(thing: unknown): IType {
     return PercentageOfActorsType.wrap(thing)
   }
 }

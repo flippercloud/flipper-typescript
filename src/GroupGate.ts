@@ -1,7 +1,7 @@
 import ActorType from './ActorType'
 import FeatureCheckContext from './FeatureCheckContext'
 import GroupType from './GroupType'
-import { IGate } from './interfaces'
+import { IGate, IType } from './interfaces'
 
 class GroupGate implements IGate {
   public name: string
@@ -41,7 +41,7 @@ class GroupGate implements IGate {
     return false
   }
 
-  public wrap(thing: unknown) {
+  public wrap(thing: unknown): IType {
     return GroupType.wrap(thing)
   }
 }

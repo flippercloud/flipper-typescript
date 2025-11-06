@@ -1,5 +1,5 @@
 import FeatureCheckContext from './FeatureCheckContext'
-import { IGate } from './interfaces'
+import { IGate, IType } from './interfaces'
 import PercentageOfTimeType from './PercentageOfTimeType'
 
 class PercentageOfTimeGate implements IGate {
@@ -22,7 +22,7 @@ class PercentageOfTimeGate implements IGate {
     return false
   }
 
-  public wrap(thing: unknown) {
+  public wrap(thing: unknown): IType {
     return PercentageOfTimeType.wrap(thing)
   }
 }
