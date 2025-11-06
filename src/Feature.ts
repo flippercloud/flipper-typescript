@@ -125,6 +125,26 @@ class Feature {
     return this.state() === 'conditional'
   }
 
+  public booleanValue(): boolean {
+    return this.gateValues().boolean
+  }
+
+  public actorsValue(): Set<string> {
+    return this.gateValues().actors
+  }
+
+  public groupsValue(): Set<string> {
+    return this.gateValues().groups
+  }
+
+  public percentageOfActorsValue(): number {
+    return this.gateValues().percentageOfActors
+  }
+
+  public percentageOfTimeValue(): number {
+    return this.gateValues().percentageOfTime
+  }
+
   private gateValues() {
     return new GateValues(this.adapter.get(this))
   }

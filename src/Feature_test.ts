@@ -172,4 +172,119 @@ describe('Feature', () => {
       })
     })
   })
+
+  describe('value retrieval methods', () => {
+    describe('booleanValue', () => {
+      test('returns false when feature is disabled', () => {
+        expect(feature.booleanValue()).toEqual(false)
+      })
+
+      test('returns true when feature is fully enabled', () => {
+        feature.enable()
+        expect(feature.booleanValue()).toEqual(true)
+      })
+
+      test('returns false when only actor is enabled', () => {
+        feature.enableActor(makeActor(1))
+        expect(feature.booleanValue()).toEqual(false)
+      })
+    })
+
+    describe('actorsValue', () => {
+      test('returns empty set when no actors enabled', () => {
+        expect(feature.actorsValue()).toEqual(new Set())
+      })
+
+      test('returns set with single actor id', () => {
+        const actor = makeActor(5)
+        feature.enableActor(actor)
+        expect(feature.actorsValue()).toEqual(new Set(['actor:5']))
+      })
+
+      test('returns set with multiple actor ids', () => {
+        feature.enableActor(makeActor(1))
+        feature.enableActor(makeActor(2))
+        feature.enableActor(makeActor(3))
+        expect(feature.actorsValue()).toEqual(new Set(['actor:1', 'actor:2', 'actor:3']))
+      })
+
+      test('reflects removal of actors', () => {
+        feature.enableActor(makeActor(1))
+        feature.enableActor(makeActor(2))
+        feature.disableActor(makeActor(1))
+        expect(feature.actorsValue()).toEqual(new Set(['actor:2']))
+      })
+    })
+
+    describe('groupsValue', () => {
+      test('returns empty set when no groups enabled', () => {
+        expect(feature.groupsValue()).toEqual(new Set())
+      })
+
+      test('returns set with single group name', () => {
+        feature.enableGroup('admins')
+        expect(feature.groupsValue()).toEqual(new Set(['admins']))
+      })
+
+      test('returns set with multiple group names', () => {
+        feature.enableGroup('admins')
+        feature.enableGroup('early_access')
+        feature.enableGroup('beta_testers')
+        expect(feature.groupsValue()).toEqual(new Set(['admins', 'early_access', 'beta_testers']))
+      })
+
+      test('reflects removal of groups', () => {
+        feature.enableGroup('admins')
+        feature.enableGroup('beta_testers')
+        feature.disableGroup('admins')
+        expect(feature.groupsValue()).toEqual(new Set(['beta_testers']))
+      })
+    })
+
+    describe('percentageOfActorsValue', () => {
+      test('returns 0 when not enabled', () => {
+        expect(feature.percentageOfActorsValue()).toEqual(0)
+      })
+
+      test('returns the percentage when enabled', () => {
+        feature.enablePercentageOfActors(25)
+        expect(feature.percentageOfActorsValue()).toEqual(25)
+      })
+
+      test('returns updated percentage when changed', () => {
+        feature.enablePercentageOfActors(10)
+        expect(feature.percentageOfActorsValue()).toEqual(10)
+        feature.enablePercentageOfActors(50)
+        expect(feature.percentageOfActorsValue()).toEqual(50)
+      })
+
+      test('returns 100 when fully enabled via percentage', () => {
+        feature.enablePercentageOfActors(100)
+        expect(feature.percentageOfActorsValue()).toEqual(100)
+      })
+    })
+
+    describe('percentageOfTimeValue', () => {
+      test('returns 0 when not enabled', () => {
+        expect(feature.percentageOfTimeValue()).toEqual(0)
+      })
+
+      test('returns the percentage when enabled', () => {
+        feature.enablePercentageOfTime(15)
+        expect(feature.percentageOfTimeValue()).toEqual(15)
+      })
+
+      test('returns updated percentage when changed', () => {
+        feature.enablePercentageOfTime(20)
+        expect(feature.percentageOfTimeValue()).toEqual(20)
+        feature.enablePercentageOfTime(75)
+        expect(feature.percentageOfTimeValue()).toEqual(75)
+      })
+
+      test('returns 100 when fully enabled via percentage', () => {
+        feature.enablePercentageOfTime(100)
+        expect(feature.percentageOfTimeValue()).toEqual(100)
+      })
+    })
+  })
 })
