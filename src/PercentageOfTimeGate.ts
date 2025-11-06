@@ -1,5 +1,5 @@
 import FeatureCheckContext from './FeatureCheckContext'
-import { IActor, IGate } from './interfaces'
+import { IGate } from './interfaces'
 import PercentageOfTimeType from './PercentageOfTimeType'
 
 class PercentageOfTimeGate implements IGate {
@@ -17,12 +17,12 @@ class PercentageOfTimeGate implements IGate {
     return Math.random() < (context.percentageOfTimeValue / 100)
   }
 
-  public protectsThing(thing: any) {
+  public protectsThing(thing: unknown): boolean {
     if (thing instanceof PercentageOfTimeType) { return true }
     return false
   }
 
-  public wrap(thing: any) {
+  public wrap(thing: unknown) {
     return PercentageOfTimeType.wrap(thing)
   }
 }

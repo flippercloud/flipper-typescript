@@ -1,5 +1,4 @@
 import Feature from './Feature'
-import { IActor } from './interfaces'
 import MemoryAdapter from './MemoryAdapter'
 import { makeActor } from './test_helper'
 

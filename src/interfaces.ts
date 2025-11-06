@@ -1,4 +1,5 @@
 import FeatureCheckContext from './FeatureCheckContext'
+import Feature from './Feature'
 
 export interface IActor {
   flipperId: string
@@ -6,12 +7,12 @@ export interface IActor {
 }
 
 export interface IAdapter {
-  features: any
-  add: any
-  remove: any
-  get: any
-  enable: any
-  disable: any
+  features: () => Feature[]
+  add: (feature: Feature) => boolean
+  remove: (feature: Feature) => boolean
+  get: (feature: Feature) => Record<string, unknown>
+  enable: (feature: Feature, gate: IGate, thing: IType) => boolean
+  disable: (feature: Feature, gate: IGate, thing: IType) => boolean
 }
 
 export interface IGate {
@@ -19,10 +20,12 @@ export interface IGate {
   key: string
   dataType: string
   isOpen: (context: FeatureCheckContext) => boolean
-  protectsThing: (thing: any) => boolean
-  wrap: (thing: any) => IType
+  protectsThing: (thing: unknown) => boolean
+  wrap: (thing: unknown) => IType
 }
 
 export interface IType {
   value: boolean | number | string
 }
+
+export type GroupCallback = (actor: IActor) => boolean

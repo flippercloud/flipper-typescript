@@ -1,15 +1,18 @@
 import { IType } from './interfaces'
 
 class BooleanType implements IType {
-  public static wrap(thing: boolean | BooleanType) {
+  public static wrap(thing: unknown): BooleanType {
     if (thing instanceof BooleanType) { return thing }
-    return new BooleanType(thing)
+    if (typeof thing === 'boolean') {
+      return new BooleanType(thing)
+    }
+    throw new Error('Invalid boolean type')
   }
 
   public value: boolean
 
-  constructor(thing: any) {
-    this.value = typeof(thing) === 'undefined' ? undefined : thing
+  constructor(thing: boolean) {
+    this.value = thing
   }
 }
 

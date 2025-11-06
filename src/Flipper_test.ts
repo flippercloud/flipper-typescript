@@ -1,4 +1,3 @@
-import Dsl from './Dsl'
 import Flipper from './Flipper'
 import MemoryAdapter from './MemoryAdapter'
 

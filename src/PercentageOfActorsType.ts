@@ -1,9 +1,12 @@
 import { IType } from './interfaces'
 
 class PercentageOfActorsType implements IType {
-  public static wrap(thing: number | PercentageOfActorsType): PercentageOfActorsType {
+  public static wrap(thing: unknown): PercentageOfActorsType {
     if (thing instanceof PercentageOfActorsType) { return thing }
-    return new PercentageOfActorsType(thing)
+    if (typeof thing === 'number') {
+      return new PercentageOfActorsType(thing)
+    }
+    throw new Error('Invalid percentage type')
   }
 
   public value: number

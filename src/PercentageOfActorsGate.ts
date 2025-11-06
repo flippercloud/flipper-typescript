@@ -4,8 +4,8 @@ import FeatureCheckContext from './FeatureCheckContext'
 import { IActor, IGate } from './interfaces'
 import PercentageOfActorsType from './PercentageOfActorsType'
 
-function instanceOfActor(thing: any): thing is IActor {
-  return 'flipperId' in thing
+function instanceOfActor(thing: unknown): thing is IActor {
+  return typeof thing === 'object' && thing !== null && 'flipperId' in thing
 }
 
 class PercentageOfActorsGate implements IGate {
@@ -32,12 +32,12 @@ class PercentageOfActorsGate implements IGate {
     return crc32(id).valueOf() % 100 < percentage
   }
 
-  public protectsThing(thing: any) {
+  public protectsThing(thing: unknown): boolean {
     if (thing instanceof PercentageOfActorsType) { return true }
     return false
   }
 
-  public wrap(thing: any) {
+  public wrap(thing: unknown) {
     return PercentageOfActorsType.wrap(thing)
   }
 }

@@ -1,9 +1,12 @@
 import { IType } from './interfaces'
 
 class PercentageOfTimeType implements IType {
-  public static wrap(thing: number | PercentageOfTimeType): PercentageOfTimeType {
+  public static wrap(thing: unknown): PercentageOfTimeType {
     if (thing instanceof PercentageOfTimeType) { return thing }
-    return new PercentageOfTimeType(thing)
+    if (typeof thing === 'number') {
+      return new PercentageOfTimeType(thing)
+    }
+    throw new Error('Invalid percentage type')
   }
 
   public value: number

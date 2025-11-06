@@ -7,7 +7,7 @@ class GateValues {
   public percentageOfActors: number
   public percentageOfTime: number
 
-  constructor(values: any) {
+  constructor(values: Record<string, unknown>) {
     this.boolean = Typecast.toBoolean(values.boolean)
     this.actors = Typecast.toSet(values.actors)
     this.groups = Typecast.toSet(values.groups)

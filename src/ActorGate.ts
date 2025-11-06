@@ -19,20 +19,21 @@ class ActorGate implements IGate {
     } else {
       if (this.protectsThing(context.thing)) {
         const enabledActors = context.actorsValue
-        return enabledActors.has(String(context.thing.value))
+        const actorType = context.thing as ActorType
+        return enabledActors.has(String(actorType.value))
       } else {
         return false
       }
     }
   }
 
-  public protectsThing(thing: any) {
+  public protectsThing(thing: unknown): boolean {
     if (thing instanceof ActorType) { return true }
-    if (typeof(thing) === 'object' && typeof(thing.flipperId) !== 'undefined') { return true }
+    if (typeof(thing) === 'object' && thing !== null && 'flipperId' in thing) { return true }
     return false
   }
 
-  public wrap(thing: any) {
+  public wrap(thing: unknown) {
     return ActorType.wrap(thing)
   }
 }

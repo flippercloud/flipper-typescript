@@ -1,23 +1,29 @@
 import ActorType from './ActorType'
 import FeatureCheckContext from './FeatureCheckContext'
-import { IType } from './interfaces'
+import { GroupCallback, IType } from './interfaces'
 
 class GroupType implements IType {
-  public static wrap(thing: string | GroupType): GroupType {
+  public static wrap(thing: unknown): GroupType {
     if (thing instanceof GroupType) { return thing }
-    return new GroupType(thing)
+    if (typeof thing === 'string') {
+      return new GroupType(thing)
+    }
+    throw new Error('Invalid group type')
   }
 
-  public callback: any
+  public callback?: GroupCallback
   public value: string
 
-  constructor(value: string, callback?: any) {
+  constructor(value: string, callback?: GroupCallback) {
     this.value = value
     this.callback = callback
   }
 
-  public isMatch(actorType: ActorType, context: FeatureCheckContext) {
-    return this.callback(actorType.thing)
+  public isMatch(actorType: ActorType, _context: FeatureCheckContext): boolean {
+    if (!this.callback) {
+      return false
+    }
+    return Boolean(this.callback(actorType.thing))
   }
 }
 

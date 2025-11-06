@@ -1,3 +1,4 @@
+import ActorType from './ActorType'
 import FeatureCheckContext from './FeatureCheckContext'
 import GroupType from './GroupType'
 import { IGate } from './interfaces'
@@ -6,9 +7,9 @@ class GroupGate implements IGate {
   public name: string
   public key: string
   public dataType: string
-  private groups: any
+  private groups: Record<string, GroupType>
 
-  constructor(groups: any) {
+  constructor(groups: Record<string, GroupType>) {
     this.name = 'group'
     this.key = 'groups'
     this.dataType = 'set'
@@ -24,7 +25,7 @@ class GroupGate implements IGate {
     groupNames.some((groupName) => {
       const groupType = this.groups[groupName]
 
-      if (groupType) {
+      if (groupType && context.thing instanceof ActorType) {
         groupMatch = groupType.isMatch(context.thing, context)
       }
 
@@ -34,13 +35,13 @@ class GroupGate implements IGate {
     return groupMatch
   }
 
-  public protectsThing(thing: any) {
+  public protectsThing(thing: unknown): boolean {
     if (thing instanceof GroupType) { return true }
     if (typeof(thing) === 'string') { return true }
     return false
   }
 
-  public wrap(thing: any) {
+  public wrap(thing: unknown) {
     return GroupType.wrap(thing)
   }
 }

@@ -20,7 +20,6 @@ describe('Dsl', () => {
 
   test('enables and disables the feature for actor', () => {
     const actor = makeActor(5)
-    const feature = dsl.feature('feature-1')
 
     dsl.enableActor('feature-1', actor)
     expect(dsl.isFeatureEnabled('feature-1', actor)).toBe(true)
@@ -29,7 +28,6 @@ describe('Dsl', () => {
   })
 
   test('enables feature for percentage of actors', () => {
-    const feature = dsl.feature('feature-1')
     dsl.enablePercentageOfActors('feature-1', 50)
 
     expect(dsl.isFeatureEnabled('feature-1', makeActor(5))).toBe(true)
@@ -37,7 +35,6 @@ describe('Dsl', () => {
   })
 
   test('enables feature for percentage of time', () => {
-    const feature = dsl.feature('feature-1')
     dsl.enablePercentageOfTime('feature-1', 50)
 
     let trueCount = 0
@@ -61,7 +58,6 @@ describe('Dsl', () => {
     }
     const admin = makeActor(1, true)
     const user = makeActor(2, false)
-    const feature = dsl.feature('feature-1')
     dsl.register(groupName, adminCheck)
 
     dsl.enableGroup('feature-1', groupName)
@@ -78,6 +74,6 @@ describe('Dsl', () => {
       return actor.isAdmin
     }
     dsl.register(groupName, adminCheck)
-    expect(dsl.groups[groupName].callback).toBe(adminCheck)
+    expect(dsl.groups[groupName]?.callback).toBe(adminCheck)
   })
 })

@@ -1,19 +1,19 @@
 import Feature from './Feature'
 import GroupType from './GroupType'
-import { IActor, IAdapter } from './interfaces'
+import { GroupCallback, IActor, IAdapter } from './interfaces'
 
 class Dsl {
   public adapter: IAdapter
-  public groups: {}
-  private memoizedFeatures: {}
+  public groups: Record<string, GroupType>
+  private memoizedFeatures: Record<string, Feature>
 
-  constructor(adapter) {
+  constructor(adapter: IAdapter) {
     this.adapter = adapter
     this.groups = {}
     this.memoizedFeatures = {}
   }
 
-  public isFeatureEnabled(featureName: string, thing?: any): boolean {
+  public isFeatureEnabled(featureName: string, thing?: unknown): boolean {
     return this.feature(featureName).isEnabled(thing)
   }
 
@@ -65,7 +65,7 @@ class Dsl {
     return feature
   }
 
-  public register(groupName: string, callback: any) {
+  public register(groupName: string, callback: GroupCallback): void {
     this.groups[groupName] = new GroupType(groupName, callback)
   }
 }
