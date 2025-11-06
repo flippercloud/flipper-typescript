@@ -110,7 +110,8 @@ class Feature {
     // Conditional if any non-boolean gate is enabled
     const hasEnabledNonBooleanGate = nonBooleanGates.some(gate => {
       const gateKey = gate.key as keyof GateValues
-      const value = values[gateKey]
+      const value: boolean | Set<string> | number = values[gateKey]
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       return gate.isEnabled(value)
     })
 
