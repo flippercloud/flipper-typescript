@@ -1,13 +1,5 @@
-import { assert } from 'chai'
-const { suite, test } = require('mocha')
+import { IActor } from './interfaces'
 
-function makeActor(id: number, isAdmin = false) {
+export function makeActor(id: number, isAdmin = false): IActor {
   return { flipperId: `actor:${id}`, isAdmin }
-}
-
-export {
-  assert,
-  makeActor,
-  test,
-  suite,
 }

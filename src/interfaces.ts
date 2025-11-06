@@ -2,6 +2,7 @@ import FeatureCheckContext from './FeatureCheckContext'
 
 export interface IActor {
   flipperId: string
+  isAdmin: boolean
 }
 
 export interface IAdapter {

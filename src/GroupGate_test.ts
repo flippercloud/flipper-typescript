@@ -1,12 +1,11 @@
 import GroupGate from './GroupGate'
-import { assert, suite, test } from './test_helper'
 
-const gate = new GroupGate()
+const gate = new GroupGate({})
 
-suite('GroupGate', () => {
+describe('GroupGate', () => {
   test('has name, key, and dataType', () => {
-    assert.equal(gate.name, 'group')
-    assert.equal(gate.key, 'groups')
-    assert.equal(gate.dataType, 'set')
+    expect(gate.name).toBe('group')
+    expect(gate.key).toBe('groups')
+    expect(gate.dataType).toBe('set')
   })
 })

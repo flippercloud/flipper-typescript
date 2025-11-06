@@ -1,15 +1,14 @@
 import GroupType from './GroupType'
-import { assert, suite, test } from './test_helper'
 
 const groupName = 'admins'
 const wrapped = GroupType.wrap(groupName)
 
-suite('GroupType', () => {
+describe('GroupType', () => {
   test('wraps group', () => {
-    assert.equal(groupName, wrapped.value)
+    expect(wrapped.value).toEqual(groupName)
   })
 
   test('does not wrap already wrapped group', () => {
-    assert.equal(wrapped, GroupType.wrap(wrapped))
+    expect(GroupType.wrap(wrapped)).toEqual(wrapped)
   })
 })

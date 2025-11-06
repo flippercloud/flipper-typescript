@@ -1,12 +1,11 @@
 import PercentageOfActorsGate from './PercentageOfActorsGate'
-import { assert, suite, test } from './test_helper'
 
 const gate = new PercentageOfActorsGate()
 
-suite('PercentageOfActorsGate', () => {
+describe('PercentageOfActorsGate', () => {
   test('has name, key, and dataType', () => {
-    assert.equal(gate.name, 'percentageOfActors')
-    assert.equal(gate.key, 'percentageOfActors')
-    assert.equal(gate.dataType, 'number')
+    expect(gate.name).toBe('percentageOfActors')
+    expect(gate.key).toBe('percentageOfActors')
+    expect(gate.dataType).toBe('number')
   })
 })
