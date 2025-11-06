@@ -72,6 +72,14 @@ class Feature {
     return this.disable(GroupType.wrap(groupName))
   }
 
+  public disablePercentageOfActors() {
+    return this.disable(PercentageOfActorsType.wrap(0))
+  }
+
+  public disablePercentageOfTime() {
+    return this.disable(PercentageOfTimeType.wrap(0))
+  }
+
   public isEnabled(thing?: unknown): boolean {
     const values = this.gateValues()
     let isEnabled = false

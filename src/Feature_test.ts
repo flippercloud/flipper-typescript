@@ -32,6 +32,51 @@ describe('Feature', () => {
     expect(feature.isEnabled(actor)).toEqual(false)
   })
 
+  describe('disablePercentageOfActors', () => {
+    test('sets percentage to 0', () => {
+      feature.enablePercentageOfActors(25)
+      expect(feature.percentageOfActorsValue()).toEqual(25)
+      feature.disablePercentageOfActors()
+      expect(feature.percentageOfActorsValue()).toEqual(0)
+    })
+
+    test('disables feature for actors', () => {
+      const actor = makeActor(5)
+      feature.enablePercentageOfActors(100)
+      expect(feature.isEnabled(actor)).toEqual(true)
+      feature.disablePercentageOfActors()
+      expect(feature.isEnabled(actor)).toEqual(false)
+    })
+
+    test('can be called when already disabled', () => {
+      expect(feature.percentageOfActorsValue()).toEqual(0)
+      feature.disablePercentageOfActors()
+      expect(feature.percentageOfActorsValue()).toEqual(0)
+    })
+  })
+
+  describe('disablePercentageOfTime', () => {
+    test('sets percentage to 0', () => {
+      feature.enablePercentageOfTime(50)
+      expect(feature.percentageOfTimeValue()).toEqual(50)
+      feature.disablePercentageOfTime()
+      expect(feature.percentageOfTimeValue()).toEqual(0)
+    })
+
+    test('disables feature', () => {
+      feature.enablePercentageOfTime(100)
+      expect(feature.isEnabled()).toEqual(true)
+      feature.disablePercentageOfTime()
+      expect(feature.isEnabled()).toEqual(false)
+    })
+
+    test('can be called when already disabled', () => {
+      expect(feature.percentageOfTimeValue()).toEqual(0)
+      feature.disablePercentageOfTime()
+      expect(feature.percentageOfTimeValue()).toEqual(0)
+    })
+  })
+
   describe('state', () => {
     describe('when fully on (boolean gate)', () => {
       beforeEach(() => {
