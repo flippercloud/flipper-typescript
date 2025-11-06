@@ -332,4 +332,105 @@ describe('Feature', () => {
       })
     })
   })
+
+  describe('management methods', () => {
+    describe('add', () => {
+      test('adds feature to adapter', () => {
+        expect(adapter.features()).toHaveLength(0)
+        feature.add()
+        const features = adapter.features()
+        expect(features).toHaveLength(1)
+        expect(features[0]?.name).toEqual('feature-1')
+      })
+
+      test('is idempotent', () => {
+        feature.add()
+        feature.add()
+        expect(adapter.features()).toHaveLength(1)
+      })
+
+      test('returns true', () => {
+        expect(feature.add()).toEqual(true)
+      })
+    })
+
+    describe('exist', () => {
+      test('returns false when feature not added', () => {
+        expect(feature.exist()).toEqual(false)
+      })
+
+      test('returns true when feature added', () => {
+        feature.add()
+        expect(feature.exist()).toEqual(true)
+      })
+
+      test('returns false after feature removed', () => {
+        feature.add()
+        feature.remove()
+        expect(feature.exist()).toEqual(false)
+      })
+    })
+
+    describe('remove', () => {
+      test('removes feature from adapter', () => {
+        feature.add()
+        expect(adapter.features()).toHaveLength(1)
+        feature.remove()
+        expect(adapter.features()).toHaveLength(0)
+      })
+
+      test('clears all gate values when removing', () => {
+        feature.enable()
+        feature.enableActor(makeActor(1))
+        feature.enableGroup('admins')
+        expect(feature.booleanValue()).toEqual(true)
+        expect(feature.actorsValue().size).toBeGreaterThan(0)
+
+        feature.remove()
+
+        expect(feature.booleanValue()).toEqual(false)
+        expect(feature.actorsValue()).toEqual(new Set())
+        expect(feature.groupsValue()).toEqual(new Set())
+      })
+
+      test('returns true', () => {
+        feature.add()
+        expect(feature.remove()).toEqual(true)
+      })
+    })
+
+    describe('clear', () => {
+      test('clears all gate values', () => {
+        feature.enable()
+        feature.enableActor(makeActor(1))
+        feature.enableGroup('admins')
+        feature.enablePercentageOfActors(50)
+        feature.enablePercentageOfTime(25)
+
+        expect(feature.booleanValue()).toEqual(true)
+        expect(feature.actorsValue().size).toBeGreaterThan(0)
+        expect(feature.groupsValue().size).toBeGreaterThan(0)
+        expect(feature.percentageOfActorsValue()).toEqual(50)
+        expect(feature.percentageOfTimeValue()).toEqual(25)
+
+        feature.clear()
+
+        expect(feature.booleanValue()).toEqual(false)
+        expect(feature.actorsValue()).toEqual(new Set())
+        expect(feature.groupsValue()).toEqual(new Set())
+        expect(feature.percentageOfActorsValue()).toEqual(0)
+        expect(feature.percentageOfTimeValue()).toEqual(0)
+      })
+
+      test('does not remove feature from adapter', () => {
+        feature.add()
+        feature.clear()
+        expect(feature.exist()).toEqual(true)
+      })
+
+      test('returns true', () => {
+        expect(feature.clear()).toEqual(true)
+      })
+    })
+  })
 })

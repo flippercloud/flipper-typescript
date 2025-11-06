@@ -153,6 +153,23 @@ class Feature {
     return this.gateValues().percentageOfTime
   }
 
+  public add(): boolean {
+    return this.adapter.add(this)
+  }
+
+  public exist(): boolean {
+    const features = this.adapter.features()
+    return features.some(f => f.key === this.key)
+  }
+
+  public remove(): boolean {
+    return this.adapter.remove(this)
+  }
+
+  public clear(): boolean {
+    return this.adapter.clear(this)
+  }
+
   private gateValues() {
     return new GateValues(this.adapter.get(this))
   }

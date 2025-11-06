@@ -10,6 +10,7 @@ export interface IAdapter {
   features: () => Feature[]
   add: (feature: Feature) => boolean
   remove: (feature: Feature) => boolean
+  clear: (feature: Feature) => boolean
   get: (feature: Feature) => Record<string, unknown>
   enable: (feature: Feature, gate: IGate, thing: IType) => boolean
   disable: (feature: Feature, gate: IGate, thing: IType) => boolean
