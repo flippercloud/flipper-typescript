@@ -681,5 +681,73 @@ describe('Feature', () => {
         expect(featureWithGroups.disabledGroups()).toEqual([])
       })
     })
+
+    describe('gate access methods', () => {
+      test('gate returns gate by name', () => {
+        const actorGate = feature.gate('actor')
+        expect(actorGate).toBeDefined()
+        expect(actorGate?.name).toBe('actor')
+      })
+
+      test('gate returns undefined for non-existent gate', () => {
+        const gate = feature.gate('non-existent')
+        expect(gate).toBeUndefined()
+      })
+
+      test('gateFor returns correct gate for actor', () => {
+        const actor = { flipperId: '123' }
+        const gate = feature.gateFor(actor)
+        expect(gate.name).toBe('actor')
+      })
+
+      test('gateFor returns correct gate for boolean', () => {
+        const gate = feature.gateFor(true)
+        expect(gate.name).toBe('boolean')
+      })
+
+      test('gateFor returns correct gate for group', async () => {
+        const { default: Dsl } = await import('./Dsl.js')
+        const { default: GroupType } = await import('./GroupType.js')
+        const dsl = new Dsl(adapter)
+        dsl.register('admins', (_actor: unknown) => true)
+        const featureWithGroups = new Feature('test-feature', adapter, dsl.groups)
+
+        const group = new GroupType('admins', (_actor: unknown) => true)
+        const gate = featureWithGroups.gateFor(group)
+        expect(gate.name).toBe('group')
+      })
+
+      test('gateFor returns correct gate for PercentageOfActorsType', async () => {
+        const { default: PercentageOfActorsType } = await import('./PercentageOfActorsType.js')
+        const percentage = new PercentageOfActorsType(25)
+        const gate = feature.gateFor(percentage)
+        expect(gate.name).toBe('percentageOfActors')
+      })
+
+      test('gateFor throws error for unsupported type', () => {
+        expect(() => {
+          feature.gateFor(Symbol('test'))
+        }).toThrow('No gate found')
+      })
+
+      test('gatesHash returns gates by name', () => {
+        const hash = feature.gatesHash()
+        expect(hash).toBeDefined()
+        expect(hash['actor']).toBeDefined()
+        expect(hash['actor']?.name).toBe('actor')
+        expect(hash['boolean']).toBeDefined()
+        expect(hash['group']).toBeDefined()
+        expect(hash['percentageOfActors']).toBeDefined()
+        expect(hash['percentageOfTime']).toBeDefined()
+        expect(Object.keys(hash)).toHaveLength(5)
+      })
+    })
+
+    describe('toString', () => {
+      test('returns feature name', () => {
+        const testFeature = new Feature('my-feature', adapter, {})
+        expect(testFeature.toString()).toBe('my-feature')
+      })
+    })
   })
 })

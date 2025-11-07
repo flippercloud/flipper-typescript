@@ -36,7 +36,6 @@ class Feature {
     if (thing === undefined || thing === null) { thing = true }
     this.adapter.add(this)
     const gate = this.gateFor(thing)
-    if (!gate) { throw new Error('No gate found for thing') }
     const thingType = gate.wrap(thing)
     return this.adapter.enable(this, gate, thingType)
   }
@@ -58,10 +57,9 @@ class Feature {
   }
 
   public disable(thing?: unknown): boolean {
-    if (thing === undefined || thing === null) { thing = true }
+    if (thing === undefined || thing === null) { thing = false }
     this.adapter.add(this)
     const gate = this.gateFor(thing)
-    if (!gate) { throw new Error('No gate found for thing') }
     const thingType = gate.wrap(thing)
     return this.adapter.disable(this, gate, thingType)
   }
@@ -214,7 +212,7 @@ class Feature {
     return new GateValues(this.adapter.get(this))
   }
 
-  private gateFor(thing: unknown): ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate | undefined {
+  public gateFor(thing: unknown): ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate {
     let returnGate: ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate | undefined
 
     this.gates.some((gate) => {
@@ -223,13 +221,29 @@ class Feature {
       return protectsThing
     })
 
+    if (!returnGate) {
+      throw new Error(`No gate found for ${String(thing)}`)
+    }
+
     return returnGate
   }
 
-  private gate(name: string): ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate | undefined {
+  public gate(name: string): ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate | undefined {
     return this.gates.find((gate) => {
       return gate.name === name
     })
+  }
+
+  public gatesHash(): Record<string, ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate> {
+    const hash: Record<string, ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate> = {}
+    this.gates.forEach((gate) => {
+      hash[gate.name] = gate
+    })
+    return hash
+  }
+
+  public toString(): string {
+    return this.name
   }
 }
 
