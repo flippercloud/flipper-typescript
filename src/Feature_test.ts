@@ -547,4 +547,139 @@ describe('Feature', () => {
       })
     })
   })
+
+  describe('group helper methods', () => {
+    describe('enabledGroups', () => {
+      test('returns empty array when no groups registered', () => {
+        expect(feature.enabledGroups()).toEqual([])
+      })
+
+      test('returns empty array when no groups enabled', async () => {
+        const { default: Dsl } = await import('./Dsl.js')
+        const dsl = new Dsl(adapter)
+        dsl.register('admins', (_actor: unknown) => true)
+        dsl.register('beta_testers', (_actor: unknown) => true)
+        const featureWithGroups = new Feature('test-feature', adapter, dsl.groups)
+
+        expect(featureWithGroups.enabledGroups()).toEqual([])
+      })
+
+      test('returns array of enabled group instances', async () => {
+        const { default: Dsl } = await import('./Dsl.js')
+        const dsl = new Dsl(adapter)
+        const adminsCallback = (_actor: unknown) => true
+        const betaCallback = (_actor: unknown) => false
+        dsl.register('admins', adminsCallback)
+        dsl.register('beta_testers', betaCallback)
+
+        const featureWithGroups = new Feature('test-feature', adapter, dsl.groups)
+        featureWithGroups.enableGroup('admins')
+
+        const enabled = featureWithGroups.enabledGroups()
+        expect(enabled).toHaveLength(1)
+        expect(enabled[0]?.value).toEqual('admins')
+        expect(enabled[0]?.callback).toEqual(adminsCallback)
+      })
+
+      test('returns multiple enabled groups', async () => {
+        const { default: Dsl } = await import('./Dsl.js')
+        const dsl = new Dsl(adapter)
+        dsl.register('admins', (_actor: unknown) => true)
+        dsl.register('beta_testers', (_actor: unknown) => true)
+        dsl.register('staff', (_actor: unknown) => true)
+        dsl.register('not_enabled', (_actor: unknown) => true)
+
+        const featureWithGroups = new Feature('test-feature', adapter, dsl.groups)
+        featureWithGroups.enableGroup('admins')
+        featureWithGroups.enableGroup('beta_testers')
+        featureWithGroups.enableGroup('staff')
+
+        const enabled = featureWithGroups.enabledGroups()
+        expect(enabled).toHaveLength(3)
+        const values = enabled.map(g => g.value).sort()
+        expect(values).toEqual(['admins', 'beta_testers', 'staff'])
+      })
+
+      test('does not include disabled groups', async () => {
+        const { default: Dsl } = await import('./Dsl.js')
+        const dsl = new Dsl(adapter)
+        dsl.register('admins', (_actor: unknown) => true)
+        dsl.register('disabled', (_actor: unknown) => true)
+
+        const featureWithGroups = new Feature('test-feature', adapter, dsl.groups)
+        featureWithGroups.enableGroup('admins')
+        featureWithGroups.enableGroup('disabled')
+        featureWithGroups.disableGroup('disabled')
+
+        const enabled = featureWithGroups.enabledGroups()
+        expect(enabled).toHaveLength(1)
+        expect(enabled[0]?.value).toEqual('admins')
+      })
+    })
+
+    describe('disabledGroups', () => {
+      test('returns empty array when no groups registered', () => {
+        expect(feature.disabledGroups()).toEqual([])
+      })
+
+      test('returns all groups when none enabled', async () => {
+        const { default: Dsl } = await import('./Dsl.js')
+        const dsl = new Dsl(adapter)
+        dsl.register('admins', (_actor: unknown) => true)
+        dsl.register('beta_testers', (_actor: unknown) => true)
+
+        const featureWithGroups = new Feature('test-feature', adapter, dsl.groups)
+
+        const disabled = featureWithGroups.disabledGroups()
+        expect(disabled).toHaveLength(2)
+        const values = disabled.map(g => g.value).sort()
+        expect(values).toEqual(['admins', 'beta_testers'])
+      })
+
+      test('returns groups that are not enabled', async () => {
+        const { default: Dsl } = await import('./Dsl.js')
+        const dsl = new Dsl(adapter)
+        dsl.register('admins', (_actor: unknown) => true)
+        dsl.register('beta_testers', (_actor: unknown) => true)
+        dsl.register('staff', (_actor: unknown) => true)
+
+        const featureWithGroups = new Feature('test-feature', adapter, dsl.groups)
+        featureWithGroups.enableGroup('admins')
+
+        const disabled = featureWithGroups.disabledGroups()
+        expect(disabled).toHaveLength(2)
+        const values = disabled.map(g => g.value).sort()
+        expect(values).toEqual(['beta_testers', 'staff'])
+      })
+
+      test('includes explicitly disabled groups', async () => {
+        const { default: Dsl } = await import('./Dsl.js')
+        const dsl = new Dsl(adapter)
+        dsl.register('admins', (_actor: unknown) => true)
+        dsl.register('disabled', (_actor: unknown) => true)
+
+        const featureWithGroups = new Feature('test-feature', adapter, dsl.groups)
+        featureWithGroups.enableGroup('disabled')
+        featureWithGroups.disableGroup('disabled')
+
+        const disabled = featureWithGroups.disabledGroups()
+        expect(disabled).toHaveLength(2)
+        const values = disabled.map(g => g.value).sort()
+        expect(values).toEqual(['admins', 'disabled'])
+      })
+
+      test('returns empty array when all groups are enabled', async () => {
+        const { default: Dsl } = await import('./Dsl.js')
+        const dsl = new Dsl(adapter)
+        dsl.register('admins', (_actor: unknown) => true)
+        dsl.register('beta_testers', (_actor: unknown) => true)
+
+        const featureWithGroups = new Feature('test-feature', adapter, dsl.groups)
+        featureWithGroups.enableGroup('admins')
+        featureWithGroups.enableGroup('beta_testers')
+
+        expect(featureWithGroups.disabledGroups()).toEqual([])
+      })
+    })
+  })
 })

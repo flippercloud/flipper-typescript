@@ -16,11 +16,13 @@ class Feature {
   public key: string
   public gates: Array<ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate>
   private adapter: IAdapter
+  private groups: Record<string, GroupType>
 
   constructor(name: string, adapter: IAdapter, groups: Record<string, GroupType>) {
     this.name = name
     this.key = name
     this.adapter = adapter
+    this.groups = groups
     this.gates = [
       new ActorGate(),
       new BooleanGate(),
@@ -192,6 +194,20 @@ class Feature {
 
   public disabledGateNames(): string[] {
     return this.disabledGates().map(gate => gate.name)
+  }
+
+  public enabledGroups(): GroupType[] {
+    const enabledGroupNames = this.groupsValue()
+    return Object.values(this.groups).filter(group =>
+      enabledGroupNames.has(group.value)
+    )
+  }
+
+  public disabledGroups(): GroupType[] {
+    const enabled = this.enabledGroups()
+    return Object.values(this.groups).filter(group =>
+      !enabled.includes(group)
+    )
   }
 
   private gateValues() {
