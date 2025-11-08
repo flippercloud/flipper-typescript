@@ -97,7 +97,7 @@ describe('Dsl', () => {
       dsl.add('test-feature')
       dsl.enable('test-feature')
       expect(dsl.exist('test-feature')).toBe(true)
-      
+
       const result = dsl.remove('test-feature')
       expect(result).toBe(true)
       expect(dsl.exist('test-feature')).toBe(false)
@@ -121,10 +121,40 @@ describe('Dsl', () => {
 
     test('features includes features added through enable', () => {
       dsl.enable('auto-added')
-      
+
       const features = dsl.features()
       expect(features).toHaveLength(1)
       expect(features[0]?.name).toBe('auto-added')
+    })
+  })
+
+  describe('preload methods', () => {
+    test('preload loads specific features', () => {
+      dsl.add('feature-1')
+      dsl.add('feature-2')
+      dsl.add('feature-3')
+      dsl.enable('feature-1')
+
+      const features = dsl.preload(['feature-1', 'feature-2'])
+      expect(features).toHaveLength(2)
+      expect(features.map(f => f.name).sort()).toEqual(['feature-1', 'feature-2'])
+    })
+
+    test('preloadAll loads all features', () => {
+      dsl.add('feature-1')
+      dsl.add('feature-2')
+      dsl.enable('feature-1')
+      dsl.enableGroup('feature-2', 'admins')
+
+      const features = dsl.preloadAll()
+      expect(features).toHaveLength(2)
+      expect(features.map(f => f.name).sort()).toEqual(['feature-1', 'feature-2'])
+    })
+  })
+
+  describe('readOnly', () => {
+    test('returns false for memory adapter', () => {
+      expect(dsl.readOnly()).toBe(false)
     })
   })
 })
