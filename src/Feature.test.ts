@@ -491,20 +491,22 @@ describe('Feature', () => {
     describe('disabledGates', () => {
       test('returns all gates when none enabled', () => {
         const disabled = feature.disabledGates()
-        expect(disabled).toHaveLength(5)
+        expect(disabled).toHaveLength(6)
       })
 
-      test('returns 4 gates when boolean enabled', () => {
+      test('returns 5 gates when boolean enabled', () => {
         feature.enable()
         const disabled = feature.disabledGates()
-        expect(disabled).toHaveLength(4)
+        expect(disabled).toHaveLength(5)
         const names = disabled.map(g => g.name)
         expect(names).not.toContain('boolean')
       })
 
-      test('returns empty array when all gates enabled', () => {
+      test('returns empty array when all gates enabled', async () => {
+        const { default: Flipper } = await import('./Flipper.js')
         feature.enable()
         feature.enableActor(makeActor(1))
+        feature.enableExpression(Flipper.constant(true))
         feature.enableGroup('admins')
         feature.enablePercentageOfActors(25)
         feature.enablePercentageOfTime(50)
@@ -528,9 +530,10 @@ describe('Feature', () => {
     describe('disabledGateNames', () => {
       test('returns all gate names when none enabled', () => {
         const names = feature.disabledGateNames()
-        expect(names).toHaveLength(5)
+        expect(names).toHaveLength(6)
         expect(names).toContain('actor')
         expect(names).toContain('boolean')
+        expect(names).toContain('expression')
         expect(names).toContain('group')
         expect(names).toContain('percentageOfActors')
         expect(names).toContain('percentageOfTime')
@@ -540,7 +543,8 @@ describe('Feature', () => {
         feature.enable()
         feature.enableActor(makeActor(1))
         const names = feature.disabledGateNames()
-        expect(names).toHaveLength(3)
+        expect(names).toHaveLength(4)
+        expect(names).toContain('expression')
         expect(names).toContain('group')
         expect(names).toContain('percentageOfActors')
         expect(names).toContain('percentageOfTime')
@@ -739,7 +743,7 @@ describe('Feature', () => {
         expect(hash['group']).toBeDefined()
         expect(hash['percentageOfActors']).toBeDefined()
         expect(hash['percentageOfTime']).toBeDefined()
-        expect(Object.keys(hash)).toHaveLength(5)
+        expect(Object.keys(hash)).toHaveLength(6)
       })
     })
 

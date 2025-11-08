@@ -4,16 +4,21 @@ export { default as Feature } from './Feature'
 export { default as MemoryAdapter } from './MemoryAdapter'
 export { default as ActorGate } from './ActorGate'
 export { default as BooleanGate } from './BooleanGate'
+export { default as ExpressionGate } from './ExpressionGate'
 export { default as GroupGate } from './GroupGate'
 export { default as PercentageOfActorsGate } from './PercentageOfActorsGate'
 export { default as PercentageOfTimeGate } from './PercentageOfTimeGate'
 export { default as ActorType } from './ActorType'
 export { default as BooleanType } from './BooleanType'
+export { default as ExpressionType } from './ExpressionType'
 export { default as GroupType } from './GroupType'
 export { default as PercentageOfActorsType } from './PercentageOfActorsType'
 export { default as PercentageOfTimeType } from './PercentageOfTimeType'
 export { default as GateValues } from './GateValues'
 export { default as FeatureCheckContext } from './FeatureCheckContext'
+
+// Expression system
+export * from './expressions'
 
 // Export/Import System
 export { default as Export } from './Export'
