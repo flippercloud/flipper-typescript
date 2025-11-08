@@ -111,7 +111,6 @@ class Feature {
     const hasEnabledNonBooleanGate = nonBooleanGates.some(gate => {
       const gateKey = gate.key as keyof GateValues
       const value: boolean | Set<string> | number = values[gateKey]
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       return gate.isEnabled(value)
     })
 
@@ -176,7 +175,6 @@ class Feature {
     return this.gates.filter(gate => {
       const gateKey = gate.key as keyof GateValues
       const value: boolean | Set<string> | number = values[gateKey]
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       return gate.isEnabled(value)
     })
   }
