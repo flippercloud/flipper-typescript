@@ -3,8 +3,8 @@ import type { Config } from 'jest'
 const config: Config = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  testMatch: ['<rootDir>/src/**/*_test.ts', '<rootDir>/src/**/*.test.ts'],
-  collectCoverageFrom: ['src/**/*.ts', '!src/**/*_test.ts', '!src/**/*.test.ts'],
+  testMatch: ['<rootDir>/src/**/*.test.ts'],
+  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.test.ts'],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],

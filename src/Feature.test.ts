@@ -1,6 +1,6 @@
 import Feature from './Feature'
 import MemoryAdapter from './MemoryAdapter'
-import { makeActor } from './test_helper'
+import { makeActor } from './testHelpers'
 
 let adapter: MemoryAdapter
 let feature: Feature

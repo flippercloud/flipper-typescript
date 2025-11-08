@@ -1,7 +1,7 @@
 import Dsl from './Dsl'
 import { IActor } from './interfaces'
 import MemoryAdapter from './MemoryAdapter'
-import { makeActor } from './test_helper'
+import { makeActor } from './testHelpers'
 
 let dsl: Dsl
 
