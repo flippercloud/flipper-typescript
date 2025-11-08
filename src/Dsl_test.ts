@@ -157,4 +157,30 @@ describe('Dsl', () => {
       expect(dsl.readOnly()).toBe(false)
     })
   })
+
+  describe('get', () => {
+    test('returns feature instance (alias for feature method)', () => {
+      const feature1 = dsl.get('test-feature')
+      const feature2 = dsl.feature('test-feature')
+      expect(feature1).toBe(feature2)
+    })
+  })
+
+  describe('group', () => {
+    test('returns registered group by name', () => {
+      const groupName = 'admins'
+      const adminCheck = (actor: IActor) => actor.isAdmin
+      dsl.register(groupName, adminCheck)
+
+      const group = dsl.group(groupName)
+      expect(group).toBeDefined()
+      expect(group?.value).toBe(groupName)
+      expect(group?.callback).toBe(adminCheck)
+    })
+
+    test('returns undefined for non-existent group', () => {
+      const group = dsl.group('non-existent')
+      expect(group).toBeUndefined()
+    })
+  })
 })
