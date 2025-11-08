@@ -1,5 +1,7 @@
 import type Feature from '../Feature'
 import type { IAdapter, IGate, IType } from '../interfaces'
+import type Export from '../Export'
+import type Dsl from '../Dsl'
 
 /**
  * Base class for adapter wrappers that delegate to another adapter.
@@ -131,6 +133,24 @@ export default class Wrapper implements IAdapter {
    */
   readOnly(): boolean {
     return this.adapter.readOnly()
+  }
+
+  /**
+   * Export the wrapped adapter's features.
+   * @param options - Export options
+   * @returns Export object
+   */
+  export(options: { format?: string; version?: number } = {}): Export {
+    return this.wrap('export', () => this.adapter.export(options))
+  }
+
+  /**
+   * Import features to the wrapped adapter.
+   * @param source - The source to import from
+   * @returns True if successful
+   */
+  import(source: IAdapter | Export | Dsl): boolean {
+    return this.wrap('import', () => this.adapter.import(source))
   }
 
   /**

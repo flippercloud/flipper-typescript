@@ -15,6 +15,15 @@ export { default as PercentageOfTimeType } from './PercentageOfTimeType'
 export { default as GateValues } from './GateValues'
 export { default as FeatureCheckContext } from './FeatureCheckContext'
 
+// Export/Import System
+export { default as Export } from './Export'
+export { default as Exporter } from './Exporter'
+export type { IExporter } from './Exporter'
+export { default as JsonExport, JsonError, InvalidError } from './exporters/json/Export'
+export { default as JsonV1 } from './exporters/json/V1'
+export { default as Synchronizer } from './adapters/sync/Synchronizer'
+export { default as FeatureSynchronizer } from './adapters/sync/FeatureSynchronizer'
+
 // Adapter wrappers
 export { default as Wrapper } from './adapters/Wrapper'
 export { default as Memoizable } from './adapters/Memoizable'

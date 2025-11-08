@@ -61,6 +61,79 @@ class Typecast {
     }
     return 0
   }
+
+  /**
+   * Convert features data to a normalized features hash.
+   *
+   * Ensures consistent types for all gate values:
+   * - Arrays/Sets become Sets
+   * - Hashes/Objects remain as-is
+   * - Other values become strings (if truthy) or remain as-is (if falsy)
+   *
+   * @param source - Raw features data from adapter or export
+   * @returns Normalized features hash
+   */
+  public static featuresHash(
+    source: Record<string, Record<string, unknown>> | null | undefined
+  ): Record<string, Record<string, unknown>> {
+    const normalized: Record<string, Record<string, unknown>> = {}
+
+    if (!source) {
+      return normalized
+    }
+
+    Object.keys(source).forEach((featureKey) => {
+      normalized[featureKey] = {}
+      const gates = source[featureKey]
+
+      if (!gates) {
+        return
+      }
+
+      Object.keys(gates).forEach((gateKey) => {
+        const value = gates[gateKey]
+
+        let normalizedValue: unknown
+        if (Array.isArray(value) || value instanceof Set) {
+          normalizedValue = this.toSet(value)
+        } else if (value !== null && typeof value === 'object') {
+          normalizedValue = value
+        } else if (
+          value !== null &&
+          value !== undefined &&
+          (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean')
+        ) {
+          normalizedValue = String(value)
+        } else {
+          normalizedValue = value
+        }
+
+        if (normalized[featureKey]) {
+          normalized[featureKey][gateKey] = normalizedValue
+        }
+      })
+    })
+
+    return normalized
+  }
+
+  /**
+   * Serialize a value to JSON string.
+   * @param value - The value to serialize
+   * @returns JSON string
+   */
+  public static toJson(value: unknown): string {
+    return JSON.stringify(value)
+  }
+
+  /**
+   * Deserialize a JSON string to a value.
+   * @param json - The JSON string to parse
+   * @returns Parsed value
+   */
+  public static fromJson(json: string): unknown {
+    return JSON.parse(json)
+  }
 }
 
 export default Typecast

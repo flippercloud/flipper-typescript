@@ -2,6 +2,7 @@ import Feature from './Feature'
 import GroupType from './GroupType'
 import { GroupCallback, IActor, IAdapter, IInstrumenter } from './interfaces'
 import NoopInstrumenter from './instrumenters/NoopInstrumenter'
+import type Export from './Export'
 
 /**
  * Domain-Specific Language for feature flag operations.
@@ -267,6 +268,54 @@ class Dsl {
    */
   public group(groupName: string): GroupType | undefined {
     return this.groups[groupName]
+  }
+
+  /**
+   * Export all features to a portable format.
+   *
+   * @param options - Export options
+   * @returns Export object containing serialized feature data
+   *
+   * @example
+   * ```typescript
+   * // Export to JSON
+   * const exportObj = flipper.export({ format: 'json', version: 1 });
+   * const jsonString = exportObj.contents;
+   *
+   * // Save to file
+   * fs.writeFileSync('backup.json', jsonString);
+   * ```
+   */
+  public export(options: { format?: string; version?: number } = {}): Export {
+    return this.adapter.export(options)
+  }
+
+  /**
+   * Import features from another source.
+   *
+   * This is a destructive operation - it will remove features not present
+   * in the source and sync all features to match the source exactly.
+   *
+   * @param source - The source to import from (Dsl, Adapter, or Export)
+   * @returns True if successful
+   *
+   * @example
+   * ```typescript
+   * // Import from another Flipper instance
+   * const source = new Flipper(sourceAdapter);
+   * destination.import(source);
+   *
+   * // Import from an export
+   * const contents = fs.readFileSync('backup.json', 'utf-8');
+   * const exportObj = new JsonExport({ contents });
+   * flipper.import(exportObj);
+   *
+   * // Import from another adapter
+   * flipper.import(sourceAdapter);
+   * ```
+   */
+  public import(source: IAdapter | Export | Dsl): boolean {
+    return this.adapter.import(source)
   }
 }
 
