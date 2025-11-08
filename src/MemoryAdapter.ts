@@ -1,5 +1,5 @@
 import Feature from './Feature'
-import { IGate, IType } from './interfaces'
+import { IAdapter, IGate, IType } from './interfaces'
 
 interface IFeatures {
   [index: string]: Feature
@@ -11,7 +11,7 @@ interface IFeatureGates {
   [index: string]: StorageValue
 }
 
-class MemoryAdapter {
+class MemoryAdapter implements IAdapter {
   public name: string
   private featuresStore: IFeatures
   private sourceStore: IFeatureGates
