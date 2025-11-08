@@ -1,5 +1,7 @@
 import type Feature from '../Feature'
 import type { IAdapter, IGate, IType } from '../interfaces'
+import Export from '../Export'
+import Dsl from '../Dsl'
 
 /**
  * Adapter that writes to two adapters but reads from only one (local).
@@ -160,5 +162,26 @@ export default class DualWrite implements IAdapter {
    */
   readOnly(): boolean {
     return this.local.readOnly()
+  }
+
+  /**
+   * Export the local adapter's features.
+   * @param options - Export options
+   * @returns Export object
+   */
+  export(options: { format?: string; version?: number } = {}): Export {
+    return this.local.export(options)
+  }
+
+  /**
+   * Import features to both remote and local adapters.
+   * Imports to remote first, then local.
+   * @param source - The source to import from
+   * @returns Result from the remote adapter
+   */
+  import(source: IAdapter | Export | Dsl): boolean {
+    const result = this.remote.import(source)
+    this.local.import(source)
+    return result
   }
 }

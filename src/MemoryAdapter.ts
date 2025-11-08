@@ -1,5 +1,9 @@
 import Feature from './Feature'
 import { IAdapter, IGate, IType } from './interfaces'
+import Exporter from './Exporter'
+import type Export from './Export'
+import type Dsl from './Dsl'
+import Synchronizer from './adapters/sync/Synchronizer'
 
 interface IFeatures {
   [index: string]: Feature
@@ -151,6 +155,52 @@ class MemoryAdapter implements IAdapter {
    */
   public readOnly(): boolean {
     return false
+  }
+
+  /**
+   * Export the adapter's features.
+   * @param options - Export options
+   * @returns Export object
+   */
+  public export(options: { format?: string; version?: number } = {}): Export {
+    const format = options.format ?? 'json'
+    const version = options.version ?? 1
+    const exporter = Exporter.build({ format, version })
+    return exporter.call(this)
+  }
+
+  /**
+   * Import features from another source.
+   *
+   * This is a destructive operation - it will replace all local features
+   * with the features from the source.
+   *
+   * @param source - The source to import from (Dsl, Adapter, or Export)
+   * @returns True if successful
+   */
+  public import(source: IAdapter | Export | Dsl): boolean {
+    const sourceAdapter = this.getSourceAdapter(source)
+    const synchronizer = new Synchronizer(this, sourceAdapter, { raise: true })
+    return synchronizer.call()
+  }
+
+  /**
+   * Extract an adapter from a source.
+   * @private
+   * @param source - The source to extract from
+   * @returns The adapter
+   */
+  private getSourceAdapter(source: IAdapter | Export | Dsl): IAdapter {
+    // Check if it has an adapter property (Dsl)
+    if ('adapter' in source && source.adapter && typeof source.adapter !== 'function') {
+      return source.adapter
+    }
+    // Check if it has an adapter() method (Export)
+    if ('adapter' in source && typeof source.adapter === 'function') {
+      return source.adapter()
+    }
+    // It's already an adapter
+    return source as IAdapter
   }
 
   /**

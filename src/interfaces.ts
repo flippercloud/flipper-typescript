@@ -1,9 +1,11 @@
 import type FeatureCheckContext from './FeatureCheckContext'
 import type Feature from './Feature'
+import Export from './Export'
+import Dsl from './Dsl'
 
 export interface IActor {
   flipperId: string
-  isAdmin: boolean
+  isAdmin?: boolean
 }
 
 export interface IAdapter {
@@ -18,6 +20,8 @@ export interface IAdapter {
   enable: (feature: Feature, gate: IGate, thing: IType) => boolean
   disable: (feature: Feature, gate: IGate, thing: IType) => boolean
   readOnly: () => boolean
+  export: (options?: { format?: string; version?: number }) => Export
+  import: (source: IAdapter | Export | Dsl) => boolean
 }
 
 export interface IGate {

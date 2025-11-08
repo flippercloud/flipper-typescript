@@ -1,5 +1,7 @@
 import type Feature from '../Feature'
 import type { IAdapter, IGate, IType } from '../interfaces'
+import type Export from '../Export'
+import type Dsl from '../Dsl'
 
 interface Cache {
   [key: string]: unknown
@@ -269,6 +271,31 @@ export default class Memoizable implements IAdapter {
    */
   readOnly(): boolean {
     return this.adapter.readOnly()
+  }
+
+  /**
+   * Export the wrapped adapter's features.
+   * Does not use cache.
+   * @param options - Export options
+   * @returns Export object
+   */
+  export(options: { format?: string; version?: number } = {}): Export {
+    return this.adapter.export(options)
+  }
+
+  /**
+   * Import features to the wrapped adapter.
+   * Clears the cache after import.
+   * @param source - The source to import from
+   * @returns True if successful
+   */
+  import(source: IAdapter | Export | Dsl): boolean {
+    const result = this.adapter.import(source)
+    if (this._memoize) {
+      // Clear entire cache after import
+      Object.keys(this.cache).forEach(key => delete this.cache[key])
+    }
+    return result
   }
 
   /**
