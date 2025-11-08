@@ -11,9 +11,42 @@ interface IFeatureGates {
   [index: string]: StorageValue
 }
 
+/**
+ * In-memory adapter for storing feature flag state.
+ *
+ * Stores all feature flag data in memory using JavaScript objects and Sets.
+ * Data is not persisted and will be lost when the process exits.
+ *
+ * Ideal for testing, development, and single-process applications.
+ *
+ * @example
+ * ```typescript
+ * const adapter = new MemoryAdapter();
+ * const flipper = new Flipper(adapter);
+ *
+ * // Enable a feature
+ * flipper.enable('new-feature');
+ *
+ * // Data is stored in memory
+ * flipper.isFeatureEnabled('new-feature'); // true
+ *
+ * // Data is lost on restart (not persisted)
+ * ```
+ */
 class MemoryAdapter implements IAdapter {
+  /**
+   * The name of this adapter.
+   */
   public name: string
+
+  /**
+   * Internal storage for feature instances.
+   */
   private featuresStore: IFeatures
+
+  /**
+   * Internal storage for gate values.
+   */
   private sourceStore: IFeatureGates
 
   constructor() {
@@ -22,12 +55,21 @@ class MemoryAdapter implements IAdapter {
     this.sourceStore = {}
   }
 
+  /**
+   * Get all features.
+   * @returns Array of all features
+   */
   public features(): Feature[] {
     return Object.keys(this.featuresStore)
       .map((key) => this.featuresStore[key])
       .filter((feature): feature is Feature => feature !== undefined)
   }
 
+  /**
+   * Add a feature to the adapter.
+   * @param feature - Feature to add
+   * @returns True if successful
+   */
   public add(feature: Feature) {
     if (this.featuresStore[feature.name] === undefined) {
       this.featuresStore[feature.name] = feature
@@ -35,12 +77,22 @@ class MemoryAdapter implements IAdapter {
     return true
   }
 
+  /**
+   * Remove a feature from the adapter.
+   * @param feature - Feature to remove
+   * @returns True if successful
+   */
   public remove(feature: Feature) {
     delete this.featuresStore[feature.name]
     this.clear(feature)
     return true
   }
 
+  /**
+   * Get feature state from the adapter.
+   * @param feature - Feature to get state for
+   * @returns Feature gate values
+   */
   public get(feature: Feature): Record<string, unknown> {
     const result: Record<string, unknown> = {}
 
@@ -67,6 +119,11 @@ class MemoryAdapter implements IAdapter {
     return result
   }
 
+  /**
+   * Get multiple features' state from the adapter.
+   * @param features - Features to get state for
+   * @returns Map of feature keys to gate values
+   */
   public getMulti(features: Feature[]): Record<string, Record<string, unknown>> {
     const result: Record<string, Record<string, unknown>> = {}
     features.forEach((feature) => {
@@ -75,6 +132,10 @@ class MemoryAdapter implements IAdapter {
     return result
   }
 
+  /**
+   * Get all features' state from the adapter.
+   * @returns Map of all feature keys to gate values
+   */
   public getAll(): Record<string, Record<string, unknown>> {
     const result: Record<string, Record<string, unknown>> = {}
     const allFeatures = this.features()
@@ -84,10 +145,21 @@ class MemoryAdapter implements IAdapter {
     return result
   }
 
+  /**
+   * Check if the adapter is read-only.
+   * @returns False (memory adapter is writable)
+   */
   public readOnly(): boolean {
     return false
   }
 
+  /**
+   * Enable a gate for a feature.
+   * @param feature - Feature to enable gate for
+   * @param gate - Gate to enable
+   * @param thing - Value to enable for the gate
+   * @returns True if successful
+   */
   public enable(feature: Feature, gate: IGate, thing: IType): boolean {
     switch (gate.dataType) {
       case 'boolean': {
@@ -109,6 +181,13 @@ class MemoryAdapter implements IAdapter {
     return true
   }
 
+  /**
+   * Disable a gate for a feature.
+   * @param feature - Feature to disable gate for
+   * @param gate - Gate to disable
+   * @param thing - Value to disable for the gate
+   * @returns True if successful
+   */
   public disable(feature: Feature, gate: IGate, thing: IType): boolean {
     switch (gate.dataType) {
       case 'boolean': {
@@ -130,6 +209,11 @@ class MemoryAdapter implements IAdapter {
     return true
   }
 
+  /**
+   * Clear all gate values for a feature.
+   * @param feature - Feature to clear
+   * @returns True if successful
+   */
   public  clear(feature: Feature) {
     feature.gates.forEach((gate) => {
       this.delete(this.key(feature, gate))
@@ -137,22 +221,53 @@ class MemoryAdapter implements IAdapter {
     return true
   }
 
+  /**
+   * Generate a storage key for a feature and gate.
+   * @private
+   * @param feature - The feature
+   * @param gate - The gate
+   * @returns Storage key string
+   */
   private key(feature: Feature, gate: IGate) {
     return `${feature.key}/${gate.key}`
   }
 
+  /**
+   * Read a value from storage.
+   * @private
+   * @param key - Storage key
+   * @returns Stored value or undefined
+   */
   private read(key: string): StorageValue {
     return this.sourceStore[key]
   }
 
+  /**
+   * Write a value to storage.
+   * @private
+   * @param key - Storage key
+   * @param value - Value to store
+   * @returns The stored value
+   */
   private write(key: string, value: string) {
     return this.sourceStore[key] = value
   }
 
+  /**
+   * Delete a value from storage.
+   * @private
+   * @param key - Storage key
+   */
   private delete(key: string) {
     delete this.sourceStore[key]
   }
 
+  /**
+   * Add a value to a set in storage.
+   * @private
+   * @param key - Storage key
+   * @param value - Value to add to the set
+   */
   private setAdd(key: string, value: string): void {
     this.ensure_set_initialized(key)
     const set = this.sourceStore[key]
@@ -161,6 +276,12 @@ class MemoryAdapter implements IAdapter {
     }
   }
 
+  /**
+   * Remove a value from a set in storage.
+   * @private
+   * @param key - Storage key
+   * @param value - Value to remove from the set
+   */
   private setDelete(key: string, value: string): void {
     this.ensure_set_initialized(key)
     const set = this.sourceStore[key]
@@ -169,12 +290,23 @@ class MemoryAdapter implements IAdapter {
     }
   }
 
+  /**
+   * Get all members of a set from storage.
+   * @private
+   * @param key - Storage key
+   * @returns Set of members
+   */
   private setMembers(key: string): Set<string> {
     this.ensure_set_initialized(key)
     const set = this.sourceStore[key]
     return set instanceof Set ? set : new Set()
   }
 
+  /**
+   * Ensure a set is initialized at the given key.
+   * @private
+   * @param key - Storage key
+   */
   private ensure_set_initialized(key: string): void {
     if (!(this.sourceStore[key] instanceof Set)) {
       this.sourceStore[key] = new Set()
