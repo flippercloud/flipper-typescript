@@ -14,4 +14,13 @@ export { default as PercentageOfActorsType } from './PercentageOfActorsType'
 export { default as PercentageOfTimeType } from './PercentageOfTimeType'
 export { default as GateValues } from './GateValues'
 export { default as FeatureCheckContext } from './FeatureCheckContext'
+
+// Adapter wrappers
+export { default as Wrapper } from './adapters/Wrapper'
+export { default as Memoizable } from './adapters/Memoizable'
+export { default as ReadOnly, WriteAttemptedError } from './adapters/ReadOnly'
+export { default as Strict, FeatureNotFoundError } from './adapters/Strict'
+export { default as DualWrite } from './adapters/DualWrite'
+export { default as OperationLogger } from './adapters/OperationLogger'
+
 export type * from './interfaces'
