@@ -1,6 +1,7 @@
 import Feature from './Feature'
 import GroupType from './GroupType'
-import { GroupCallback, IActor, IAdapter } from './interfaces'
+import { GroupCallback, IActor, IAdapter, IInstrumenter } from './interfaces'
+import NoopInstrumenter from './instrumenters/NoopInstrumenter'
 
 /**
  * Domain-Specific Language for feature flag operations.
@@ -46,13 +47,21 @@ class Dsl {
   private memoizedFeatures: Record<string, Feature>
 
   /**
+   * The instrumenter used for tracking operations.
+   */
+  public instrumenter: IInstrumenter
+
+  /**
    * Creates a new Dsl instance.
    * @param adapter - The adapter to use for persistence
+   * @param options - Optional configuration
+   * @param options.instrumenter - The instrumenter to use for tracking operations
    */
-  constructor(adapter: IAdapter) {
+  constructor(adapter: IAdapter, options: { instrumenter?: IInstrumenter } = {}) {
     this.adapter = adapter
     this.groups = {}
     this.memoizedFeatures = {}
+    this.instrumenter = options.instrumenter ?? new NoopInstrumenter()
   }
 
   /**
@@ -194,7 +203,7 @@ class Dsl {
     let feature = this.memoizedFeatures[featureName]
 
     if (feature === undefined) {
-      feature = new Feature(featureName, this.adapter, this.groups)
+      feature = new Feature(featureName, this.adapter, this.groups, { instrumenter: this.instrumenter })
       this.memoizedFeatures[featureName] = feature
     }
 
