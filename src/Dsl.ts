@@ -78,6 +78,7 @@ class Dsl {
 
     if (feature === undefined) {
       feature = new Feature(featureName, this.adapter, this.groups)
+      this.memoizedFeatures[featureName] = feature
     }
 
     return feature
@@ -101,6 +102,15 @@ class Dsl {
 
   public register(groupName: string, callback: GroupCallback): void {
     this.groups[groupName] = new GroupType(groupName, callback)
+  }
+
+  // Alias for feature() - provides shorthand access
+  public get(featureName: string): Feature {
+    return this.feature(featureName)
+  }
+
+  public group(groupName: string): GroupType | undefined {
+    return this.groups[groupName]
   }
 }
 
