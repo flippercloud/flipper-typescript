@@ -158,6 +158,26 @@ class Dsl {
   }
 
   /**
+   * Disable percentage of actors gate (sets to 0%).
+   * @param featureName - The name of the feature
+   * @returns True if successful
+   */
+  public disablePercentageOfActors(featureName: string) {
+    this.feature(featureName).disablePercentageOfActors()
+    return true
+  }
+
+  /**
+   * Disable percentage of time gate (sets to 0%).
+   * @param featureName - The name of the feature
+   * @returns True if successful
+   */
+  public disablePercentageOfTime(featureName: string) {
+    this.feature(featureName).disablePercentageOfTime()
+    return true
+  }
+
+  /**
    * Add a feature to the adapter (creates it if it doesn't exist).
    * @param featureName - The name of the feature to add
    * @returns True if successful
