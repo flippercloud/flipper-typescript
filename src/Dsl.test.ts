@@ -52,26 +52,35 @@ describe('Dsl', () => {
   })
 
   test('enables and disables the feature for group', () => {
-    const groupName = 'admins'
-    const adminCheck = (actor: IActor) => {
-      return actor.isAdmin
-    }
-    const admin = makeActor(1, true)
-    const user = makeActor(2, false)
-    dsl.register(groupName, adminCheck)
+    dsl.register('admins', (actor: IActor) => actor.flipperId === 'actor:5')
+    dsl.enableGroup('feature-1', 'admins')
+    expect(dsl.isFeatureEnabled('feature-1', makeActor(5))).toBe(true)
+    dsl.disableGroup('feature-1', 'admins')
+    expect(dsl.isFeatureEnabled('feature-1', makeActor(5))).toBe(false)
+  })
 
-    dsl.enableGroup('feature-1', groupName)
-    expect(dsl.isFeatureEnabled('feature-1', admin)).toBe(true)
-    expect(dsl.isFeatureEnabled('feature-1', user)).toBe(false)
-    dsl.disableGroup('feature-1', groupName)
-    expect(dsl.isFeatureEnabled('feature-1', admin)).toBe(false)
-    expect(dsl.isFeatureEnabled('feature-1', user)).toBe(false)
+  test('disables percentage of actors', () => {
+    dsl.enablePercentageOfActors('feature-1', 50)
+    expect(dsl.isFeatureEnabled('feature-1', makeActor(5))).toBe(true)
+
+    dsl.disablePercentageOfActors('feature-1')
+    expect(dsl.isFeatureEnabled('feature-1', makeActor(5))).toBe(false)
+    expect(dsl.feature('feature-1').percentageOfActorsValue()).toBe(0)
+  })
+
+  test('disables percentage of time', () => {
+    dsl.enablePercentageOfTime('feature-1', 100)
+    expect(dsl.isFeatureEnabled('feature-1', makeActor(1))).toBe(true)
+
+    dsl.disablePercentageOfTime('feature-1')
+    expect(dsl.isFeatureEnabled('feature-1', makeActor(1))).toBe(false)
+    expect(dsl.feature('feature-1').percentageOfTimeValue()).toBe(0)
   })
 
   test('registers group', () => {
     const groupName = 'admins'
     const adminCheck = (actor: IActor) => {
-      return actor.isAdmin
+      return actor.isAdmin === true
     }
     dsl.register(groupName, adminCheck)
     expect(dsl.groups[groupName]?.callback).toBe(adminCheck)
@@ -161,7 +170,7 @@ describe('Dsl', () => {
   describe('group', () => {
     test('returns registered group by name', () => {
       const groupName = 'admins'
-      const adminCheck = (actor: IActor) => actor.isAdmin
+      const adminCheck = (actor: IActor) => actor.isAdmin === true
       dsl.register(groupName, adminCheck)
 
       const group = dsl.group(groupName)
