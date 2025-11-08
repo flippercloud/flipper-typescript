@@ -1,6 +1,8 @@
 import ActorGate from './ActorGate'
 import ActorType from './ActorType'
 import BooleanGate from './BooleanGate'
+import ExpressionGate from './ExpressionGate'
+import ExpressionType from './ExpressionType'
 import FeatureCheckContext from './FeatureCheckContext'
 import GateValues from './GateValues'
 import GroupGate from './GroupGate'
@@ -11,13 +13,14 @@ import PercentageOfActorsGate from './PercentageOfActorsGate'
 import PercentageOfActorsType from './PercentageOfActorsType'
 import PercentageOfTimeGate from './PercentageOfTimeGate'
 import PercentageOfTimeType from './PercentageOfTimeType'
+import { type ExpressionLike } from './expressions'
 
 /**
  * Represents a single feature flag with its enabled state and gate values.
  *
  * Features are the core entity in Flipper, encapsulating all logic for checking
- * if a feature is enabled based on various gate types (boolean, actor, group,
- * percentage of actors, percentage of time).
+ * if a feature is enabled based on various gate types (boolean, expression, actor,
+ * group, percentage of actors, percentage of time).
  *
  * @example
  * ```typescript
@@ -30,6 +33,9 @@ import PercentageOfTimeType from './PercentageOfTimeType'
  *
  * // Enable for specific actor
  * feature.enableActor({ flipperId: 'user-123' });
+ *
+ * // Enable with expression
+ * feature.enableExpression({ Property: 'admin' });
  *
  * // Check if enabled
  * feature.isEnabled(); // true
@@ -53,7 +59,7 @@ class Feature {
   /**
    * All available gate types for this feature.
    */
-  public gates: Array<ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate>
+  public gates: Array<ActorGate | BooleanGate | ExpressionGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate>
 
   /**
    * The adapter used for persisting feature state.
@@ -95,8 +101,9 @@ class Feature {
     this.groups = groups
     this.instrumenter = options.instrumenter ?? new NoopInstrumenter()
     this.gates = [
-      new ActorGate(),
       new BooleanGate(),
+      new ExpressionGate(),
+      new ActorGate(),
       new GroupGate(this.groups),
       new PercentageOfActorsGate(),
       new PercentageOfTimeGate(),
@@ -157,6 +164,33 @@ class Feature {
   }
 
   /**
+   * Enable the feature with an expression.
+   *
+   * Expressions provide complex conditional logic based on actor properties.
+   * Actors must have a `flipperProperties` property for expression evaluation.
+   *
+   * @param expression - Expression object or ExpressionLike instance
+   * @returns True if successful
+   * @example
+   * ```typescript
+   * // Enable for admins
+   * feature.enableExpression({ Property: 'admin' });
+   *
+   * // Enable for admins OR enterprise users
+   * feature.enableExpression({
+   *   Any: [
+   *     { Property: 'admin' },
+   *     { Equal: [{ Property: 'plan' }, 'enterprise'] }
+   *   ]
+   * });
+   * ```
+   */
+  public enableExpression(expression: Record<string, unknown> | ExpressionLike) {
+    const expressionType = ExpressionType.wrap(expression)
+    return this.enable(expressionType)
+  }
+
+  /**
    * Disable the feature for a specific gate type or fully disable it.
    * @param thing - Optional value determining which gate to disable (boolean, actor, group, percentage)
    * @returns True if successful
@@ -208,6 +242,19 @@ class Feature {
   }
 
   /**
+   * Disable the expression gate.
+   * @returns True if successful
+   */
+  public disableExpression() {
+    const gate = this.gate('expression')
+    if (!gate) {
+      throw new Error('Expression gate not found')
+    }
+    this.adapter.add(this)
+    return this.adapter.clear(this)
+  }
+
+  /**
    * Check if the feature is enabled for a specific actor or context.
    * @param thing - Optional actor or context to check against
    * @returns True if the feature is enabled
@@ -255,7 +302,7 @@ class Feature {
     // Conditional if any non-boolean gate is enabled
     const hasEnabledNonBooleanGate = nonBooleanGates.some(gate => {
       const gateKey = gate.key as keyof GateValues
-      const value: boolean | Set<string> | number = values[gateKey]
+      const value: boolean | Set<string> | number | Record<string, unknown> | null = values[gateKey]
       return gate.isEnabled(value)
     })
 
@@ -369,11 +416,11 @@ class Feature {
    * Get all gates that are currently enabled for this feature.
    * @returns Array of enabled gate instances
    */
-  public enabledGates(): Array<ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate> {
+  public enabledGates(): Array<ActorGate | BooleanGate | ExpressionGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate> {
     const values = this.gateValues()
     return this.gates.filter(gate => {
       const gateKey = gate.key as keyof GateValues
-      const value: boolean | Set<string> | number = values[gateKey]
+      const value: boolean | Set<string> | number | Record<string, unknown> | null = values[gateKey]
       return gate.isEnabled(value)
     })
   }
@@ -382,7 +429,7 @@ class Feature {
    * Get all gates that are currently disabled for this feature.
    * @returns Array of disabled gate instances
    */
-  public disabledGates(): Array<ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate> {
+  public disabledGates(): Array<ActorGate | BooleanGate | ExpressionGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate> {
     const enabled = this.enabledGates()
     return this.gates.filter(gate => !enabled.includes(gate))
   }

@@ -114,6 +114,20 @@ class MemoryAdapter implements IAdapter {
           result[gate.key] = this.setMembers(this.key(feature, gate))
           break
         }
+        case 'json': {
+          const rawValue = this.read(this.key(feature, gate))
+          // Parse JSON string back to object
+          if (rawValue && typeof rawValue === 'string') {
+            try {
+              result[gate.key] = JSON.parse(rawValue)
+            } catch {
+              result[gate.key] = null
+            }
+          } else {
+            result[gate.key] = null
+          }
+          break
+        }
         default: {
           throw new Error(`${gate.name} is not supported by this adapter yet`)
         }
@@ -224,6 +238,11 @@ class MemoryAdapter implements IAdapter {
         this.setAdd(this.key(feature, gate), String(thing.value))
         break
       }
+      case 'json': {
+        // For JSON types, store the stringified value directly
+        this.write(this.key(feature, gate), String(thing.value))
+        break
+      }
       default: {
         throw new Error(`${gate.name} is not supported by this adapter yet`)
       }
@@ -250,6 +269,11 @@ class MemoryAdapter implements IAdapter {
       }
       case 'set': {
         this.setDelete(this.key(feature, gate), String(thing.value))
+        break
+      }
+      case 'json': {
+        // For JSON types, delete the key to disable
+        this.delete(this.key(feature, gate))
         break
       }
       default: {

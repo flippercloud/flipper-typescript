@@ -3,7 +3,7 @@ import Typecast from './Typecast'
 /**
  * Container for all gate values of a feature.
  *
- * Encapsulates the state of all gates (boolean, actors, groups, percentages)
+ * Encapsulates the state of all gates (boolean, actors, groups, percentages, expression)
  * for a single feature. Values are type-cast to their expected types for
  * consistent access.
  *
@@ -14,13 +14,14 @@ import Typecast from './Typecast'
  *   actors: ['user-1', 'user-2'],
  *   groups: ['admins'],
  *   percentageOfActors: 25,
- *   percentageOfTime: 10
+ *   percentageOfTime: 10,
+ *   expression: { Property: 'admin' }
  * };
  *
  * const gateValues = new GateValues(rawValues);
  * console.log(gateValues.boolean); // true
  * console.log(gateValues.actors); // Set(['user-1', 'user-2'])
- * console.log(gateValues.percentageOfActors); // 25
+ * console.log(gateValues.expression); // { Property: 'admin' }
  * ```
  */
 class GateValues {
@@ -50,6 +51,11 @@ class GateValues {
   public percentageOfTime: number
 
   /**
+   * Expression gate value (object representation of expression).
+   */
+  public expression: Record<string, unknown> | null
+
+  /**
    * Creates a new GateValues instance.
    * @param values - Raw gate values from adapter (will be type-cast)
    */
@@ -59,6 +65,9 @@ class GateValues {
     this.groups = Typecast.toSet(values.groups)
     this.percentageOfActors = Typecast.toNumber(values.percentageOfActors)
     this.percentageOfTime = Typecast.toNumber(values.percentageOfTime)
+    this.expression = values.expression && typeof values.expression === 'object' && !Array.isArray(values.expression)
+      ? values.expression as Record<string, unknown>
+      : null
   }
 }
 

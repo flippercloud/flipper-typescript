@@ -86,6 +86,14 @@ class FeatureCheckContext {
   get percentageOfTimeValue(): number {
     return this.values.percentageOfTime
   }
+
+  /**
+   * Get the expression gate value.
+   * @returns Expression object or null
+   */
+  get expressionValue(): Record<string, unknown> | null {
+    return this.values.expression
+  }
 }
 
 export default FeatureCheckContext
