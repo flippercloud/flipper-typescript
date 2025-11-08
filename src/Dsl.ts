@@ -55,6 +55,24 @@ class Dsl {
     return true
   }
 
+  public add(featureName: string): boolean {
+    return this.feature(featureName).add()
+  }
+
+  public exist(featureName: string): boolean {
+    return this.feature(featureName).exist()
+  }
+
+  public remove(featureName: string): boolean {
+    return this.feature(featureName).remove()
+  }
+
+  public features(): Feature[] {
+    const featureObjects = this.adapter.features()
+    // Return memoized versions or create new ones
+    return featureObjects.map(f => this.feature(f.name))
+  }
+
   public feature(featureName: string) {
     let feature = this.memoizedFeatures[featureName]
 
