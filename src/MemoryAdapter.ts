@@ -67,6 +67,27 @@ class MemoryAdapter {
     return result
   }
 
+  public getMulti(features: Feature[]): Record<string, Record<string, unknown>> {
+    const result: Record<string, Record<string, unknown>> = {}
+    features.forEach((feature) => {
+      result[feature.key] = this.get(feature)
+    })
+    return result
+  }
+
+  public getAll(): Record<string, Record<string, unknown>> {
+    const result: Record<string, Record<string, unknown>> = {}
+    const allFeatures = this.features()
+    allFeatures.forEach((feature) => {
+      result[feature.key] = this.get(feature)
+    })
+    return result
+  }
+
+  public readOnly(): boolean {
+    return false
+  }
+
   public enable(feature: Feature, gate: IGate, thing: IType): boolean {
     switch (gate.dataType) {
       case 'boolean': {

@@ -12,8 +12,11 @@ export interface IAdapter {
   remove: (feature: Feature) => boolean
   clear: (feature: Feature) => boolean
   get: (feature: Feature) => Record<string, unknown>
+  getMulti: (features: Feature[]) => Record<string, Record<string, unknown>>
+  getAll: () => Record<string, Record<string, unknown>>
   enable: (feature: Feature, gate: IGate, thing: IType) => boolean
   disable: (feature: Feature, gate: IGate, thing: IType) => boolean
+  readOnly: () => boolean
 }
 
 export interface IGate {
