@@ -1,5 +1,5 @@
-import FeatureCheckContext from './FeatureCheckContext'
-import Feature from './Feature'
+import type FeatureCheckContext from './FeatureCheckContext'
+import type Feature from './Feature'
 
 export interface IActor {
   flipperId: string

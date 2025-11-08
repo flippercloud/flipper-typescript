@@ -1,7 +1,5 @@
 import Feature from './Feature'
 import MemoryAdapter from './MemoryAdapter'
-import Dsl from './Dsl'
-import { IActor } from './interfaces'
 import { makeActor } from './test_helper'
 
 let adapter: MemoryAdapter
@@ -752,36 +750,45 @@ describe('Feature', () => {
       })
     })
 
-    describe('toParam', () => {
-      test('returns feature name for URL usage', () => {
-        const testFeature = new Feature('my-feature', adapter, {})
-        expect(testFeature.toParam()).toBe('my-feature')
-      })
-    })
-
-    describe('inspect', () => {
-      test('returns debug string with feature details', () => {
+    describe('toJSON', () => {
+      test('returns JSON-serializable object with feature details', () => {
         const testFeature = new Feature('debug-feature', adapter, {})
         testFeature.enable()
-        const result = testFeature.inspect()
-        expect(result).toContain('name="debug-feature"')
-        expect(result).toContain('state="on"')
-        expect(result).toContain('enabled_gate_names=["boolean"]')
-        expect(result).toContain('adapter="memory"')
+        const result = testFeature.toJSON()
+        expect(result).toEqual({
+          name: 'debug-feature',
+          state: 'on',
+          enabledGates: ['boolean'],
+          adapter: 'memory'
+        })
+      })
+
+      test('works with JSON.stringify', () => {
+        const testFeature = new Feature('json-feature', adapter, {})
+        testFeature.enable()
+        const json = JSON.stringify(testFeature)
+        const parsed = JSON.parse(json) as { name: string; state: string; enabledGates: string[]; adapter: string }
+        expect(parsed.name).toBe('json-feature')
+        expect(parsed.state).toBe('on')
       })
     })
 
-    describe('getGroups', () => {
-      test('returns enabled groups (alias for enabledGroups)', () => {
-        const adminCheck = (actor: IActor) => actor.isAdmin
-        const dsl = new Dsl(adapter)
-        dsl.register('admins', adminCheck)
-        const testFeature = new Feature('group-feature', adapter, dsl.groups)
+    describe('Node.js inspect', () => {
+      test('returns pretty debug string', () => {
+        const testFeature = new Feature('inspect-feature', adapter, {})
+        testFeature.enable()
+        const inspectSymbol = Symbol.for('nodejs.util.inspect.custom')
+        const result = (testFeature as unknown as Record<symbol, () => string>)[inspectSymbol]!()
+        expect(result).toBe('Feature(inspect-feature) { state: on, gates: [boolean] }')
+      })
 
+      test('shows conditional state with multiple gates', () => {
+        const testFeature = new Feature('multi-gate', adapter, {})
+        testFeature.enableActor(makeActor(1))
         testFeature.enableGroup('admins')
-        const groups = testFeature.getGroups()
-        expect(groups).toHaveLength(1)
-        expect(groups[0]?.value).toBe('admins')
+        const inspectSymbol = Symbol.for('nodejs.util.inspect.custom')
+        const result = (testFeature as unknown as Record<symbol, () => string>)[inspectSymbol]!()
+        expect(result).toBe('Feature(multi-gate) { state: conditional, gates: [actor, group] }')
       })
     })
   })

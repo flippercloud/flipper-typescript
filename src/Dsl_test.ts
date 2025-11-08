@@ -158,14 +158,6 @@ describe('Dsl', () => {
     })
   })
 
-  describe('get', () => {
-    test('returns feature instance (alias for feature method)', () => {
-      const feature1 = dsl.get('test-feature')
-      const feature2 = dsl.feature('test-feature')
-      expect(feature1).toBe(feature2)
-    })
-  })
-
   describe('group', () => {
     test('returns registered group by name', () => {
       const groupName = 'admins'

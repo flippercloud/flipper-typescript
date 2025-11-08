@@ -26,7 +26,7 @@ class Feature {
     this.gates = [
       new ActorGate(),
       new BooleanGate(),
-      new GroupGate(groups),
+      new GroupGate(this.groups),
       new PercentageOfActorsGate(),
       new PercentageOfTimeGate(),
     ]
@@ -244,22 +244,17 @@ class Feature {
     return this.name
   }
 
-  public toParam(): string {
-    return this.toString()
+  public toJSON(): { name: string; state: string; enabledGates: string[]; adapter: string } {
+    return {
+      name: this.name,
+      state: this.state(),
+      enabledGates: this.enabledGateNames(),
+      adapter: String(this.adapter.name)
+    }
   }
 
-  public inspect(): string {
-    const attributes = [
-      `name=${JSON.stringify(this.name)}`,
-      `state=${JSON.stringify(this.state())}`,
-      `enabled_gate_names=${JSON.stringify(this.enabledGateNames())}`,
-      `adapter=${JSON.stringify(this.adapter.name)}`,
-    ]
-    return `#<Feature ${attributes.join(', ')}>`
-  }
-
-  public getGroups(): GroupType[] {
-    return this.enabledGroups()
+  public [Symbol.for('nodejs.util.inspect.custom')](): string {
+    return `Feature(${this.name}) { state: ${this.state()}, gates: [${this.enabledGateNames().join(', ')}] }`
   }
 }
 
