@@ -5,7 +5,8 @@ import FeatureCheckContext from './FeatureCheckContext'
 import GateValues from './GateValues'
 import GroupGate from './GroupGate'
 import GroupType from './GroupType'
-import { IActor, IAdapter } from './interfaces'
+import { IActor, IAdapter, IInstrumenter, InstrumentationPayload, IType } from './interfaces'
+import NoopInstrumenter from './instrumenters/NoopInstrumenter'
 import PercentageOfActorsGate from './PercentageOfActorsGate'
 import PercentageOfActorsType from './PercentageOfActorsType'
 import PercentageOfTimeGate from './PercentageOfTimeGate'
@@ -65,16 +66,34 @@ class Feature {
   private groups: Record<string, GroupType>
 
   /**
+   * The instrumenter used for tracking operations.
+   */
+  private instrumenter: IInstrumenter
+
+  /**
+   * Name of the instrumentation event emitted by Feature operations.
+   */
+  private static readonly INSTRUMENTATION_NAME = 'feature_operation.flipper'
+
+  /**
    * Creates a new Feature instance.
    * @param name - The name of the feature
    * @param adapter - The adapter to use for persistence
    * @param groups - Registry of registered groups
+   * @param options - Optional configuration
+   * @param options.instrumenter - The instrumenter to use for tracking operations
    */
-  constructor(name: string, adapter: IAdapter, groups: Record<string, GroupType>) {
+  constructor(
+    name: string,
+    adapter: IAdapter,
+    groups: Record<string, GroupType>,
+    options: { instrumenter?: IInstrumenter } = {}
+  ) {
     this.name = name
     this.key = name
     this.adapter = adapter
     this.groups = groups
+    this.instrumenter = options.instrumenter ?? new NoopInstrumenter()
     this.gates = [
       new ActorGate(),
       new BooleanGate(),
@@ -90,11 +109,15 @@ class Feature {
    * @returns True if successful
    */
   public enable(thing?: unknown): boolean {
-    if (thing === undefined || thing === null) { thing = true }
-    this.adapter.add(this)
-    const gate = this.gateFor(thing)
-    const thingType = gate.wrap(thing)
-    return this.adapter.enable(this, gate, thingType)
+    return this.instrument('enable', (payload) => {
+      if (thing === undefined || thing === null) { thing = true }
+      this.adapter.add(this)
+      const gate = this.gateFor(thing)
+      const thingType = gate.wrap(thing)
+      payload.gate_name = gate.key
+      payload.thing = thingType
+      return this.adapter.enable(this, gate, thingType)
+    })
   }
 
   /**
@@ -139,11 +162,15 @@ class Feature {
    * @returns True if successful
    */
   public disable(thing?: unknown): boolean {
-    if (thing === undefined || thing === null) { thing = false }
-    this.adapter.add(this)
-    const gate = this.gateFor(thing)
-    const thingType = gate.wrap(thing)
-    return this.adapter.disable(this, gate, thingType)
+    return this.instrument('disable', (payload) => {
+      if (thing === undefined || thing === null) { thing = false }
+      this.adapter.add(this)
+      const gate = this.gateFor(thing)
+      const thingType = gate.wrap(thing)
+      payload.gate_name = gate.key
+      payload.thing = thingType
+      return this.adapter.disable(this, gate, thingType)
+    })
   }
 
   /**
@@ -186,20 +213,29 @@ class Feature {
    * @returns True if the feature is enabled
    */
   public isEnabled(thing?: unknown): boolean {
-    const values = this.gateValues()
-    let isEnabled = false
+    return this.instrument('enabled?', (payload) => {
+      const values = this.gateValues()
+      let isEnabled = false
 
-    this.gates.some((gate) => {
-      let thingType: unknown = thing
-      const actorGate = this.gate('actor')
-      if (typeof(thingType) !== 'undefined' && actorGate) { thingType = actorGate.wrap(thing) }
-      const context = new FeatureCheckContext(this.name, values, thingType)
-      const isOpen = gate.isOpen(context)
-      if (isOpen) { isEnabled = true }
-      return isOpen
+      if (thing !== undefined) {
+        payload.thing = thing as unknown as IType
+      }
+
+      this.gates.some((gate) => {
+        let thingType: unknown = thing
+        const actorGate = this.gate('actor')
+        if (typeof(thingType) !== 'undefined' && actorGate) { thingType = actorGate.wrap(thing) }
+        const context = new FeatureCheckContext(this.name, values, thingType)
+        const isOpen = gate.isOpen(context)
+        if (isOpen) {
+          isEnabled = true
+          payload.gate_name = gate.key
+        }
+        return isOpen
+      })
+
+      return isEnabled
     })
-
-    return isEnabled
   }
 
   /**
@@ -295,11 +331,11 @@ class Feature {
   }
 
   /**
-   * Add this feature to the adapter (creates it if it doesn't exist).
+   * Add this feature to the adapter if it doesn't already exist.
    * @returns True if successful
    */
   public add(): boolean {
-    return this.adapter.add(this)
+    return this.instrument('add', () => this.adapter.add(this))
   }
 
   /**
@@ -307,8 +343,10 @@ class Feature {
    * @returns True if the feature exists
    */
   public exist(): boolean {
-    const features = this.adapter.features()
-    return features.some(f => f.key === this.key)
+    return this.instrument('exist?', () => {
+      const features = this.adapter.features()
+      return features.some(f => f.key === this.key)
+    })
   }
 
   /**
@@ -316,7 +354,7 @@ class Feature {
    * @returns True if successful
    */
   public remove(): boolean {
-    return this.adapter.remove(this)
+    return this.instrument('remove', () => this.adapter.remove(this))
   }
 
   /**
@@ -324,7 +362,7 @@ class Feature {
    * @returns True if successful
    */
   public clear(): boolean {
-    return this.adapter.clear(this)
+    return this.instrument('clear', () => this.adapter.clear(this))
   }
 
   /**
@@ -468,6 +506,21 @@ class Feature {
    */
   public [Symbol.for('nodejs.util.inspect.custom')](): string {
     return `Feature(${this.name}) { state: ${this.state()}, gates: [${this.enabledGateNames().join(', ')}] }`
+  }
+
+  /**
+   * Instrument a feature operation.
+   *
+   * @param operation - The name of the operation being performed
+   * @param fn - The function to execute and instrument
+   * @returns The result of the function
+   */
+  private instrument<T>(operation: string, fn: (payload: InstrumentationPayload) => T): T {
+    return this.instrumenter.instrument(Feature.INSTRUMENTATION_NAME, {}, (payload) => {
+      payload.feature_name = this.name
+      payload.operation = operation
+      return fn(payload)
+    })
   }
 }
 
