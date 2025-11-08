@@ -1,5 +1,7 @@
 import Feature from './Feature'
 import MemoryAdapter from './MemoryAdapter'
+import Dsl from './Dsl'
+import { IActor } from './interfaces'
 import { makeActor } from './test_helper'
 
 let adapter: MemoryAdapter
@@ -747,6 +749,39 @@ describe('Feature', () => {
       test('returns feature name', () => {
         const testFeature = new Feature('my-feature', adapter, {})
         expect(testFeature.toString()).toBe('my-feature')
+      })
+    })
+
+    describe('toParam', () => {
+      test('returns feature name for URL usage', () => {
+        const testFeature = new Feature('my-feature', adapter, {})
+        expect(testFeature.toParam()).toBe('my-feature')
+      })
+    })
+
+    describe('inspect', () => {
+      test('returns debug string with feature details', () => {
+        const testFeature = new Feature('debug-feature', adapter, {})
+        testFeature.enable()
+        const result = testFeature.inspect()
+        expect(result).toContain('name="debug-feature"')
+        expect(result).toContain('state="on"')
+        expect(result).toContain('enabled_gate_names=["boolean"]')
+        expect(result).toContain('adapter="memory"')
+      })
+    })
+
+    describe('getGroups', () => {
+      test('returns enabled groups (alias for enabledGroups)', () => {
+        const adminCheck = (actor: IActor) => actor.isAdmin
+        const dsl = new Dsl(adapter)
+        dsl.register('admins', adminCheck)
+        const testFeature = new Feature('group-feature', adapter, dsl.groups)
+
+        testFeature.enableGroup('admins')
+        const groups = testFeature.getGroups()
+        expect(groups).toHaveLength(1)
+        expect(groups[0]?.value).toBe('admins')
       })
     })
   })

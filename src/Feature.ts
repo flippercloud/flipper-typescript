@@ -243,6 +243,24 @@ class Feature {
   public toString(): string {
     return this.name
   }
+
+  public toParam(): string {
+    return this.toString()
+  }
+
+  public inspect(): string {
+    const attributes = [
+      `name=${JSON.stringify(this.name)}`,
+      `state=${JSON.stringify(this.state())}`,
+      `enabled_gate_names=${JSON.stringify(this.enabledGateNames())}`,
+      `adapter=${JSON.stringify(this.adapter.name)}`,
+    ]
+    return `#<Feature ${attributes.join(', ')}>`
+  }
+
+  public getGroups(): GroupType[] {
+    return this.enabledGroups()
+  }
 }
 
 export default Feature

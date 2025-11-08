@@ -7,6 +7,7 @@ export interface IActor {
 }
 
 export interface IAdapter {
+  name: string
   features: () => Feature[]
   add: (feature: Feature) => boolean
   remove: (feature: Feature) => boolean
