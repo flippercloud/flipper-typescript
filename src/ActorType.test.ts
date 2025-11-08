@@ -1,5 +1,5 @@
 import ActorType from './ActorType'
-import { makeActor } from './test_helper'
+import { makeActor } from './testHelpers'
 
 const actor = makeActor(1)
 const wrapped = ActorType.wrap(actor)

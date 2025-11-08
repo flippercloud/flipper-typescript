@@ -13,6 +13,10 @@ class BooleanGate implements IGate {
     this.dataType = 'boolean'
   }
 
+  public isEnabled(value: unknown): boolean {
+    return value === true
+  }
+
   public isOpen(context: FeatureCheckContext): boolean {
     return context.booleanValue === true
   }

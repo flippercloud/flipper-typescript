@@ -19,6 +19,10 @@ class PercentageOfActorsGate implements IGate {
     this.dataType = 'number'
   }
 
+  public isEnabled(value: unknown): boolean {
+    return typeof value === 'number' && value > 0
+  }
+
   public isOpen(context: FeatureCheckContext): boolean {
     let usable = false
     if (typeof(context.thing) === 'undefined') { return false }

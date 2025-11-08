@@ -1,5 +1,5 @@
 import Feature from './Feature'
-import { IGate, IType } from './interfaces'
+import { IAdapter, IGate, IType } from './interfaces'
 
 interface IFeatures {
   [index: string]: Feature
@@ -11,7 +11,7 @@ interface IFeatureGates {
   [index: string]: StorageValue
 }
 
-class MemoryAdapter {
+class MemoryAdapter implements IAdapter {
   public name: string
   private featuresStore: IFeatures
   private sourceStore: IFeatureGates
@@ -65,6 +65,27 @@ class MemoryAdapter {
     })
 
     return result
+  }
+
+  public getMulti(features: Feature[]): Record<string, Record<string, unknown>> {
+    const result: Record<string, Record<string, unknown>> = {}
+    features.forEach((feature) => {
+      result[feature.key] = this.get(feature)
+    })
+    return result
+  }
+
+  public getAll(): Record<string, Record<string, unknown>> {
+    const result: Record<string, Record<string, unknown>> = {}
+    const allFeatures = this.features()
+    allFeatures.forEach((feature) => {
+      result[feature.key] = this.get(feature)
+    })
+    return result
+  }
+
+  public readOnly(): boolean {
+    return false
   }
 
   public enable(feature: Feature, gate: IGate, thing: IType): boolean {

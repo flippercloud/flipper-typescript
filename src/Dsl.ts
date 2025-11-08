@@ -55,18 +55,62 @@ class Dsl {
     return true
   }
 
+  public add(featureName: string): boolean {
+    return this.feature(featureName).add()
+  }
+
+  public exist(featureName: string): boolean {
+    return this.feature(featureName).exist()
+  }
+
+  public remove(featureName: string): boolean {
+    return this.feature(featureName).remove()
+  }
+
+  public features(): Feature[] {
+    const featureObjects = this.adapter.features()
+    // Return memoized versions or create new ones
+    return featureObjects.map(f => this.feature(f.name))
+  }
+
   public feature(featureName: string) {
     let feature = this.memoizedFeatures[featureName]
 
     if (feature === undefined) {
       feature = new Feature(featureName, this.adapter, this.groups)
+      this.memoizedFeatures[featureName] = feature
     }
 
     return feature
   }
 
+  public preload(featureNames: string[]): Feature[] {
+    const features = featureNames.map(name => this.feature(name))
+    this.adapter.getMulti(features)
+    return features
+  }
+
+  public preloadAll(): Feature[] {
+    const allData = this.adapter.getAll()
+    const keys = Object.keys(allData)
+    return keys.map(key => this.feature(key))
+  }
+
+  public readOnly(): boolean {
+    return this.adapter.readOnly()
+  }
+
   public register(groupName: string, callback: GroupCallback): void {
     this.groups[groupName] = new GroupType(groupName, callback)
+  }
+
+  // Alias for feature() - provides shorthand access
+  public get(featureName: string): Feature {
+    return this.feature(featureName)
+  }
+
+  public group(groupName: string): GroupType | undefined {
+    return this.groups[groupName]
   }
 }
 

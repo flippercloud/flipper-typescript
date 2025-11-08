@@ -16,15 +16,17 @@ class Feature {
   public key: string
   public gates: Array<ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate>
   private adapter: IAdapter
+  private groups: Record<string, GroupType>
 
   constructor(name: string, adapter: IAdapter, groups: Record<string, GroupType>) {
     this.name = name
     this.key = name
     this.adapter = adapter
+    this.groups = groups
     this.gates = [
       new ActorGate(),
       new BooleanGate(),
-      new GroupGate(groups),
+      new GroupGate(this.groups),
       new PercentageOfActorsGate(),
       new PercentageOfTimeGate(),
     ]
@@ -34,7 +36,6 @@ class Feature {
     if (thing === undefined || thing === null) { thing = true }
     this.adapter.add(this)
     const gate = this.gateFor(thing)
-    if (!gate) { throw new Error('No gate found for thing') }
     const thingType = gate.wrap(thing)
     return this.adapter.enable(this, gate, thingType)
   }
@@ -56,10 +57,9 @@ class Feature {
   }
 
   public disable(thing?: unknown): boolean {
-    if (thing === undefined || thing === null) { thing = true }
+    if (thing === undefined || thing === null) { thing = false }
     this.adapter.add(this)
     const gate = this.gateFor(thing)
-    if (!gate) { throw new Error('No gate found for thing') }
     const thingType = gate.wrap(thing)
     return this.adapter.disable(this, gate, thingType)
   }
@@ -70,6 +70,14 @@ class Feature {
 
   public disableGroup(groupName: string) {
     return this.disable(GroupType.wrap(groupName))
+  }
+
+  public disablePercentageOfActors() {
+    return this.disable(PercentageOfActorsType.wrap(0))
+  }
+
+  public disablePercentageOfTime() {
+    return this.disable(PercentageOfTimeType.wrap(0))
   }
 
   public isEnabled(thing?: unknown): boolean {
@@ -89,11 +97,120 @@ class Feature {
     return isEnabled
   }
 
+  public state(): 'on' | 'off' | 'conditional' {
+    const values = this.gateValues()
+    const booleanGate = this.gate('boolean')
+    const nonBooleanGates = this.gates.filter(gate => gate !== booleanGate)
+
+    // Fully on if boolean gate is enabled or percentage of time is 100
+    if (values.boolean || values.percentageOfTime === 100) {
+      return 'on'
+    }
+
+    // Conditional if any non-boolean gate is enabled
+    const hasEnabledNonBooleanGate = nonBooleanGates.some(gate => {
+      const gateKey = gate.key as keyof GateValues
+      const value: boolean | Set<string> | number = values[gateKey]
+      return gate.isEnabled(value)
+    })
+
+    if (hasEnabledNonBooleanGate) {
+      return 'conditional'
+    }
+
+    return 'off'
+  }
+
+  public isOn(): boolean {
+    return this.state() === 'on'
+  }
+
+  public isOff(): boolean {
+    return this.state() === 'off'
+  }
+
+  public isConditional(): boolean {
+    return this.state() === 'conditional'
+  }
+
+  public booleanValue(): boolean {
+    return this.gateValues().boolean
+  }
+
+  public actorsValue(): Set<string> {
+    return this.gateValues().actors
+  }
+
+  public groupsValue(): Set<string> {
+    return this.gateValues().groups
+  }
+
+  public percentageOfActorsValue(): number {
+    return this.gateValues().percentageOfActors
+  }
+
+  public percentageOfTimeValue(): number {
+    return this.gateValues().percentageOfTime
+  }
+
+  public add(): boolean {
+    return this.adapter.add(this)
+  }
+
+  public exist(): boolean {
+    const features = this.adapter.features()
+    return features.some(f => f.key === this.key)
+  }
+
+  public remove(): boolean {
+    return this.adapter.remove(this)
+  }
+
+  public clear(): boolean {
+    return this.adapter.clear(this)
+  }
+
+  public enabledGates(): Array<ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate> {
+    const values = this.gateValues()
+    return this.gates.filter(gate => {
+      const gateKey = gate.key as keyof GateValues
+      const value: boolean | Set<string> | number = values[gateKey]
+      return gate.isEnabled(value)
+    })
+  }
+
+  public disabledGates(): Array<ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate> {
+    const enabled = this.enabledGates()
+    return this.gates.filter(gate => !enabled.includes(gate))
+  }
+
+  public enabledGateNames(): string[] {
+    return this.enabledGates().map(gate => gate.name)
+  }
+
+  public disabledGateNames(): string[] {
+    return this.disabledGates().map(gate => gate.name)
+  }
+
+  public enabledGroups(): GroupType[] {
+    const enabledGroupNames = this.groupsValue()
+    return Object.values(this.groups).filter(group =>
+      enabledGroupNames.has(group.value)
+    )
+  }
+
+  public disabledGroups(): GroupType[] {
+    const enabled = this.enabledGroups()
+    return Object.values(this.groups).filter(group =>
+      !enabled.includes(group)
+    )
+  }
+
   private gateValues() {
     return new GateValues(this.adapter.get(this))
   }
 
-  private gateFor(thing: unknown): ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate | undefined {
+  public gateFor(thing: unknown): ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate {
     let returnGate: ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate | undefined
 
     this.gates.some((gate) => {
@@ -102,13 +219,42 @@ class Feature {
       return protectsThing
     })
 
+    if (!returnGate) {
+      throw new Error(`No gate found for ${String(thing)}`)
+    }
+
     return returnGate
   }
 
-  private gate(name: string): ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate | undefined {
+  public gate(name: string): ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate | undefined {
     return this.gates.find((gate) => {
       return gate.name === name
     })
+  }
+
+  public gatesHash(): Record<string, ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate> {
+    const hash: Record<string, ActorGate | BooleanGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate> = {}
+    this.gates.forEach((gate) => {
+      hash[gate.name] = gate
+    })
+    return hash
+  }
+
+  public toString(): string {
+    return this.name
+  }
+
+  public toJSON(): { name: string; state: string; enabledGates: string[]; adapter: string } {
+    return {
+      name: this.name,
+      state: this.state(),
+      enabledGates: this.enabledGateNames(),
+      adapter: String(this.adapter.name)
+    }
+  }
+
+  public [Symbol.for('nodejs.util.inspect.custom')](): string {
+    return `Feature(${this.name}) { state: ${this.state()}, gates: [${this.enabledGateNames().join(', ')}] }`
   }
 }
 

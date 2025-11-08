@@ -16,6 +16,17 @@ class GroupGate implements IGate {
     this.groups = groups
   }
 
+  public isEnabled(value: unknown): boolean {
+    if (!value) return false
+    if (value instanceof Set) {
+      return value.size > 0
+    }
+    if (Array.isArray(value)) {
+      return value.length > 0
+    }
+    return false
+  }
+
   public isOpen(context: FeatureCheckContext): boolean {
     if (context.thing === 'undefined') { return false }
 

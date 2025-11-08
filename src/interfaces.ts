@@ -1,5 +1,5 @@
-import FeatureCheckContext from './FeatureCheckContext'
-import Feature from './Feature'
+import type FeatureCheckContext from './FeatureCheckContext'
+import type Feature from './Feature'
 
 export interface IActor {
   flipperId: string
@@ -7,12 +7,17 @@ export interface IActor {
 }
 
 export interface IAdapter {
+  name: string
   features: () => Feature[]
   add: (feature: Feature) => boolean
   remove: (feature: Feature) => boolean
+  clear: (feature: Feature) => boolean
   get: (feature: Feature) => Record<string, unknown>
+  getMulti: (features: Feature[]) => Record<string, Record<string, unknown>>
+  getAll: () => Record<string, Record<string, unknown>>
   enable: (feature: Feature, gate: IGate, thing: IType) => boolean
   disable: (feature: Feature, gate: IGate, thing: IType) => boolean
+  readOnly: () => boolean
 }
 
 export interface IGate {
@@ -20,6 +25,7 @@ export interface IGate {
   key: string
   dataType: string
   isOpen: (context: FeatureCheckContext) => boolean
+  isEnabled: (value: unknown) => boolean
   protectsThing: (thing: unknown) => boolean
   wrap: (thing: unknown) => IType
 }
