@@ -23,27 +23,25 @@ import { type ExpressionLike } from './expressions'
  * group, percentage of actors, percentage of time).
  *
  * @example
- * ```typescript
  * const adapter = new MemoryAdapter();
  * const groups = {};
  * const feature = new Feature('new-ui', adapter, groups);
  *
  * // Enable for everyone
- * feature.enable();
+ * await feature.enable();
  *
  * // Enable for specific actor
- * feature.enableActor({ flipperId: 'user-123' });
+ * await feature.enableActor({ flipperId: 'user-123' });
  *
  * // Enable with expression
- * feature.enableExpression({ Property: 'admin' });
+ * await feature.enableExpression({ Property: 'admin' });
  *
  * // Check if enabled
- * feature.isEnabled(); // true
- * feature.isEnabled({ flipperId: 'user-123' }); // true
+ * await feature.isEnabled(); // true
+ * await feature.isEnabled({ flipperId: 'user-123' }); // true
  *
  * // Check state
- * feature.state(); // 'on' | 'off' | 'conditional'
- * ```
+ * await feature.state(); // 'on' | 'off' | 'conditional'
  */
 class Feature {
   /**
@@ -115,15 +113,15 @@ class Feature {
    * @param thing - Optional value determining which gate to enable (boolean, actor, group, percentage)
    * @returns True if successful
    */
-  public enable(thing?: unknown): boolean {
-    return this.instrument('enable', (payload) => {
+  async enable(thing?: unknown): Promise<boolean> {
+    return this.instrument('enable', async (payload) => {
       if (thing === undefined || thing === null) { thing = true }
-      this.adapter.add(this)
+      await this.adapter.add(this)
       const gate = this.gateFor(thing)
       const thingType = gate.wrap(thing)
       payload.gate_name = gate.key
       payload.thing = thingType
-      return this.adapter.enable(this, gate, thingType)
+      return await this.adapter.enable(this, gate, thingType)
     })
   }
 
@@ -172,18 +170,16 @@ class Feature {
    * @param expression - Expression object or ExpressionLike instance
    * @returns True if successful
    * @example
-   * ```typescript
    * // Enable for admins
-   * feature.enableExpression({ Property: 'admin' });
+   * await feature.enableExpression({ Property: 'admin' });
    *
    * // Enable for admins OR enterprise users
-   * feature.enableExpression({
+   * await feature.enableExpression({
    *   Any: [
    *     { Property: 'admin' },
    *     { Equal: [{ Property: 'plan' }, 'enterprise'] }
    *   ]
    * });
-   * ```
    */
   public enableExpression(expression: Record<string, unknown> | ExpressionLike) {
     const expressionType = ExpressionType.wrap(expression)
@@ -195,15 +191,15 @@ class Feature {
    * @param thing - Optional value determining which gate to disable (boolean, actor, group, percentage)
    * @returns True if successful
    */
-  public disable(thing?: unknown): boolean {
-    return this.instrument('disable', (payload) => {
+  async disable(thing?: unknown): Promise<boolean> {
+    return this.instrument('disable', async (payload) => {
       if (thing === undefined || thing === null) { thing = false }
-      this.adapter.add(this)
+      await this.adapter.add(this)
       const gate = this.gateFor(thing)
       const thingType = gate.wrap(thing)
       payload.gate_name = gate.key
       payload.thing = thingType
-      return this.adapter.disable(this, gate, thingType)
+      return await this.adapter.disable(this, gate, thingType)
     })
   }
 
@@ -245,12 +241,12 @@ class Feature {
    * Disable the expression gate.
    * @returns True if successful
    */
-  public disableExpression() {
+  async disableExpression(): Promise<boolean> {
     const gate = this.gate('expression')
     if (!gate) {
       throw new Error('Expression gate not found')
     }
-    this.adapter.add(this)
+    await this.adapter.add(this)
     return this.adapter.clear(this)
   }
 
@@ -259,9 +255,9 @@ class Feature {
    * @param thing - Optional actor or context to check against
    * @returns True if the feature is enabled
    */
-  public isEnabled(thing?: unknown): boolean {
-    return this.instrument('enabled?', (payload) => {
-      const values = this.gateValues()
+  async isEnabled(thing?: unknown): Promise<boolean> {
+    return this.instrument('enabled?', async (payload) => {
+      const values = await this.gateValues()
       let isEnabled = false
 
       if (thing !== undefined) {
@@ -289,8 +285,8 @@ class Feature {
    * Get the overall state of the feature.
    * @returns 'on' if fully enabled, 'off' if disabled, 'conditional' if partially enabled
    */
-  public state(): 'on' | 'off' | 'conditional' {
-    const values = this.gateValues()
+  public async state(): Promise<'on' | 'off' | 'conditional'> {
+    const values = await this.gateValues()
     const booleanGate = this.gate('boolean')
     const nonBooleanGates = this.gates.filter(gate => gate !== booleanGate)
 
@@ -317,81 +313,81 @@ class Feature {
    * Check if the feature state is 'on' (fully enabled).
    * @returns True if feature is fully enabled
    */
-  public isOn(): boolean {
-    return this.state() === 'on'
+  public async isOn(): Promise<boolean> {
+    return await this.state() === 'on'
   }
 
   /**
    * Check if the feature state is 'off' (fully disabled).
    * @returns True if feature is fully disabled
    */
-  public isOff(): boolean {
-    return this.state() === 'off'
+  public async isOff(): Promise<boolean> {
+    return await this.state() === 'off'
   }
 
   /**
    * Check if the feature state is 'conditional' (partially enabled).
    * @returns True if feature is conditionally enabled
    */
-  public isConditional(): boolean {
-    return this.state() === 'conditional'
+  public async isConditional(): Promise<boolean> {
+    return await this.state() === 'conditional'
   }
 
   /**
    * Get the boolean gate value.
    * @returns True if boolean gate is enabled
    */
-  public booleanValue(): boolean {
-    return this.gateValues().boolean
+  public async booleanValue(): Promise<boolean> {
+    return (await this.gateValues()).boolean
   }
 
   /**
    * Get the set of actor IDs that have this feature enabled.
    * @returns Set of actor IDs
    */
-  public actorsValue(): Set<string> {
-    return this.gateValues().actors
+  public async actorsValue(): Promise<Set<string>> {
+    return (await this.gateValues()).actors
   }
 
   /**
    * Get the set of group names that have this feature enabled.
    * @returns Set of group names
    */
-  public groupsValue(): Set<string> {
-    return this.gateValues().groups
+  public async groupsValue(): Promise<Set<string>> {
+    return (await this.gateValues()).groups
   }
 
   /**
    * Get the percentage of actors value.
    * @returns Percentage (0-100)
    */
-  public percentageOfActorsValue(): number {
-    return this.gateValues().percentageOfActors
+  public async percentageOfActorsValue(): Promise<number> {
+    return (await this.gateValues()).percentageOfActors
   }
 
   /**
    * Get the percentage of time value.
    * @returns Percentage (0-100)
    */
-  public percentageOfTimeValue(): number {
-    return this.gateValues().percentageOfTime
+  public async percentageOfTimeValue(): Promise<number> {
+    return (await this.gateValues()).percentageOfTime
   }
 
   /**
    * Add this feature to the adapter if it doesn't already exist.
    * @returns True if successful
    */
-  public add(): boolean {
-    return this.instrument('add', () => this.adapter.add(this))
+  async add(): Promise<boolean> {
+    return this.instrument('add', async () => this.adapter.add(this))
   }
 
   /**
    * Check if this feature exists in the adapter.
    * @returns True if the feature exists
    */
-  public exist(): boolean {
-    return this.instrument('exist?', () => {
-      const features = this.adapter.features()
+  async exist(): Promise<boolean> {
+    return this.instrument('exist?', async () => {
+      const features = await this.adapter.features()
       return features.some(f => f.key === this.key)
     })
   }
@@ -400,24 +396,24 @@ class Feature {
    * Remove this feature from the adapter (deletes it completely).
    * @returns True if successful
    */
-  public remove(): boolean {
-    return this.instrument('remove', () => this.adapter.remove(this))
+  async remove(): Promise<boolean> {
+    return this.instrument('remove', async () => this.adapter.remove(this))
   }
 
   /**
    * Clear all gate values for this feature.
    * @returns True if successful
    */
-  public clear(): boolean {
-    return this.instrument('clear', () => this.adapter.clear(this))
+  async clear(): Promise<boolean> {
+    return this.instrument('clear', async () => this.adapter.clear(this))
   }
 
   /**
    * Get all gates that are currently enabled for this feature.
    * @returns Array of enabled gate instances
    */
-  public enabledGates(): Array<ActorGate | BooleanGate | ExpressionGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate> {
-    const values = this.gateValues()
+  public async enabledGates(): Promise<Array<ActorGate | BooleanGate | ExpressionGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate>> {
+    const values = await this.gateValues()
     return this.gates.filter(gate => {
       const gateKey = gate.key as keyof GateValues
       const value: boolean | Set<string> | number | Record<string, unknown> | null = values[gateKey]
@@ -429,8 +425,8 @@ class Feature {
    * Get all gates that are currently disabled for this feature.
    * @returns Array of disabled gate instances
    */
-  public disabledGates(): Array<ActorGate | BooleanGate | ExpressionGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate> {
-    const enabled = this.enabledGates()
+  public async disabledGates(): Promise<Array<ActorGate | BooleanGate | ExpressionGate | GroupGate | PercentageOfActorsGate | PercentageOfTimeGate>> {
+    const enabled = await this.enabledGates()
     return this.gates.filter(gate => !enabled.includes(gate))
   }
 
@@ -438,24 +434,24 @@ class Feature {
    * Get the names of all enabled gates.
    * @returns Array of enabled gate names
    */
-  public enabledGateNames(): string[] {
-    return this.enabledGates().map(gate => gate.name)
+  public async enabledGateNames(): Promise<string[]> {
+    return (await this.enabledGates()).map(gate => gate.name)
   }
 
   /**
    * Get the names of all disabled gates.
    * @returns Array of disabled gate names
    */
-  public disabledGateNames(): string[] {
-    return this.disabledGates().map(gate => gate.name)
+  public async disabledGateNames(): Promise<string[]> {
+    return (await this.disabledGates()).map(gate => gate.name)
   }
 
   /**
    * Get all groups that are enabled for this feature.
    * @returns Array of enabled GroupType instances
    */
-  public enabledGroups(): GroupType[] {
-    const enabledGroupNames = this.groupsValue()
+  public async enabledGroups(): Promise<GroupType[]> {
+    const enabledGroupNames = await this.groupsValue()
     return Object.values(this.groups).filter(group =>
       enabledGroupNames.has(group.value)
     )
@@ -465,8 +461,8 @@ class Feature {
    * Get all groups that are disabled for this feature.
    * @returns Array of disabled GroupType instances
    */
-  public disabledGroups(): GroupType[] {
-    const enabled = this.enabledGroups()
+  public async disabledGroups(): Promise<GroupType[]> {
+    const enabled = await this.enabledGroups()
     return Object.values(this.groups).filter(group =>
       !enabled.includes(group)
     )
@@ -477,8 +473,8 @@ class Feature {
    * @private
    * @returns GateValues instance
    */
-  private gateValues() {
-    return new GateValues(this.adapter.get(this))
+  private async gateValues(): Promise<GateValues> {
+    return new GateValues(await this.adapter.get(this))
   }
 
   /**
@@ -538,11 +534,11 @@ class Feature {
    * Get JSON representation of the feature.
    * @returns Object with feature details
    */
-  public toJSON(): { name: string; state: string; enabledGates: string[]; adapter: string } {
+  public async toJSON(): Promise<{ name: string; state: string; enabledGates: string[]; adapter: string }> {
     return {
       name: this.name,
-      state: this.state(),
-      enabledGates: this.enabledGateNames(),
+      state: await this.state(),
+      enabledGates: await this.enabledGateNames(),
       adapter: String(this.adapter.name)
     }
   }
@@ -551,8 +547,8 @@ class Feature {
    * Custom inspect method for Node.js console output.
    * @returns Formatted string representation
    */
-  public [Symbol.for('nodejs.util.inspect.custom')](): string {
-    return `Feature(${this.name}) { state: ${this.state()}, gates: [${this.enabledGateNames().join(', ')}] }`
+  public async [Symbol.for('nodejs.util.inspect.custom')](): Promise<string> {
+    return `Feature(${this.name}) { state: ${await this.state()}, gates: [${(await this.enabledGateNames()).join(', ')}] }`
   }
 
   /**
@@ -562,7 +558,7 @@ class Feature {
    * @param fn - The function to execute and instrument
    * @returns The result of the function
    */
-  private instrument<T>(operation: string, fn: (payload: InstrumentationPayload) => T): T {
+  private instrument<T>(operation: string, fn: (payload: InstrumentationPayload) => T | Promise<T>): T | Promise<T> {
     return this.instrumenter.instrument(Feature.INSTRUMENTATION_NAME, {}, (payload) => {
       payload.feature_name = this.name
       payload.operation = operation

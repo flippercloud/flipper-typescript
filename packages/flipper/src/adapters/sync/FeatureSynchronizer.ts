@@ -8,14 +8,12 @@ import type GateValues from '../../GateValues'
  * necessary enable/disable operations to sync the local feature.
  *
  * @example
- * ```typescript
  * const synchronizer = new FeatureSynchronizer(
  *   feature,
  *   localGateValues,
  *   remoteGateValues
  * );
  * synchronizer.call();
- * ```
  */
 class FeatureSynchronizer {
   private readonly feature: Feature
@@ -40,19 +38,20 @@ class FeatureSynchronizer {
    * Compares each gate's values and enables/disables as needed
    * to match the remote state.
    */
-  public call(): void {
-    this.syncBoolean()
-    this.syncActors()
-    this.syncGroups()
-    this.syncPercentageOfActors()
-    this.syncPercentageOfTime()
+  public async call(): Promise<void> {
+    // Note: Feature methods will be async in Phase 2, for now just wrap in async
+    await this.syncBoolean()
+    await this.syncActors()
+    await this.syncGroups()
+    await this.syncPercentageOfActors()
+    await this.syncPercentageOfTime()
     // Note: Expression sync would go here when expressions are implemented
   }
 
   /**
    * Sync the boolean gate.
    */
-  private syncBoolean(): void {
+  private async syncBoolean(): Promise<void> {
     const localValue = this.local.boolean
     const remoteValue = this.remote.boolean
 
@@ -61,60 +60,60 @@ class FeatureSynchronizer {
     }
 
     if (remoteValue) {
-      this.feature.enable()
+      await this.feature.enable()
     } else {
-      this.feature.disable()
+      await this.feature.disable()
     }
   }
 
   /**
    * Sync the actors gate.
    */
-  private syncActors(): void {
+  private async syncActors(): Promise<void> {
     const localSet = this.local.actors
     const remoteSet = this.remote.actors
 
     // Disable actors that are in local but not in remote
-    localSet.forEach((actorId) => {
+    for (const actorId of localSet) {
       if (!remoteSet.has(actorId)) {
-        this.feature.disableActor({ flipperId: actorId })
+        await this.feature.disableActor({ flipperId: actorId })
       }
-    })
+    }
 
     // Enable actors that are in remote but not in local
-    remoteSet.forEach((actorId) => {
+    for (const actorId of remoteSet) {
       if (!localSet.has(actorId)) {
-        this.feature.enableActor({ flipperId: actorId })
+        await this.feature.enableActor({ flipperId: actorId })
       }
-    })
+    }
   }
 
   /**
    * Sync the groups gate.
    */
-  private syncGroups(): void {
+  private async syncGroups(): Promise<void> {
     const localSet = this.local.groups
     const remoteSet = this.remote.groups
 
     // Disable groups that are in local but not in remote
-    localSet.forEach((groupName) => {
+    for (const groupName of localSet) {
       if (!remoteSet.has(groupName)) {
-        this.feature.disableGroup(groupName)
+        await this.feature.disableGroup(groupName)
       }
-    })
+    }
 
     // Enable groups that are in remote but not in local
-    remoteSet.forEach((groupName) => {
+    for (const groupName of remoteSet) {
       if (!localSet.has(groupName)) {
-        this.feature.enableGroup(groupName)
+        await this.feature.enableGroup(groupName)
       }
-    })
+    }
   }
 
   /**
    * Sync the percentage of actors gate.
    */
-  private syncPercentageOfActors(): void {
+  private async syncPercentageOfActors(): Promise<void> {
     const localValue = this.local.percentageOfActors
     const remoteValue = this.remote.percentageOfActors
 
@@ -123,16 +122,16 @@ class FeatureSynchronizer {
     }
 
     if (remoteValue === null || remoteValue === undefined) {
-      this.feature.disablePercentageOfActors()
+      await this.feature.disablePercentageOfActors()
     } else {
-      this.feature.enablePercentageOfActors(parseInt(String(remoteValue), 10))
+      await this.feature.enablePercentageOfActors(parseInt(String(remoteValue), 10))
     }
   }
 
   /**
    * Sync the percentage of time gate.
    */
-  private syncPercentageOfTime(): void {
+  private async syncPercentageOfTime(): Promise<void> {
     const localValue = this.local.percentageOfTime
     const remoteValue = this.remote.percentageOfTime
 
@@ -141,9 +140,9 @@ class FeatureSynchronizer {
     }
 
     if (remoteValue === null || remoteValue === undefined) {
-      this.feature.disablePercentageOfTime()
+      await this.feature.disablePercentageOfTime()
     } else {
-      this.feature.enablePercentageOfTime(parseInt(String(remoteValue), 10))
+      await this.feature.enablePercentageOfTime(parseInt(String(remoteValue), 10))
     }
   }
 }

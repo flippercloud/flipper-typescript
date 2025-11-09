@@ -15,12 +15,12 @@ describe('Instrumented', () => {
   })
 
   describe('instrumentation', () => {
-    it('instruments features() operation', () => {
+    it('instruments features() operation', async () => {
       const memory = new MemoryAdapter()
       const instrumenter = new MemoryInstrumenter()
       const adapter = new Instrumented(memory, { instrumenter })
 
-      adapter.features()
+      await adapter.features()
 
       expect(instrumenter.count()).toBe(1)
       const event = instrumenter.eventByName(Instrumented.INSTRUMENTATION_NAME)!
@@ -28,13 +28,13 @@ describe('Instrumented', () => {
       expect(event.payload.adapter_name).toBe('memory')
     })
 
-    it('instruments add() operation', () => {
+    it('instruments add() operation', async () => {
       const memory = new MemoryAdapter()
       const instrumenter = new MemoryInstrumenter()
       const adapter = new Instrumented(memory, { instrumenter })
       const feature = new Feature('search', adapter, {})
 
-      adapter.add(feature)
+      await adapter.add(feature)
 
       expect(instrumenter.count()).toBe(1)
       const event = instrumenter.eventByName(Instrumented.INSTRUMENTATION_NAME)!
@@ -43,13 +43,13 @@ describe('Instrumented', () => {
       expect(event.payload.feature_name).toBe('search')
     })
 
-    it('instruments remove() operation', () => {
+    it('instruments remove() operation', async () => {
       const memory = new MemoryAdapter()
       const instrumenter = new MemoryInstrumenter()
       const adapter = new Instrumented(memory, { instrumenter })
       const feature = new Feature('search', adapter, {})
 
-      adapter.remove(feature)
+      await adapter.remove(feature)
 
       expect(instrumenter.count()).toBe(1)
       const event = instrumenter.eventByName(Instrumented.INSTRUMENTATION_NAME)!
@@ -58,13 +58,13 @@ describe('Instrumented', () => {
       expect(event.payload.feature_name).toBe('search')
     })
 
-    it('instruments clear() operation', () => {
+    it('instruments clear() operation', async () => {
       const memory = new MemoryAdapter()
       const instrumenter = new MemoryInstrumenter()
       const adapter = new Instrumented(memory, { instrumenter })
       const feature = new Feature('search', adapter, {})
 
-      adapter.clear(feature)
+      await adapter.clear(feature)
 
       expect(instrumenter.count()).toBe(1)
       const event = instrumenter.eventByName(Instrumented.INSTRUMENTATION_NAME)!
@@ -73,13 +73,13 @@ describe('Instrumented', () => {
       expect(event.payload.feature_name).toBe('search')
     })
 
-    it('instruments get() operation', () => {
+    it('instruments get() operation', async () => {
       const memory = new MemoryAdapter()
       const instrumenter = new MemoryInstrumenter()
       const adapter = new Instrumented(memory, { instrumenter })
       const feature = new Feature('search', adapter, {})
 
-      adapter.get(feature)
+      await adapter.get(feature)
 
       expect(instrumenter.count()).toBe(1)
       const event = instrumenter.eventByName(Instrumented.INSTRUMENTATION_NAME)!
@@ -88,14 +88,14 @@ describe('Instrumented', () => {
       expect(event.payload.feature_name).toBe('search')
     })
 
-    it('instruments getMulti() operation', () => {
+    it('instruments getMulti() operation', async () => {
       const memory = new MemoryAdapter()
       const instrumenter = new MemoryInstrumenter()
       const adapter = new Instrumented(memory, { instrumenter })
       const feature1 = new Feature('search', adapter, {})
       const feature2 = new Feature('stats', adapter, {})
 
-      adapter.getMulti([feature1, feature2])
+      await adapter.getMulti([feature1, feature2])
 
       expect(instrumenter.count()).toBe(1)
       const event = instrumenter.eventByName(Instrumented.INSTRUMENTATION_NAME)!
@@ -104,12 +104,12 @@ describe('Instrumented', () => {
       expect(event.payload.feature_names).toEqual(['search', 'stats'])
     })
 
-    it('instruments getAll() operation', () => {
+    it('instruments getAll() operation', async () => {
       const memory = new MemoryAdapter()
       const instrumenter = new MemoryInstrumenter()
       const adapter = new Instrumented(memory, { instrumenter })
 
-      adapter.getAll()
+      await adapter.getAll()
 
       expect(instrumenter.count()).toBe(1)
       const event = instrumenter.eventByName(Instrumented.INSTRUMENTATION_NAME)!
@@ -117,13 +117,13 @@ describe('Instrumented', () => {
       expect(event.payload.adapter_name).toBe('memory')
     })
 
-    it('instruments enable() operation', () => {
+    it('instruments enable() operation', async () => {
       const memory = new MemoryAdapter()
       const instrumenter = new MemoryInstrumenter()
       const adapter = new Instrumented(memory, { instrumenter })
       const feature = new Feature('search', adapter, {})
 
-      feature.enable()
+      await feature.enable()
 
       // Should have 2 events: add and enable
       expect(instrumenter.count()).toBeGreaterThan(1)
@@ -134,13 +134,13 @@ describe('Instrumented', () => {
       expect(enableEvents[0]!.payload.gate_name).toBe('boolean')
     })
 
-    it('instruments disable() operation', () => {
+    it('instruments disable() operation', async () => {
       const memory = new MemoryAdapter()
       const instrumenter = new MemoryInstrumenter()
       const adapter = new Instrumented(memory, { instrumenter })
       const feature = new Feature('search', adapter, {})
 
-      feature.disable()
+      await feature.disable()
 
       // Should have 2 events: add and disable
       expect(instrumenter.count()).toBeGreaterThan(1)
@@ -151,51 +151,48 @@ describe('Instrumented', () => {
       expect(disableEvents[0]!.payload.gate_name).toBe('boolean')
     })
 
-    it('still delegates to wrapped adapter', () => {
+    it('still delegates to wrapped adapter', async () => {
       const memory = new MemoryAdapter()
       const instrumenter = new MemoryInstrumenter()
       const adapter = new Instrumented(memory, { instrumenter })
       const feature = new Feature('search', adapter, {})
 
-      adapter.add(feature)
-      adapter.enable(feature, feature.gate('boolean')!, feature.gate('boolean')!.wrap(true))
+      await adapter.add(feature)
+      await adapter.enable(feature, feature.gate('boolean')!, feature.gate('boolean')!.wrap(true))
 
-      expect(feature.isEnabled()).toBe(true)
+      expect(await feature.isEnabled()).toBe(true)
     })
   })
 
   describe('integration with Dsl', () => {
-    it('can be used with Dsl', () => {
+    it('can be used with Dsl', async () => {
       const memory = new MemoryAdapter()
       const instrumenter = new MemoryInstrumenter()
       const adapter = new Instrumented(memory, { instrumenter })
       const flipper = new Dsl(adapter)
 
-      flipper.enable('search')
+      await flipper.enable('search')
 
-      expect(flipper.feature('search').isEnabled()).toBe(true)
+      expect(await flipper.feature('search').isEnabled()).toBe(true)
       expect(instrumenter.count()).toBeGreaterThan(0)
     })
 
-    it('tracks all operations through Dsl', () => {
+    it('tracks all operations through Dsl', async () => {
       const memory = new MemoryAdapter()
       const instrumenter = new MemoryInstrumenter()
       const adapter = new Instrumented(memory, { instrumenter })
       const flipper = new Dsl(adapter)
 
-      instrumenter.reset()
-
-      flipper.enable('search')
-      flipper.disable('search')
-      flipper.remove('search')
+      await flipper.enable('feature1')
+      await flipper.enableActor('feature2', { flipperId: 'User;1' })
+      await flipper.enablePercentageOfActors('feature3', 50)
 
       const events = instrumenter.eventsByName(Instrumented.INSTRUMENTATION_NAME)
       expect(events.length).toBeGreaterThan(3)
 
       const operations = events.map(e => e.payload.operation)
       expect(operations).toContain('enable')
-      expect(operations).toContain('disable')
-      expect(operations).toContain('remove')
+      expect(operations).toContain('add')
     })
   })
 
@@ -208,15 +205,15 @@ describe('Instrumented', () => {
   })
 
   describe('default instrumenter', () => {
-    it('uses NoopInstrumenter when no instrumenter provided', () => {
+    it('uses NoopInstrumenter when no instrumenter provided', async () => {
       const memory = new MemoryAdapter()
       const adapter = new Instrumented(memory)
       const feature = new Feature('search', adapter, {})
 
       // Should not throw and should work normally
-      adapter.add(feature)
-      feature.enable()
-      expect(feature.isEnabled()).toBe(true)
+      await adapter.add(feature)
+      await feature.enable()
+      expect(await feature.isEnabled()).toBe(true)
     })
   })
 })

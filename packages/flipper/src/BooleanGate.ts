@@ -10,18 +10,16 @@ import { IGate, IType } from './interfaces'
  * may still enable the feature for specific actors or contexts.
  *
  * @example
- * ```typescript
  * const feature = flipper.feature('maintenance-mode');
  *
  * // Enable for everyone
- * feature.enable(); // Sets boolean gate to true
+ * await feature.enable(); // Sets boolean gate to true
  *
  * // Check without actor
- * feature.isEnabled(); // true
+ * await feature.isEnabled(); // true
  *
  * // Disable for everyone (but other gates may still enable it)
- * feature.disable(); // Sets boolean gate to false
- * ```
+ * await feature.disable(); // Sets boolean gate to false
  */
 class BooleanGate implements IGate {
   /**

@@ -22,98 +22,98 @@ describe('OperationLogger', () => {
   })
 
   describe('logging operations', () => {
-    it('logs add operation', () => {
-      logger.add(feature)
+    it('logs add operation', async () => {
+      await logger.add(feature)
 
       expect(logger.count()).toBe(1)
       expect(logger.count('add')).toBe(1)
     })
 
-    it('logs remove operation', () => {
-      adapter.add(feature)
-      logger.remove(feature)
+    it('logs remove operation', async () => {
+      await adapter.add(feature)
+      await logger.remove(feature)
 
       expect(logger.count('remove')).toBe(1)
     })
 
-    it('logs clear operation', () => {
-      adapter.add(feature)
-      logger.clear(feature)
+    it('logs clear operation', async () => {
+      await adapter.add(feature)
+      await logger.clear(feature)
 
       expect(logger.count('clear')).toBe(1)
     })
 
-    it('logs get operation', () => {
-      adapter.add(feature)
-      logger.get(feature)
+    it('logs get operation', async () => {
+      await adapter.add(feature)
+      await logger.get(feature)
 
       expect(logger.count('get')).toBe(1)
     })
 
-    it('logs getMulti operation', () => {
-      adapter.add(feature)
-      logger.getMulti([feature])
+    it('logs getMulti operation', async () => {
+      await adapter.add(feature)
+      await logger.getMulti([feature])
 
       expect(logger.count('getMulti')).toBe(1)
     })
 
-    it('logs getAll operation', () => {
-      logger.getAll()
+    it('logs getAll operation', async () => {
+      await logger.getAll()
 
       expect(logger.count('getAll')).toBe(1)
     })
 
-    it('logs enable operation', () => {
-      adapter.add(feature)
-      logger.enable(feature, gate, thing)
+    it('logs enable operation', async () => {
+      await adapter.add(feature)
+      await logger.enable(feature, gate, thing)
 
       expect(logger.count('enable')).toBe(1)
     })
 
-    it('logs disable operation', () => {
-      adapter.add(feature)
-      logger.disable(feature, gate, thing)
+    it('logs disable operation', async () => {
+      await adapter.add(feature)
+      await logger.disable(feature, gate, thing)
 
       expect(logger.count('disable')).toBe(1)
     })
 
-    it('logs features operation', () => {
-      logger.features()
+    it('logs features operation', async () => {
+      await logger.features()
 
       expect(logger.count('features')).toBe(1)
     })
   })
 
   describe('count()', () => {
-    it('returns total count without argument', () => {
-      logger.add(feature)
-      logger.features()
-      logger.get(feature)
+    it('returns total count without argument', async () => {
+      await logger.add(feature)
+      await logger.features()
+      await logger.get(feature)
 
       expect(logger.count()).toBe(3)
     })
 
-    it('returns count for specific operation type', () => {
-      logger.add(feature)
-      logger.add(feature)
-      logger.features()
+    it('returns count for specific operation type', async () => {
+      await logger.add(feature)
+      await logger.add(feature)
+      await logger.features()
 
       expect(logger.count('add')).toBe(2)
       expect(logger.count('features')).toBe(1)
     })
 
-    it('returns 0 for operations that did not happen', () => {
-      logger.add(feature)
+    it('returns 0 for operations that did not happen', async () => {
+      await logger.add(feature)
 
       expect(logger.count('remove')).toBe(0)
     })
   })
 
   describe('type()', () => {
-    it('returns all operations of given type', () => {
-      logger.add(feature)
-      logger.add(feature)
-      logger.features()
+    it('returns all operations of given type', async () => {
+      await logger.add(feature)
+      await logger.add(feature)
+      await logger.features()
 
       const adds = logger.type('add')
 
@@ -121,18 +121,18 @@ describe('OperationLogger', () => {
       expect(adds.every((op) => op.type === 'add')).toBe(true)
     })
 
-    it('returns empty array for operations that did not happen', () => {
-      logger.add(feature)
+    it('returns empty array for operations that did not happen', async () => {
+      await logger.add(feature)
 
       expect(logger.type('remove')).toEqual([])
     })
   })
 
   describe('last()', () => {
-    it('returns last operation of given type', () => {
-      logger.add(feature)
-      logger.features()
-      logger.add(feature)
+    it('returns last operation of given type', async () => {
+      await logger.add(feature)
+      await logger.features()
+      await logger.add(feature)
 
       const lastAdd = logger.last('add')
 
@@ -140,17 +140,17 @@ describe('OperationLogger', () => {
       expect(lastAdd?.type).toBe('add')
     })
 
-    it('returns undefined for operations that did not happen', () => {
-      logger.add(feature)
+    it('returns undefined for operations that did not happen', async () => {
+      await logger.add(feature)
 
       expect(logger.last('remove')).toBeUndefined()
     })
 
-    it('returns most recent when multiple operations', () => {
-      logger.add(feature)
-      logger.add(feature)
-      logger.features()
-      logger.add(feature)
+    it('returns most recent when multiple operations', async () => {
+      await logger.add(feature)
+      await logger.add(feature)
+      await logger.features()
+      await logger.add(feature)
 
       expect(logger.count('add')).toBe(3)
       expect(logger.last('add')).toBeDefined()
@@ -158,10 +158,10 @@ describe('OperationLogger', () => {
   })
 
   describe('reset()', () => {
-    it('clears all operations', () => {
-      logger.add(feature)
-      logger.features()
-      logger.get(feature)
+    it('clears all operations', async () => {
+      await logger.add(feature)
+      await logger.features()
+      await logger.get(feature)
 
       expect(logger.count()).toBe(3)
 
@@ -170,10 +170,10 @@ describe('OperationLogger', () => {
       expect(logger.count()).toBe(0)
     })
 
-    it('allows logging new operations after reset', () => {
-      logger.add(feature)
+    it('allows logging new operations after reset', async () => {
+      await logger.add(feature)
       logger.reset()
-      logger.features()
+      await logger.features()
 
       expect(logger.count()).toBe(1)
       expect(logger.count('features')).toBe(1)
@@ -181,9 +181,9 @@ describe('OperationLogger', () => {
   })
 
   describe('getOperations()', () => {
-    it('returns array of all operations', () => {
-      logger.add(feature)
-      logger.features()
+    it('returns array of all operations', async () => {
+      await logger.add(feature)
+      await logger.features()
 
       const ops = logger.getOperations()
 
@@ -192,11 +192,11 @@ describe('OperationLogger', () => {
       expect(ops[1]?.type).toBe('features')
     })
 
-    it('returns copy of operations', () => {
-      logger.add(feature)
+    it('returns copy of operations', async () => {
+      await logger.add(feature)
 
       const ops1 = logger.getOperations()
-      logger.features()
+      await logger.features()
       const ops2 = logger.getOperations()
 
       expect(ops1).toHaveLength(1)
@@ -205,9 +205,9 @@ describe('OperationLogger', () => {
   })
 
   describe('toString()', () => {
-    it('returns readable representation', () => {
-      logger.add(feature)
-      logger.features()
+    it('returns readable representation', async () => {
+      await logger.add(feature)
+      await logger.features()
 
       const str = logger.toString()
 
@@ -218,9 +218,9 @@ describe('OperationLogger', () => {
   })
 
   describe('toJSON()', () => {
-    it('returns JSON representation', () => {
-      logger.add(feature)
-      logger.features()
+    it('returns JSON representation', async () => {
+      await logger.add(feature)
+      await logger.features()
 
       const json = logger.toJSON()
 
@@ -241,11 +241,11 @@ describe('OperationLogger', () => {
       expect(logger.count('add')).toBe(1)
     })
 
-    it('appends to external array', () => {
+    it('appends to external array', async () => {
       const operations: Array<{ type: string; args: unknown[] }> = []
       const logger = new OperationLogger(adapter, operations)
 
-      logger.add(feature)
+      await logger.add(feature)
 
       expect(operations).toHaveLength(1)
       expect(operations[0]?.type).toBe('add')
@@ -253,10 +253,10 @@ describe('OperationLogger', () => {
   })
 
   describe('integration testing', () => {
-    it('helps verify call order', () => {
+    it('helps verify call order', async () => {
       const dsl = new Dsl(logger)
 
-      dsl.enable('test_feature')
+      await dsl.enable('test_feature')
 
       const ops = logger.getOperations()
 
@@ -266,12 +266,12 @@ describe('OperationLogger', () => {
       expect(ops[ops.length - 1]?.type).toBe('enable')
     })
 
-    it('helps verify call counts in tests', () => {
+    it('helps verify call counts in tests', async () => {
       const dsl = new Dsl(logger)
 
-      dsl.isFeatureEnabled('test')
-      dsl.isFeatureEnabled('test')
-      dsl.isFeatureEnabled('test')
+      await dsl.isFeatureEnabled('test')
+      await dsl.isFeatureEnabled('test')
+      await dsl.isFeatureEnabled('test')
 
       // Should hit get for each check (no memoization)
       expect(logger.count('get')).toBe(3)
@@ -279,16 +279,16 @@ describe('OperationLogger', () => {
   })
 
   describe('still delegates to adapter', () => {
-    it('actually performs add operation', () => {
-      logger.add(feature)
+    it('actually performs add operation', async () => {
+      await logger.add(feature)
 
-      expect(adapter.features()).toContainEqual(feature)
+      expect(await adapter.features()).toContainEqual(feature)
     })
 
-    it('actually performs get operation', () => {
-      adapter.add(feature)
+    it('actually performs get operation', async () => {
+      await adapter.add(feature)
 
-      const result = logger.get(feature)
+      const result = await logger.get(feature)
 
       expect(result).toBeDefined()
     })

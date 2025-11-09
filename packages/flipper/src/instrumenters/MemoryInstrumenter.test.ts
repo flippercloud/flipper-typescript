@@ -25,17 +25,17 @@ describe('MemoryInstrumenter', () => {
       expect(event!.result).toBe('result')
     })
 
-    it('passes payload to the function', () => {
+    it('passes payload to the function', async () => {
       const payload = { feature_name: 'test_feature', operation: 'enable' }
-      instrumenter.instrument('test', payload, (p) => {
+      await instrumenter.instrument('test', payload, (p) => {
         expect(p.feature_name).toBe('test_feature')
         expect(p.operation).toBe('enable')
       })
     })
 
-    it('copies payload to prevent external modifications', () => {
+    it('copies payload to prevent external modifications', async () => {
       const payload: { feature_name: string; result?: unknown } = { feature_name: 'test' }
-      instrumenter.instrument('test', payload, (p) => {
+      await instrumenter.instrument('test', payload, (p) => {
         p.result = 'modified'
       })
 
@@ -45,14 +45,14 @@ describe('MemoryInstrumenter', () => {
       expect(instrumenter.events[0]?.payload.result).toBe('modified')
     })
 
-    it('records exception information when function throws', () => {
+    it('records exception information when function throws', async () => {
       const error = new Error('test error')
 
-      expect(() => {
-        instrumenter.instrument('test', { feature_name: 'test' }, () => {
+      await expect(async () => {
+        await instrumenter.instrument('test', { feature_name: 'test' }, () => {
           throw error
         })
-      }).toThrow('test error')
+      }).rejects.toThrow('test error')
 
       expect(instrumenter.events.length).toBe(1)
       expect(instrumenter.events[0]!.name).toBe('test')
@@ -61,9 +61,9 @@ describe('MemoryInstrumenter', () => {
       expect(instrumenter.events[0]!.result).toBeUndefined()
     })
 
-    it('records event even when function throws', () => {
+    it('records event even when function throws', async () => {
       try {
-        instrumenter.instrument('test', {}, () => {
+        await instrumenter.instrument('test', {}, () => {
           throw new Error('boom')
         })
       } catch {
@@ -73,10 +73,10 @@ describe('MemoryInstrumenter', () => {
       expect(instrumenter.events.length).toBe(1)
     })
 
-    it('handles multiple calls', () => {
-      instrumenter.instrument('op1', {}, () => 1)
-      instrumenter.instrument('op2', {}, () => 2)
-      instrumenter.instrument('op3', {}, () => 3)
+    it('handles multiple calls', async () => {
+      await instrumenter.instrument('op1', {}, () => 1)
+      await instrumenter.instrument('op2', {}, () => 2)
+      await instrumenter.instrument('op3', {}, () => 3)
 
       expect(instrumenter.events.length).toBe(3)
       expect(instrumenter.events[0]!.result).toBe(1)
@@ -86,10 +86,10 @@ describe('MemoryInstrumenter', () => {
   })
 
   describe('eventsByName', () => {
-    beforeEach(() => {
-      instrumenter.instrument('op1', {}, () => 1)
-      instrumenter.instrument('op2', {}, () => 2)
-      instrumenter.instrument('op1', {}, () => 3)
+    beforeEach(async () => {
+      await instrumenter.instrument('op1', {}, () => 1)
+      await instrumenter.instrument('op2', {}, () => 2)
+      await instrumenter.instrument('op1', {}, () => 3)
     })
 
     it('returns all events with matching name', () => {
@@ -106,10 +106,10 @@ describe('MemoryInstrumenter', () => {
   })
 
   describe('eventByName', () => {
-    beforeEach(() => {
-      instrumenter.instrument('op1', {}, () => 1)
-      instrumenter.instrument('op2', {}, () => 2)
-      instrumenter.instrument('op1', {}, () => 3)
+    beforeEach(async () => {
+      await instrumenter.instrument('op1', {}, () => 1)
+      await instrumenter.instrument('op2', {}, () => 2)
+      await instrumenter.instrument('op1', {}, () => 3)
     })
 
     it('returns first event with matching name', () => {
@@ -125,10 +125,10 @@ describe('MemoryInstrumenter', () => {
   })
 
   describe('count', () => {
-    beforeEach(() => {
-      instrumenter.instrument('op1', {}, () => 1)
-      instrumenter.instrument('op2', {}, () => 2)
-      instrumenter.instrument('op1', {}, () => 3)
+    beforeEach(async () => {
+      await instrumenter.instrument('op1', {}, () => 1)
+      await instrumenter.instrument('op2', {}, () => 2)
+      await instrumenter.instrument('op1', {}, () => 3)
     })
 
     it('returns total count without arguments', () => {
@@ -146,9 +146,9 @@ describe('MemoryInstrumenter', () => {
   })
 
   describe('reset', () => {
-    it('clears all events', () => {
-      instrumenter.instrument('op1', {}, () => 1)
-      instrumenter.instrument('op2', {}, () => 2)
+    it('clears all events', async () => {
+      await instrumenter.instrument('op1', {}, () => 1)
+      await instrumenter.instrument('op2', {}, () => 2)
       expect(instrumenter.count()).toBe(2)
 
       instrumenter.reset()

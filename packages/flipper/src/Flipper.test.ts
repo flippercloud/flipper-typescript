@@ -2,10 +2,10 @@ import Flipper from './Flipper'
 import MemoryAdapter from './MemoryAdapter'
 
 describe('Flipper', () => {
-  test('constructor returns Dsl instance', () => {
+  test('constructor returns Dsl instance', async () => {
     const adapter = new MemoryAdapter()
     const flipper = new Flipper(adapter)
-    expect(flipper.isFeatureEnabled('feature-1')).toBe(false)
+    expect(await flipper.isFeatureEnabled('feature-1')).toBe(false)
   })
 
   describe('groupNames', () => {

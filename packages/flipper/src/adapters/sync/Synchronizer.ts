@@ -15,14 +15,12 @@ import NoopInstrumenter from '../../instrumenters/NoopInstrumenter'
  * all local features with the remote features.
  *
  * @example
- * ```typescript
  * const synchronizer = new Synchronizer(
  *   localAdapter,
  *   remoteAdapter,
  *   { raise: true }
  * );
  * synchronizer.call();
- * ```
  */
 class Synchronizer {
   private readonly local: IAdapter
@@ -59,16 +57,16 @@ class Synchronizer {
    * @returns True if successful, false if an error occurred and raise=false
    * @throws {Error} If an error occurs and raise=true
    */
-  public call(): boolean {
-    return this.instrumenter.instrument(
+  public async call(): Promise<boolean> {
+    return await this.instrumenter.instrument(
       'synchronizer_call.flipper',
       {},
-      () => {
+      async () => {
         try {
-          this.sync()
+          await this.sync()
           return true
         } catch (error) {
-          this.instrumenter.instrument(
+          await this.instrumenter.instrument(
             'synchronizer_exception.flipper',
             { exception: error },
             () => undefined
@@ -85,17 +83,17 @@ class Synchronizer {
   /**
    * Internal sync implementation.
    */
-  private sync(): void {
-    const localGetAll = this.local.getAll()
-    const remoteGetAll = this.remote.getAll()
+  private async sync(): Promise<void> {
+    const localGetAll = await this.local.getAll()
+    const remoteGetAll = await this.remote.getAll()
 
     // Sync all the gate values
-    Object.keys(remoteGetAll).forEach((featureKey) => {
+    for (const featureKey of Object.keys(remoteGetAll)) {
       const feature = new Feature(featureKey, this.local, this.groups)
       const remoteGatesHash = remoteGetAll[featureKey]
 
       if (!remoteGatesHash) {
-        return
+        continue
       }
 
       // Get local gates or use default config
@@ -104,24 +102,24 @@ class Synchronizer {
       const localGateValues = new GateValues(localGatesHash)
       const remoteGateValues = new GateValues(remoteGatesHash)
 
-      new FeatureSynchronizer(feature, localGateValues, remoteGateValues).call()
-    })
+      await new FeatureSynchronizer(feature, localGateValues, remoteGateValues).call()
+    }
 
     // Add features that are missing in local and present in remote
     const featuresToAdd = Object.keys(remoteGetAll).filter(
       (key) => !Object.prototype.hasOwnProperty.call(localGetAll, key)
     )
-    featuresToAdd.forEach((key) => {
-      new Feature(key, this.local, this.groups).add()
-    })
+    for (const key of featuresToAdd) {
+      await new Feature(key, this.local, this.groups).add()
+    }
 
     // Remove features that are present in local and missing in remote
     const featuresToRemove = Object.keys(localGetAll).filter(
       (key) => !Object.prototype.hasOwnProperty.call(remoteGetAll, key)
     )
-    featuresToRemove.forEach((key) => {
-      new Feature(key, this.local, this.groups).remove()
-    })
+    for (const key of featuresToRemove) {
+      await new Feature(key, this.local, this.groups).remove()
+    }
   }
 
   /**

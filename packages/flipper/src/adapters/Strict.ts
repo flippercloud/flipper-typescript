@@ -40,16 +40,15 @@ export type StrictHandler =
  * before being added to the adapter.
  *
  * @example
- * ```typescript
  * const adapter = new MemoryAdapter();
  * const strictAdapter = new Strict(adapter); // throws by default
  *
  * // This will throw FeatureNotFoundError
- * strictAdapter.get(feature);
+ * await strictAdapter.get(feature);
  *
  * // Add the feature first
- * strictAdapter.add(feature);
- * strictAdapter.get(feature); // now works
+ * await strictAdapter.add(feature);
+ * await strictAdapter.get(feature); // now works
  *
  * // Use 'warn' mode to log instead of throwing
  * const warnAdapter = new Strict(adapter, 'warn');
@@ -58,7 +57,6 @@ export type StrictHandler =
  * const customAdapter = new Strict(adapter, (feature) => {
  *   console.log(`Feature ${feature.name} not found`);
  * });
- * ```
  */
 export default class Strict extends Wrapper {
   /**
@@ -82,9 +80,9 @@ export default class Strict extends Wrapper {
    * @returns Feature gate values
    * @throws {FeatureNotFoundError} If feature doesn't exist and handler is 'raise' or true
    */
-  override get(feature: Feature): Record<string, unknown> {
-    this.assertFeatureExists(feature)
-    return super.get(feature)
+  override async get(feature: Feature): Promise<Record<string, unknown>> {
+    await this.assertFeatureExists(feature)
+    return await super.get(feature)
   }
 
   /**
@@ -93,9 +91,11 @@ export default class Strict extends Wrapper {
    * @returns Map of feature keys to gate values
    * @throws {FeatureNotFoundError} If any feature doesn't exist and handler is 'raise' or true
    */
-  override getMulti(features: Feature[]): Record<string, Record<string, unknown>> {
-    features.forEach((feature) => this.assertFeatureExists(feature))
-    return super.getMulti(features)
+  override async getMulti(features: Feature[]): Promise<Record<string, Record<string, unknown>>> {
+    for (const feature of features) {
+      await this.assertFeatureExists(feature)
+    }
+    return await super.getMulti(features)
   }
 
   /**
@@ -104,8 +104,8 @@ export default class Strict extends Wrapper {
    * @param feature - Feature to check
    * @throws {FeatureNotFoundError} If feature doesn't exist and handler is 'raise' or true
    */
-  private assertFeatureExists(feature: Feature): void {
-    const features = this.adapter.features()
+  private async assertFeatureExists(feature: Feature): Promise<void> {
+    const features = await this.adapter.features()
     const exists = features.some((f) => f.key === feature.key)
 
     if (exists) {

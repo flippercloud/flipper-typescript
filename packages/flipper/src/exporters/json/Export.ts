@@ -28,7 +28,6 @@ export class InvalidError extends Error {
  * the Ruby Flipper JSON export format.
  *
  * @example
- * ```typescript
  * // Create from JSON string
  * const jsonExport = new JsonExport({
  *   contents: '{"version":1,"features":{"search":{"boolean":"true"}}}',
@@ -36,9 +35,8 @@ export class InvalidError extends Error {
  * });
  *
  * // Get features hash
- * const features = jsonExport.features();
+ * const features = await jsonExport.features();
  * // { search: { boolean: 'true', actors: Set([]), ... } }
- * ```
  */
 class JsonExport extends BaseExport {
   /**

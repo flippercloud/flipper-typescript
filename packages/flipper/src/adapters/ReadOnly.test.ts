@@ -12,7 +12,7 @@ describe('ReadOnly', () => {
   let gate: BooleanGate
   let thing: BooleanType
 
-  beforeEach(() => {
+  beforeEach(async () => {
     adapter = new MemoryAdapter()
     readOnly = new ReadOnly(adapter)
     const dsl = new Dsl(adapter)
@@ -21,7 +21,7 @@ describe('ReadOnly', () => {
     thing = new BooleanType(true)
 
     // Add feature to underlying adapter
-    adapter.add(feature)
+    await adapter.add(feature)
   })
 
   describe('readOnly()', () => {
@@ -31,49 +31,49 @@ describe('ReadOnly', () => {
   })
 
   describe('read operations', () => {
-    it('allows features()', () => {
-      expect(() => readOnly.features()).not.toThrow()
-      expect(readOnly.features()).toEqual([feature])
+    it('allows features()', async () => {
+      await expect(readOnly.features()).resolves.not.toThrow()
+      expect(await readOnly.features()).toEqual([feature])
     })
 
-    it('allows get()', () => {
-      expect(() => readOnly.get(feature)).not.toThrow()
+    it('allows get()', async () => {
+      await expect(readOnly.get(feature)).resolves.not.toThrow()
     })
 
-    it('allows getMulti()', () => {
-      expect(() => readOnly.getMulti([feature])).not.toThrow()
+    it('allows getMulti()', async () => {
+      await expect(readOnly.getMulti([feature])).resolves.not.toThrow()
     })
 
-    it('allows getAll()', () => {
-      expect(() => readOnly.getAll()).not.toThrow()
+    it('allows getAll()', async () => {
+      await expect(readOnly.getAll()).resolves.not.toThrow()
     })
   })
 
   describe('write operations', () => {
-    it('prevents add()', () => {
+    it('prevents add()', async () => {
       const newFeature = new Feature('new_feature', adapter, {})
-      expect(() => readOnly.add(newFeature)).toThrow(WriteAttemptedError)
-      expect(() => readOnly.add(newFeature)).toThrow(
+      await expect(readOnly.add(newFeature)).rejects.toThrow(WriteAttemptedError)
+      await expect(readOnly.add(newFeature)).rejects.toThrow(
         'write attempted while in read only mode'
       )
     })
 
-    it('prevents remove()', () => {
-      expect(() => readOnly.remove(feature)).toThrow(WriteAttemptedError)
+    it('prevents remove()', async () => {
+      await expect(readOnly.remove(feature)).rejects.toThrow(WriteAttemptedError)
     })
 
-    it('prevents clear()', () => {
-      expect(() => readOnly.clear(feature)).toThrow(WriteAttemptedError)
+    it('prevents clear()', async () => {
+      await expect(readOnly.clear(feature)).rejects.toThrow(WriteAttemptedError)
     })
 
-    it('prevents enable()', () => {
-      expect(() => readOnly.enable(feature, gate, thing)).toThrow(
+    it('prevents enable()', async () => {
+      await expect(readOnly.enable(feature, gate, thing)).rejects.toThrow(
         WriteAttemptedError
       )
     })
 
-    it('prevents disable()', () => {
-      expect(() => readOnly.disable(feature, gate, thing)).toThrow(
+    it('prevents disable()', async () => {
+      await expect(readOnly.disable(feature, gate, thing)).rejects.toThrow(
         WriteAttemptedError
       )
     })
@@ -93,14 +93,14 @@ describe('ReadOnly', () => {
   })
 
   describe('integration with Dsl', () => {
-    it('prevents enabling features', () => {
+    it('prevents enabling features', async () => {
       const dsl = new Dsl(readOnly)
-      expect(() => dsl.enable('test_feature')).toThrow(WriteAttemptedError)
+      await expect(dsl.enable('test_feature')).rejects.toThrow(WriteAttemptedError)
     })
 
-    it('allows checking if feature is enabled', () => {
+    it('allows checking if feature is enabled', async () => {
       const dsl = new Dsl(readOnly)
-      expect(() => dsl.isFeatureEnabled('test_feature')).not.toThrow()
+      await expect(dsl.isFeatureEnabled('test_feature')).resolves.not.toThrow()
     })
   })
 })

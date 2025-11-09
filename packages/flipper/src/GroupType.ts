@@ -9,7 +9,6 @@ import { GroupCallback, IType } from './interfaces'
  * The callback is evaluated at check time to determine group membership.
  *
  * @example
- * ```typescript
  * // Define group callback
  * const isAdmin = (actor) => actor.role === 'admin';
  * const adminGroup = new GroupType('admins', isAdmin);
@@ -18,7 +17,6 @@ import { GroupCallback, IType } from './interfaces'
  * const user = { flipperId: 'user-1', role: 'admin' };
  * const actorType = ActorType.wrap(user);
  * adminGroup.isMatch(actorType, context); // true
- * ```
  */
 class GroupType implements IType {
   /**

@@ -11,19 +11,17 @@ import PercentageOfTimeType from './PercentageOfTimeType'
  * Useful for canary deployments or testing features under load.
  *
  * @example
- * ```typescript
  * const feature = flipper.feature('load-test');
  *
  * // Enable for 10% of requests
- * feature.enablePercentageOfTime(10);
+ * await feature.enablePercentageOfTime(10);
  *
  * // Each check is independent and random
- * feature.isEnabled(); // May be true
- * feature.isEnabled(); // May be false
- * feature.isEnabled(); // May be true
+ * await feature.isEnabled(); // May be true
+ * await feature.isEnabled(); // May be false
+ * await feature.isEnabled(); // May be true
  *
  * // Approximately 10% of checks will return true
- * ```
  */
 class PercentageOfTimeGate implements IGate {
   /**

@@ -10,12 +10,10 @@ import Wrapper from './Wrapper'
  * allowing monitoring, logging, and performance tracking of adapter calls.
  *
  * @example
- * ```typescript
  * const memoryInstrumenter = new MemoryInstrumenter();
  * const adapter = new Instrumented(new Memory(), { instrumenter: memoryInstrumenter });
- * adapter.features(); // Emits "adapter_operation.flipper" event
+ * await adapter.features(); // Emits "adapter_operation.flipper" event
  * console.log(memoryInstrumenter.count()); // 1
- * ```
  */
 export default class Instrumented extends Wrapper {
   /**
@@ -47,7 +45,7 @@ export default class Instrumented extends Wrapper {
    * @param fn - Function that executes the actual adapter operation
    * @returns The result from the adapter
    */
-  protected override wrap<T>(method: string, fn: () => T): T {
+  protected override wrap<T>(method: string, fn: () => T | Promise<T>): T | Promise<T> {
     return this.instrumenter.instrument<T>(
       Instrumented.INSTRUMENTATION_NAME,
       {
@@ -55,8 +53,17 @@ export default class Instrumented extends Wrapper {
         adapter_name: this.adapter.name,
       },
       (payload) => {
-        payload.result = fn()
-        return payload.result as T
+        const result = fn()
+        // Handle both sync and async results
+        if (result instanceof Promise) {
+          return result.then((r) => {
+            payload.result = r
+            return r
+          })
+        } else {
+          payload.result = result
+          return result
+        }
       },
     )
   }
@@ -64,54 +71,55 @@ export default class Instrumented extends Wrapper {
   /**
    * Add a feature with additional instrumentation context.
    */
-  override add(feature: Feature): boolean {
-    return this.instrumentWithFeature('add', feature, () => this.adapter.add(feature))
+  override async add(feature: Feature): Promise<boolean> {
+    return await this.instrumentWithFeature('add', feature, () => this.adapter.add(feature))
   }
 
   /**
    * Remove a feature with additional instrumentation context.
    */
-  override remove(feature: Feature): boolean {
-    return this.instrumentWithFeature('remove', feature, () => this.adapter.remove(feature))
+  override async remove(feature: Feature): Promise<boolean> {
+    return await this.instrumentWithFeature('remove', feature, () => this.adapter.remove(feature))
   }
 
   /**
    * Clear a feature with additional instrumentation context.
    */
-  override clear(feature: Feature): boolean {
-    return this.instrumentWithFeature('clear', feature, () => this.adapter.clear(feature))
+  override async clear(feature: Feature): Promise<boolean> {
+    return await this.instrumentWithFeature('clear', feature, () => this.adapter.clear(feature))
   }
 
   /**
    * Get a feature with additional instrumentation context.
    */
-  override get(feature: Feature): Record<string, unknown> {
-    return this.instrumentWithFeature('get', feature, () => this.adapter.get(feature))
+  override async get(feature: Feature): Promise<Record<string, unknown>> {
+    return await this.instrumentWithFeature('get', feature, () => this.adapter.get(feature))
   }
 
   /**
    * Get multiple features with additional instrumentation context.
    */
-  override getMulti(features: Feature[]): Record<string, Record<string, unknown>> {
-    return this.instrumenter.instrument<Record<string, Record<string, unknown>>>(
+  override async getMulti(features: Feature[]): Promise<Record<string, Record<string, unknown>>> {
+    const result = this.instrumenter.instrument<Promise<Record<string, Record<string, unknown>>>>(
       Instrumented.INSTRUMENTATION_NAME,
       {
         operation: 'getMulti',
         adapter_name: this.adapter.name,
         feature_names: features.map((f) => f.name),
       },
-      (payload) => {
-        payload.result = this.adapter.getMulti(features)
+      async (payload) => {
+        payload.result = await this.adapter.getMulti(features)
         return payload.result as Record<string, Record<string, unknown>>
       },
     )
+    return await result
   }
 
   /**
    * Enable a gate with additional instrumentation context.
    */
-  override enable(feature: Feature, gate: IGate, thing: IType): boolean {
-    return this.instrumenter.instrument<boolean>(
+  override async enable(feature: Feature, gate: IGate, thing: IType): Promise<boolean> {
+    const result = this.instrumenter.instrument<Promise<boolean>>(
       Instrumented.INSTRUMENTATION_NAME,
       {
         operation: 'enable',
@@ -119,18 +127,19 @@ export default class Instrumented extends Wrapper {
         feature_name: feature.name,
         gate_name: gate.key,
       },
-      (payload) => {
-        payload.result = this.adapter.enable(feature, gate, thing)
+      async (payload) => {
+        payload.result = await this.adapter.enable(feature, gate, thing)
         return payload.result as boolean
       },
     )
+    return await result
   }
 
   /**
    * Disable a gate with additional instrumentation context.
    */
-  override disable(feature: Feature, gate: IGate, thing: IType): boolean {
-    return this.instrumenter.instrument<boolean>(
+  override async disable(feature: Feature, gate: IGate, thing: IType): Promise<boolean> {
+    const result = this.instrumenter.instrument<Promise<boolean>>(
       Instrumented.INSTRUMENTATION_NAME,
       {
         operation: 'disable',
@@ -138,28 +147,30 @@ export default class Instrumented extends Wrapper {
         feature_name: feature.name,
         gate_name: gate.key,
       },
-      (payload) => {
-        payload.result = this.adapter.disable(feature, gate, thing)
+      async (payload) => {
+        payload.result = await this.adapter.disable(feature, gate, thing)
         return payload.result as boolean
       },
     )
+    return await result
   }
 
   /**
    * Helper method to instrument operations that take a single feature.
    */
-  private instrumentWithFeature<T>(operation: string, feature: Feature, fn: () => T): T {
-    return this.instrumenter.instrument<T>(
+  private async instrumentWithFeature<T>(operation: string, feature: Feature, fn: () => Promise<T>): Promise<T> {
+    const result = this.instrumenter.instrument<Promise<T>>(
       Instrumented.INSTRUMENTATION_NAME,
       {
         operation,
         adapter_name: this.adapter.name,
         feature_name: feature.name,
       },
-      (payload) => {
-        payload.result = fn()
+      async (payload) => {
+        payload.result = await fn()
         return payload.result as T
       },
     )
+    return await result
   }
 }

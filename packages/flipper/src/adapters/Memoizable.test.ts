@@ -13,7 +13,7 @@ describe('Memoizable', () => {
   let gate: BooleanGate
   let thing: BooleanType
 
-  beforeEach(() => {
+  beforeEach(async () => {
     adapter = new MemoryAdapter()
     memoizer = new Memoizable(adapter)
     const dsl = new Dsl(adapter)
@@ -21,7 +21,7 @@ describe('Memoizable', () => {
     gate = new BooleanGate()
     thing = new BooleanType(true)
 
-    adapter.add(feature)
+    await adapter.add(feature)
   })
 
   describe('memoize property', () => {
@@ -34,51 +34,51 @@ describe('Memoizable', () => {
       expect(memoizer.memoize).toBe(true)
     })
 
-    it('clears cache when disabled', () => {
+    it('clears cache when disabled', async () => {
       memoizer.memoize = true
-      memoizer.get(feature) // Cache it
+      await memoizer.get(feature) // Cache it
 
       memoizer.memoize = false
       memoizer.memoize = true
 
       // New call should hit adapter (cache was cleared)
-      expect(memoizer.get(feature)).toBeDefined()
+      expect(await memoizer.get(feature)).toBeDefined()
     })
   })
 
   describe('when memoization is disabled', () => {
-    it('always calls adapter for features()', () => {
+    it('always calls adapter for features()', async () => {
       const spy = jest.spyOn(adapter, 'features')
 
-      memoizer.features()
-      memoizer.features()
+      await memoizer.features()
+      await memoizer.features()
 
       expect(spy).toHaveBeenCalledTimes(2)
     })
 
-    it('always calls adapter for get()', () => {
+    it('always calls adapter for get()', async () => {
       const spy = jest.spyOn(adapter, 'get')
 
-      memoizer.get(feature)
-      memoizer.get(feature)
+      await memoizer.get(feature)
+      await memoizer.get(feature)
 
       expect(spy).toHaveBeenCalledTimes(2)
     })
 
-    it('always calls adapter for getMulti()', () => {
+    it('always calls adapter for getMulti()', async () => {
       const spy = jest.spyOn(adapter, 'getMulti')
 
-      memoizer.getMulti([feature])
-      memoizer.getMulti([feature])
+      await memoizer.getMulti([feature])
+      await memoizer.getMulti([feature])
 
       expect(spy).toHaveBeenCalledTimes(2)
     })
 
-    it('always calls adapter for getAll()', () => {
+    it('always calls adapter for getAll()', async () => {
       const spy = jest.spyOn(adapter, 'getAll')
 
-      memoizer.getAll()
-      memoizer.getAll()
+      await memoizer.getAll()
+      await memoizer.getAll()
 
       expect(spy).toHaveBeenCalledTimes(2)
     })
@@ -90,72 +90,73 @@ describe('Memoizable', () => {
     })
 
     describe('features()', () => {
-      it('caches result', () => {
+      it('caches result', async () => {
         const spy = jest.spyOn(adapter, 'features')
 
-        memoizer.features()
-        memoizer.features()
-        memoizer.features()
+        await memoizer.features()
+        await memoizer.features()
+        await memoizer.features()
 
         expect(spy).toHaveBeenCalledTimes(1)
       })
 
-      it('returns same result from cache', () => {
-        const first = memoizer.features()
-        const second = memoizer.features()
+      it('returns same result from cache', async () => {
+        const first = await memoizer.features()
+        const second = await memoizer.features()
 
         expect(first).toEqual(second)
       })
     })
 
     describe('get()', () => {
-      it('caches result per feature', () => {
+      it('caches result per feature', async () => {
         const spy = jest.spyOn(adapter, 'get')
 
-        memoizer.get(feature)
-        memoizer.get(feature)
-        memoizer.get(feature)
+        // Start 3 concurrent requests
+        void memoizer.get(feature)
+        void memoizer.get(feature)
+        await memoizer.get(feature)
 
         expect(spy).toHaveBeenCalledTimes(1)
       })
 
-      it('returns same result from cache', () => {
-        const first = memoizer.get(feature)
-        const second = memoizer.get(feature)
+      it('returns same result from cache', async () => {
+        const first = await memoizer.get(feature)
+        const second = await memoizer.get(feature)
 
         expect(first).toEqual(second)
       })
     })
 
     describe('getMulti()', () => {
-      it('only fetches uncached features', () => {
+      it('only fetches uncached features', async () => {
         const feature2 = new Feature('feature2', adapter, {})
-        adapter.add(feature2)
+        await adapter.add(feature2)
 
         const spy = jest.spyOn(adapter, 'getMulti')
 
         // Cache feature1
-        memoizer.get(feature)
+        await memoizer.get(feature)
 
         // Request both - should only fetch feature2
-        memoizer.getMulti([feature, feature2])
+        await memoizer.getMulti([feature, feature2])
 
         expect(spy).toHaveBeenCalledTimes(1)
         expect(spy).toHaveBeenCalledWith([feature2])
       })
 
-      it('returns all features from cache when available', () => {
+      it('returns all features from cache when available', async () => {
         const feature2 = new Feature('feature2', adapter, {})
-        adapter.add(feature2)
+        await adapter.add(feature2)
 
         // Cache both individually
-        memoizer.get(feature)
-        memoizer.get(feature2)
+        await memoizer.get(feature)
+        await memoizer.get(feature2)
 
         const spy = jest.spyOn(adapter, 'getMulti')
 
         // Request both - should use cache
-        const result = memoizer.getMulti([feature, feature2])
+        const result = await memoizer.getMulti([feature, feature2])
 
         expect(spy).not.toHaveBeenCalled()
         expect(result[feature.key]).toBeDefined()
@@ -164,80 +165,80 @@ describe('Memoizable', () => {
     })
 
     describe('getAll()', () => {
-      it('caches result', () => {
+      it('caches result', async () => {
         const spy = jest.spyOn(adapter, 'getAll')
 
-        memoizer.getAll()
-        memoizer.getAll()
+        await memoizer.getAll()
+        await memoizer.getAll()
 
         expect(spy).toHaveBeenCalledTimes(1)
       })
 
-      it('builds result from cache on subsequent calls', () => {
-        const first = memoizer.getAll()
-        const second = memoizer.getAll()
+      it('builds result from cache on subsequent calls', async () => {
+        const first = await memoizer.getAll()
+        const second = await memoizer.getAll()
 
         expect(first).toEqual(second)
       })
     })
 
     describe('cache expiration', () => {
-      it('expires feature cache on enable', () => {
-        memoizer.get(feature)
+      it('expires feature cache on enable', async () => {
+        await memoizer.get(feature)
 
         const spy = jest.spyOn(adapter, 'get')
-        memoizer.enable(feature, gate, thing)
+        await memoizer.enable(feature, gate, thing)
 
         // Next get should hit adapter
-        memoizer.get(feature)
+        await memoizer.get(feature)
         expect(spy).toHaveBeenCalled()
       })
 
-      it('expires feature cache on disable', () => {
-        memoizer.get(feature)
+      it('expires feature cache on disable', async () => {
+        await memoizer.get(feature)
 
         const spy = jest.spyOn(adapter, 'get')
-        memoizer.disable(feature, gate, thing)
+        await memoizer.disable(feature, gate, thing)
 
         // Next get should hit adapter
-        memoizer.get(feature)
+        await memoizer.get(feature)
         expect(spy).toHaveBeenCalled()
       })
 
-      it('expires feature cache on clear', () => {
-        memoizer.get(feature)
+      it('expires feature cache on clear', async () => {
+        await memoizer.get(feature)
 
         const spy = jest.spyOn(adapter, 'get')
-        memoizer.clear(feature)
+        await memoizer.clear(feature)
 
         // Next get should hit adapter
-        memoizer.get(feature)
+        await memoizer.get(feature)
         expect(spy).toHaveBeenCalled()
       })
 
-      it('expires features set on add', () => {
-        memoizer.features()
+      it('expires features set on add', async () => {
+        await memoizer.features()
 
         const spy = jest.spyOn(adapter, 'features')
         const newFeature = new Feature('new', adapter, {})
-        memoizer.add(newFeature)
+        await memoizer.add(newFeature)
 
         // Next features() should hit adapter
-        memoizer.features()
+        await memoizer.features()
         expect(spy).toHaveBeenCalled()
       })
 
-      it('expires features set and feature on remove', () => {
-        memoizer.features()
-        memoizer.get(feature)
+      it('expires features set and feature on remove', async () => {
+        await memoizer.features()
+        await memoizer.get(feature)
 
         const featuresSpy = jest.spyOn(adapter, 'features')
         const getSpy = jest.spyOn(adapter, 'get')
 
-        memoizer.remove(feature)
+        await memoizer.remove(feature)
 
-        memoizer.features()
-        memoizer.get(feature)
+        await memoizer.features()
+        await memoizer.get(feature)
 
         expect(featuresSpy).toHaveBeenCalled()
         expect(getSpy).toHaveBeenCalled()
@@ -246,18 +247,18 @@ describe('Memoizable', () => {
   })
 
   describe('custom cache', () => {
-    it('accepts external cache object', () => {
+    it('accepts external cache object', async () => {
       const cache = {}
       const memoizer = new Memoizable(adapter, cache)
 
       memoizer.memoize = true
-      memoizer.get(feature)
+      await memoizer.get(feature)
 
       // Cache should be populated
       expect(Object.keys(cache).length).toBeGreaterThan(0)
     })
 
-    it('shares cache between instances', () => {
+    it('shares cache between instances', async () => {
       const cache = {}
       const memoizer1 = new Memoizable(adapter, cache)
       const memoizer2 = new Memoizable(adapter, cache)
@@ -266,12 +267,12 @@ describe('Memoizable', () => {
       memoizer2.memoize = true
 
       // Memoizer1 fetches and caches
-      memoizer1.get(feature)
+      await memoizer1.get(feature)
 
       const spy = jest.spyOn(adapter, 'get')
 
       // Memoizer2 should use shared cache
-      memoizer2.get(feature)
+      await memoizer2.get(feature)
 
       expect(spy).not.toHaveBeenCalled()
     })
@@ -285,9 +286,9 @@ describe('Memoizable', () => {
       const spy = jest.spyOn(adapter, 'get')
 
       // Multiple checks of same feature
-      dsl.isFeatureEnabled('test_feature')
-      dsl.isFeatureEnabled('test_feature')
-      dsl.isFeatureEnabled('test_feature')
+      void dsl.isFeatureEnabled('test_feature')
+      void dsl.isFeatureEnabled('test_feature')
+      void dsl.isFeatureEnabled('test_feature')
 
       // Should only hit adapter once
       expect(spy).toHaveBeenCalledTimes(1)

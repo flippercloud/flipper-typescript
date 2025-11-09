@@ -8,13 +8,11 @@ import { IInstrumenter, InstrumentationPayload } from '../interfaces'
  * any instrumentation overhead.
  *
  * @example
- * ```typescript
  * const instrumenter = new NoopInstrumenter();
  * const result = instrumenter.instrument('operation', {}, (payload) => {
  *   return 'result';
  * });
  * // result === 'result'
- * ```
  */
 class NoopInstrumenter implements IInstrumenter {
   /**
@@ -25,7 +23,7 @@ class NoopInstrumenter implements IInstrumenter {
    * @param fn - The function to execute
    * @returns The result of the function
    */
-  instrument<T>(_name: string, payload: InstrumentationPayload, fn: (payload: InstrumentationPayload) => T): T {
+  instrument<T>(_name: string, payload: InstrumentationPayload, fn: (payload: InstrumentationPayload) => T | Promise<T>): T | Promise<T> {
     return fn(payload)
   }
 }

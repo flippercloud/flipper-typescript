@@ -16,20 +16,18 @@ function instanceOfActor(thing: unknown): thing is IActor {
  * always get the same result for a given feature and percentage.
  *
  * @example
- * ```typescript
  * const feature = flipper.feature('gradual-rollout');
  *
  * // Enable for 25% of users
- * feature.enablePercentageOfActors(25);
+ * await feature.enablePercentageOfActors(25);
  *
  * // Check for specific users (deterministic)
- * feature.isEnabled({ flipperId: 'user-1' }); // May be true or false
- * feature.isEnabled({ flipperId: 'user-1' }); // Same result every time
+ * await feature.isEnabled({ flipperId: 'user-1' }); // May be true or false
+ * await feature.isEnabled({ flipperId: 'user-1' }); // Same result every time
  *
  * // Increase rollout to 50%
- * feature.enablePercentageOfActors(50);
+ * await feature.enablePercentageOfActors(50);
  * // Users who were in 25% are still enabled, plus additional users
- * ```
  */
 class PercentageOfActorsGate implements IGate {
   /**

@@ -31,22 +31,20 @@ export class ActorLimitExceededError extends Error {
  * are not affected by this limit.
  *
  * @example
- * ```typescript
  * const adapter = new ActorLimit(new MemoryAdapter(), 100);
  *
  * // Enable for up to 100 actors
  * for (let i = 0; i < 100; i++) {
- *   feature.enableActor({ flipperId: `user-${i}` }); // OK
+ *   await feature.enableActor({ flipperId: `user-${i}` }); // OK
  * }
  *
  * // 101st actor throws error
- * feature.enableActor({ flipperId: 'user-100' });
+ * await feature.enableActor({ flipperId: 'user-100' });
  * // => ActorLimitExceededError: Actor limit of 100 exceeded
  *
  * // Other gates still work
- * feature.enable(); // OK - boolean gate
- * feature.enablePercentageOfActors(25); // OK - percentage gate
- * ```
+ * await feature.enable(); // OK - boolean gate
+ * await feature.enablePercentageOfActors(25); // OK - percentage gate
  */
 export default class ActorLimit extends Wrapper {
   /**
@@ -72,11 +70,11 @@ export default class ActorLimit extends Wrapper {
    * @returns True if gate was enabled successfully
    * @throws {ActorLimitExceededError} If enabling an actor would exceed the limit
    */
-  override enable(feature: Feature, gate: IGate, thing: IType): boolean {
-    if (gate instanceof ActorGate && this.isOverLimit(feature)) {
+  override async enable(feature: Feature, gate: IGate, thing: IType): Promise<boolean> {
+    if (gate instanceof ActorGate && await this.isOverLimit(feature)) {
       throw new ActorLimitExceededError(feature.name, this.limit)
     }
-    return super.enable(feature, gate, thing)
+    return await super.enable(feature, gate, thing)
   }
 
   /**
@@ -84,8 +82,8 @@ export default class ActorLimit extends Wrapper {
    * @param feature - Feature to check
    * @returns True if the feature has reached the limit
    */
-  private isOverLimit(feature: Feature): boolean {
-    const actorsValue = feature.actorsValue()
+  private async isOverLimit(feature: Feature): Promise<boolean> {
+    const actorsValue = await feature.actorsValue()
     return actorsValue.size >= this.limit
   }
 }

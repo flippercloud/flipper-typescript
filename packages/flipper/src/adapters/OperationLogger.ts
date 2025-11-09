@@ -17,12 +17,11 @@ export interface Operation {
  * Never use in production - for testing only.
  *
  * @example
- * ```typescript
  * const adapter = new MemoryAdapter();
  * const logger = new OperationLogger(adapter);
  *
- * logger.add(feature);
- * logger.enable(feature, gate, thing);
+ * await logger.add(feature);
+ * await logger.enable(feature, gate, thing);
  *
  * // Check operations
  * logger.count(); // 2
@@ -38,7 +37,6 @@ export interface Operation {
  * // Reset log
  * logger.reset();
  * logger.count(); // 0
- * ```
  */
 export default class OperationLogger extends Wrapper {
   /**
@@ -108,7 +106,7 @@ export default class OperationLogger extends Wrapper {
    * @param fn - Function that calls the wrapped adapter method
    * @returns The result from the wrapped adapter
    */
-  protected override wrap<T>(method: string, fn: () => T): T {
+  protected override wrap<T>(method: string, fn: () => T | Promise<T>): T | Promise<T> {
     // Log the operation
     this.operations.push({
       type: method,

@@ -11,7 +11,6 @@ import type Dsl from '../Dsl'
  * for more specific control.
  *
  * @example
- * ```typescript
  * class MyWrapper extends Wrapper {
  *   protected wrap<T>(method: string, fn: () => T): T {
  *     console.log(`Calling ${method}`);
@@ -20,7 +19,6 @@ import type Dsl from '../Dsl'
  *     return result;
  *   }
  * }
- * ```
  */
 export default class Wrapper implements IAdapter {
   /**
@@ -48,8 +46,8 @@ export default class Wrapper implements IAdapter {
    * Get all features from the wrapped adapter.
    * @returns Array of all features
    */
-  features(): Feature[] {
-    return this.wrap('features', () => this.adapter.features())
+  async features(): Promise<Feature[]> {
+    return await this.wrap('features', () => this.adapter.features())
   }
 
   /**
@@ -57,8 +55,8 @@ export default class Wrapper implements IAdapter {
    * @param feature - Feature to add
    * @returns True if feature was added successfully
    */
-  add(feature: Feature): boolean {
-    return this.wrap('add', () => this.adapter.add(feature))
+  async add(feature: Feature): Promise<boolean> {
+    return await this.wrap('add', () => this.adapter.add(feature))
   }
 
   /**
@@ -66,8 +64,8 @@ export default class Wrapper implements IAdapter {
    * @param feature - Feature to remove
    * @returns True if feature was removed successfully
    */
-  remove(feature: Feature): boolean {
-    return this.wrap('remove', () => this.adapter.remove(feature))
+  async remove(feature: Feature): Promise<boolean> {
+    return await this.wrap('remove', () => this.adapter.remove(feature))
   }
 
   /**
@@ -75,8 +73,8 @@ export default class Wrapper implements IAdapter {
    * @param feature - Feature to clear
    * @returns True if feature was cleared successfully
    */
-  clear(feature: Feature): boolean {
-    return this.wrap('clear', () => this.adapter.clear(feature))
+  async clear(feature: Feature): Promise<boolean> {
+    return await this.wrap('clear', () => this.adapter.clear(feature))
   }
 
   /**
@@ -84,8 +82,8 @@ export default class Wrapper implements IAdapter {
    * @param feature - Feature to get state for
    * @returns Feature gate values
    */
-  get(feature: Feature): Record<string, unknown> {
-    return this.wrap('get', () => this.adapter.get(feature))
+  async get(feature: Feature): Promise<Record<string, unknown>> {
+    return await this.wrap('get', () => this.adapter.get(feature))
   }
 
   /**
@@ -93,16 +91,16 @@ export default class Wrapper implements IAdapter {
    * @param features - Features to get state for
    * @returns Map of feature keys to gate values
    */
-  getMulti(features: Feature[]): Record<string, Record<string, unknown>> {
-    return this.wrap('getMulti', () => this.adapter.getMulti(features))
+  async getMulti(features: Feature[]): Promise<Record<string, Record<string, unknown>>> {
+    return await this.wrap('getMulti', () => this.adapter.getMulti(features))
   }
 
   /**
    * Get all features' state from the wrapped adapter.
    * @returns Map of all feature keys to gate values
    */
-  getAll(): Record<string, Record<string, unknown>> {
-    return this.wrap('getAll', () => this.adapter.getAll())
+  async getAll(): Promise<Record<string, Record<string, unknown>>> {
+    return await this.wrap('getAll', () => this.adapter.getAll())
   }
 
   /**
@@ -112,8 +110,8 @@ export default class Wrapper implements IAdapter {
    * @param thing - Value to enable for the gate
    * @returns True if gate was enabled successfully
    */
-  enable(feature: Feature, gate: IGate, thing: IType): boolean {
-    return this.wrap('enable', () => this.adapter.enable(feature, gate, thing))
+  async enable(feature: Feature, gate: IGate, thing: IType): Promise<boolean> {
+    return await this.wrap('enable', () => this.adapter.enable(feature, gate, thing))
   }
 
   /**
@@ -123,8 +121,8 @@ export default class Wrapper implements IAdapter {
    * @param thing - Value to disable for the gate
    * @returns True if gate was disabled successfully
    */
-  disable(feature: Feature, gate: IGate, thing: IType): boolean {
-    return this.wrap('disable', () => this.adapter.disable(feature, gate, thing))
+  async disable(feature: Feature, gate: IGate, thing: IType): Promise<boolean> {
+    return await this.wrap('disable', () => this.adapter.disable(feature, gate, thing))
   }
 
   /**
@@ -140,8 +138,8 @@ export default class Wrapper implements IAdapter {
    * @param options - Export options
    * @returns Export object
    */
-  export(options: { format?: string; version?: number } = {}): Export {
-    return this.wrap('export', () => this.adapter.export(options))
+  async export(options: { format?: string; version?: number } = {}): Promise<Export> {
+    return await this.wrap('export', () => this.adapter.export(options))
   }
 
   /**
@@ -149,8 +147,8 @@ export default class Wrapper implements IAdapter {
    * @param source - The source to import from
    * @returns True if successful
    */
-  import(source: IAdapter | Export | Dsl): boolean {
-    return this.wrap('import', () => this.adapter.import(source))
+  async import(source: IAdapter | Export | Dsl): Promise<boolean> {
+    return await this.wrap('import', () => this.adapter.import(source))
   }
 
   /**
@@ -161,7 +159,7 @@ export default class Wrapper implements IAdapter {
    * @param fn - Function that calls the wrapped adapter method
    * @returns The result from the wrapped adapter
    */
-  protected wrap<T>(_method: string, fn: () => T): T {
+  protected wrap<T>(_method: string, fn: () => T | Promise<T>): T | Promise<T> {
     return fn()
   }
 }
