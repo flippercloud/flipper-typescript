@@ -1,4 +1,4 @@
-import type { IAdapter } from './interfaces'
+import type { IAdapter, IGate, IType } from './interfaces'
 import Feature from './Feature'
 
 /**
@@ -13,52 +13,58 @@ class ExportAdapter implements IAdapter {
     this.featuresData = featuresData
   }
 
-  features(): Feature[] {
-    return []
+  async features(): Promise<Feature[]> {
+    return await Promise.resolve(
+      Object.keys(this.featuresData).map((key) => new Feature(key, this, {}))
+    )
   }
 
-  add(_feature: Feature): boolean {
-    return true
+  async add(_feature: Feature): Promise<boolean> {
+    return await Promise.resolve(false)
   }
 
-  remove(_feature: Feature): boolean {
-    return true
+  async remove(_feature: Feature): Promise<boolean> {
+    return await Promise.resolve(false)
   }
 
-  clear(_feature: Feature): boolean {
-    return true
+  async clear(_feature: Feature): Promise<boolean> {
+    return await Promise.resolve(false)
   }
 
-  get(_feature: Feature): Record<string, unknown> {
-    return {}
+  async get(feature: Feature): Promise<Record<string, unknown>> {
+    return await Promise.resolve(this.featuresData[feature.key] ?? {})
   }
 
-  getMulti(_features: Feature[]): Record<string, Record<string, unknown>> {
-    return {}
+  async getMulti(features: Feature[]): Promise<Record<string, Record<string, unknown>>> {
+    return await Promise.resolve(
+      Object.fromEntries(
+        features.map((f) => [f.key, this.featuresData[f.key] ?? {}])
+      )
+    )
   }
 
-  getAll(): Record<string, Record<string, unknown>> {
-    return this.featuresData
+  async getAll(): Promise<Record<string, Record<string, unknown>>> {
+    return await Promise.resolve(this.featuresData)
   }
 
-  enable(_feature: Feature, _gate: unknown, _thing: unknown): boolean {
-    return true
+  async enable(_feature: Feature, _gate: IGate, _thing: IType): Promise<boolean> {
+    return await Promise.resolve(false)
   }
 
-  disable(_feature: Feature, _gate: unknown, _thing: unknown): boolean {
-    return true
+  async disable(_feature: Feature, _gate: IGate, _thing: IType): Promise<boolean> {
+    return await Promise.resolve(false)
   }
 
   readOnly(): boolean {
     return true
   }
 
-  export(): never {
-    throw new Error('Cannot export from an Export')
+  async export(): Promise<never> {
+    return await Promise.reject(new Error('Cannot export from an Export'))
   }
 
-  import(): never {
-    throw new Error('Cannot import to an Export')
+  async import(): Promise<never> {
+    return await Promise.reject(new Error('Cannot import to an Export'))
   }
 }
 
@@ -69,16 +75,14 @@ class ExportAdapter implements IAdapter {
  * saved, transferred, or imported into another Flipper instance.
  *
  * @example
- * ```typescript
  * // Export from source
- * const sourceExport = sourceFlipper.export();
+ * const sourceExport = await sourceFlipper.export();
  *
  * // Transfer the export
  * const jsonString = sourceExport.contents;
  *
  * // Import to destination
  * await destinationFlipper.import(sourceExport);
- * ```
  */
 abstract class Export {
   /**
@@ -129,12 +133,11 @@ abstract class Export {
    *
    * @returns Adapter with exported features
    */
-  public adapter(): IAdapter {
+  async adapter(): Promise<IAdapter> {
     if (!this.adapterCache) {
-      const featuresData = this.features()
-      this.adapterCache = new ExportAdapter(featuresData)
+      this.adapterCache = new ExportAdapter(this.features())
     }
-    return this.adapterCache
+    return await Promise.resolve(this.adapterCache)
   }
 
   /**

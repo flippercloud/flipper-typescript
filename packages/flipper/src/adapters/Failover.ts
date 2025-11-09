@@ -31,7 +31,6 @@ export interface FailoverOptions {
  * - Graceful degradation during outages
  *
  * @example
- * ```typescript
  * // Simple failover: try cache, fall back to database
  * const adapter = new Failover(
  *   cacheAdapter,     // Fast but might fail
@@ -51,7 +50,6 @@ export interface FailoverOptions {
  *   secondaryAdapter,
  *   { errors: [NetworkError, TimeoutError] }
  * );
- * ```
  */
 export default class Failover implements IAdapter {
   /**
@@ -101,12 +99,12 @@ export default class Failover implements IAdapter {
    * Get all features, failing over to secondary on error.
    * @returns Array of all features
    */
-  features(): Feature[] {
+  async features(): Promise<Feature[]> {
     try {
-      return this.primary.features()
+      return await this.primary.features()
     } catch (error) {
       if (this.shouldFailover(error)) {
-        return this.secondary.features()
+        return await this.secondary.features()
       }
       throw error
     }
@@ -117,10 +115,10 @@ export default class Failover implements IAdapter {
    * @param feature - Feature to add
    * @returns True if feature was added successfully
    */
-  add(feature: Feature): boolean {
-    const result = this.primary.add(feature)
+  async add(feature: Feature): Promise<boolean> {
+    const result = await this.primary.add(feature)
     if (this.dualWrite) {
-      this.secondary.add(feature)
+      await this.secondary.add(feature)
     }
     return result
   }
@@ -130,10 +128,10 @@ export default class Failover implements IAdapter {
    * @param feature - Feature to remove
    * @returns True if feature was removed successfully
    */
-  remove(feature: Feature): boolean {
-    const result = this.primary.remove(feature)
+  async remove(feature: Feature): Promise<boolean> {
+    const result = await this.primary.remove(feature)
     if (this.dualWrite) {
-      this.secondary.remove(feature)
+      await this.secondary.remove(feature)
     }
     return result
   }
@@ -143,10 +141,10 @@ export default class Failover implements IAdapter {
    * @param feature - Feature to clear
    * @returns True if feature was cleared successfully
    */
-  clear(feature: Feature): boolean {
-    const result = this.primary.clear(feature)
+  async clear(feature: Feature): Promise<boolean> {
+    const result = await this.primary.clear(feature)
     if (this.dualWrite) {
-      this.secondary.clear(feature)
+      await this.secondary.clear(feature)
     }
     return result
   }
@@ -156,12 +154,12 @@ export default class Failover implements IAdapter {
    * @param feature - Feature to get state for
    * @returns Feature gate values
    */
-  get(feature: Feature): Record<string, unknown> {
+  async get(feature: Feature): Promise<Record<string, unknown>> {
     try {
-      return this.primary.get(feature)
+      return await this.primary.get(feature)
     } catch (error) {
       if (this.shouldFailover(error)) {
-        return this.secondary.get(feature)
+        return await this.secondary.get(feature)
       }
       throw error
     }
@@ -172,12 +170,12 @@ export default class Failover implements IAdapter {
    * @param features - Features to get state for
    * @returns Map of feature keys to gate values
    */
-  getMulti(features: Feature[]): Record<string, Record<string, unknown>> {
+  async getMulti(features: Feature[]): Promise<Record<string, Record<string, unknown>>> {
     try {
-      return this.primary.getMulti(features)
+      return await this.primary.getMulti(features)
     } catch (error) {
       if (this.shouldFailover(error)) {
-        return this.secondary.getMulti(features)
+        return await this.secondary.getMulti(features)
       }
       throw error
     }
@@ -187,12 +185,12 @@ export default class Failover implements IAdapter {
    * Get all features' state, failing over to secondary on error.
    * @returns Map of all feature keys to gate values
    */
-  getAll(): Record<string, Record<string, unknown>> {
+  async getAll(): Promise<Record<string, Record<string, unknown>>> {
     try {
-      return this.primary.getAll()
+      return await this.primary.getAll()
     } catch (error) {
       if (this.shouldFailover(error)) {
-        return this.secondary.getAll()
+        return await this.secondary.getAll()
       }
       throw error
     }
@@ -205,10 +203,10 @@ export default class Failover implements IAdapter {
    * @param thing - Value to enable for the gate
    * @returns True if gate was enabled successfully
    */
-  enable(feature: Feature, gate: IGate, thing: IType): boolean {
-    const result = this.primary.enable(feature, gate, thing)
+  async enable(feature: Feature, gate: IGate, thing: IType): Promise<boolean> {
+    const result = await this.primary.enable(feature, gate, thing)
     if (this.dualWrite) {
-      this.secondary.enable(feature, gate, thing)
+      await this.secondary.enable(feature, gate, thing)
     }
     return result
   }
@@ -220,10 +218,10 @@ export default class Failover implements IAdapter {
    * @param thing - Value to disable for the gate
    * @returns True if gate was disabled successfully
    */
-  disable(feature: Feature, gate: IGate, thing: IType): boolean {
-    const result = this.primary.disable(feature, gate, thing)
+  async disable(feature: Feature, gate: IGate, thing: IType): Promise<boolean> {
+    const result = await this.primary.disable(feature, gate, thing)
     if (this.dualWrite) {
-      this.secondary.disable(feature, gate, thing)
+      await this.secondary.disable(feature, gate, thing)
     }
     return result
   }
@@ -241,12 +239,12 @@ export default class Failover implements IAdapter {
    * @param options - Export options
    * @returns Export object
    */
-  export(options: { format?: string; version?: number } = {}): Export {
+  async export(options: { format?: string; version?: number } = {}): Promise<Export> {
     try {
-      return this.primary.export(options)
+      return await this.primary.export(options)
     } catch (error) {
       if (this.shouldFailover(error)) {
-        return this.secondary.export(options)
+        return await this.secondary.export(options)
       }
       throw error
     }
@@ -257,10 +255,10 @@ export default class Failover implements IAdapter {
    * @param source - The source to import from
    * @returns True if successful
    */
-  import(source: IAdapter | Export | Dsl): boolean {
-    const result = this.primary.import(source)
+  async import(source: IAdapter | Export | Dsl): Promise<boolean> {
+    const result = await this.primary.import(source)
     if (this.dualWrite) {
-      this.secondary.import(source)
+      await this.secondary.import(source)
     }
     return result
   }

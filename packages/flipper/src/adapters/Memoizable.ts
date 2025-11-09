@@ -16,7 +16,6 @@ interface Cache {
  * Call `memoize = true` to enable caching, `memoize = false` to disable and clear.
  *
  * @example
- * ```typescript
  * const adapter = new MemoryAdapter();
  * const memoizer = new Memoizable(adapter);
  *
@@ -24,10 +23,10 @@ interface Cache {
  * memoizer.memoize = true;
  *
  * // First call hits the adapter
- * memoizer.get(feature);
+ * await memoizer.get(feature);
  *
  * // Second call uses cache
- * memoizer.get(feature); // cached!
+ * await memoizer.get(feature); // cached!
  *
  * // Disable memoization and clear cache
  * memoizer.memoize = false;
@@ -38,7 +37,6 @@ interface Cache {
  *   req.flipperMemoizer.memoize = true;
  *   next();
  * });
- * ```
  */
 export default class Memoizable implements IAdapter {
   /**
@@ -109,16 +107,16 @@ export default class Memoizable implements IAdapter {
    * Get all features, with caching if memoization is enabled.
    * @returns Array of all features
    */
-  features(): Feature[] {
+  async features(): Promise<Feature[]> {
     if (!this._memoize) {
-      return this.adapter.features()
+      return await this.adapter.features()
     }
 
     if (!(this.FEATURES_KEY in this.cache)) {
       this.cache[this.FEATURES_KEY] = this.adapter.features()
     }
 
-    return this.cache[this.FEATURES_KEY] as Feature[]
+    return await (this.cache[this.FEATURES_KEY] as Promise<Feature[]>)
   }
 
   /**
@@ -126,8 +124,8 @@ export default class Memoizable implements IAdapter {
    * @param feature - Feature to add
    * @returns True if feature was added successfully
    */
-  add(feature: Feature): boolean {
-    const result = this.adapter.add(feature)
+  async add(feature: Feature): Promise<boolean> {
+    const result = await this.adapter.add(feature)
     this.expireFeaturesSet()
     return result
   }
@@ -137,8 +135,8 @@ export default class Memoizable implements IAdapter {
    * @param feature - Feature to remove
    * @returns True if feature was removed successfully
    */
-  remove(feature: Feature): boolean {
-    const result = this.adapter.remove(feature)
+  async remove(feature: Feature): Promise<boolean> {
+    const result = await this.adapter.remove(feature)
     this.expireFeaturesSet()
     this.expireFeature(feature)
     return result
@@ -149,8 +147,8 @@ export default class Memoizable implements IAdapter {
    * @param feature - Feature to clear
    * @returns True if feature was cleared successfully
    */
-  clear(feature: Feature): boolean {
-    const result = this.adapter.clear(feature)
+  async clear(feature: Feature): Promise<boolean> {
+    const result = await this.adapter.clear(feature)
     this.expireFeature(feature)
     return result
   }
@@ -160,17 +158,18 @@ export default class Memoizable implements IAdapter {
    * @param feature - Feature to get state for
    * @returns Feature gate values
    */
-  get(feature: Feature): Record<string, unknown> {
+  async get(feature: Feature): Promise<Record<string, unknown>> {
     if (!this._memoize) {
-      return this.adapter.get(feature)
+      return await this.adapter.get(feature)
     }
 
     const key = this.keyFor(feature.key)
     if (!(key in this.cache)) {
+      // Store the promise itself to avoid thundering herd
       this.cache[key] = this.adapter.get(feature)
     }
 
-    return this.cache[key] as Record<string, unknown>
+    return await (this.cache[key] as Promise<Record<string, unknown>>)
   }
 
   /**
@@ -178,9 +177,9 @@ export default class Memoizable implements IAdapter {
    * @param features - Features to get state for
    * @returns Map of feature keys to gate values
    */
-  getMulti(features: Feature[]): Record<string, Record<string, unknown>> {
+  async getMulti(features: Feature[]): Promise<Record<string, Record<string, unknown>>> {
     if (!this._memoize) {
-      return this.adapter.getMulti(features)
+      return await this.adapter.getMulti(features)
     }
 
     // Find features not in cache
@@ -191,18 +190,18 @@ export default class Memoizable implements IAdapter {
 
     // Fetch uncached features
     if (uncachedFeatures.length > 0) {
-      const response = this.adapter.getMulti(uncachedFeatures)
+      const response = await this.adapter.getMulti(uncachedFeatures)
       Object.entries(response).forEach(([featureKey, hash]) => {
-        this.cache[this.keyFor(featureKey)] = hash
+        this.cache[this.keyFor(featureKey)] = Promise.resolve(hash)
       })
     }
 
     // Build result from cache
     const result: Record<string, Record<string, unknown>> = {}
-    features.forEach((feature) => {
+    for (const feature of features) {
       const key = this.keyFor(feature.key)
-      result[feature.key] = this.cache[key] as Record<string, unknown>
-    })
+      result[feature.key] = await (this.cache[key] as Promise<Record<string, unknown>>)
+    }
 
     return result
   }
@@ -211,9 +210,9 @@ export default class Memoizable implements IAdapter {
    * Get all features' state, with full caching if memoization is enabled.
    * @returns Map of all feature keys to gate values
    */
-  getAll(): Record<string, Record<string, unknown>> {
+  async getAll(): Promise<Record<string, Record<string, unknown>>> {
     if (!this._memoize) {
-      return this.adapter.getAll()
+      return await this.adapter.getAll()
     }
 
     let response: Record<string, Record<string, unknown>>
@@ -221,18 +220,18 @@ export default class Memoizable implements IAdapter {
     if (this.cache[this.GET_ALL_KEY]) {
       // Build from cache
       response = {}
-      const featureKeys = this.cache[this.FEATURES_KEY] as string[]
-      featureKeys.forEach((featureKey) => {
+      const featureKeys = await (this.cache[this.FEATURES_KEY] as Promise<string[]>)
+      for (const featureKey of featureKeys) {
         const key = this.keyFor(featureKey)
-        response[featureKey] = this.cache[key] as Record<string, unknown>
-      })
+        response[featureKey] = await (this.cache[key] as Promise<Record<string, unknown>>)
+      }
     } else {
       // Fetch from adapter and cache
-      response = this.adapter.getAll()
+      response = await this.adapter.getAll()
       Object.entries(response).forEach(([featureKey, value]) => {
-        this.cache[this.keyFor(featureKey)] = value
+        this.cache[this.keyFor(featureKey)] = Promise.resolve(value)
       })
-      this.cache[this.FEATURES_KEY] = Object.keys(response)
+      this.cache[this.FEATURES_KEY] = Promise.resolve(Object.keys(response))
       this.cache[this.GET_ALL_KEY] = true
     }
 
@@ -246,8 +245,8 @@ export default class Memoizable implements IAdapter {
    * @param thing - Value to enable for the gate
    * @returns True if gate was enabled successfully
    */
-  enable(feature: Feature, gate: IGate, thing: IType): boolean {
-    const result = this.adapter.enable(feature, gate, thing)
+  async enable(feature: Feature, gate: IGate, thing: IType): Promise<boolean> {
+    const result = await this.adapter.enable(feature, gate, thing)
     this.expireFeature(feature)
     return result
   }
@@ -259,8 +258,8 @@ export default class Memoizable implements IAdapter {
    * @param thing - Value to disable for the gate
    * @returns True if gate was disabled successfully
    */
-  disable(feature: Feature, gate: IGate, thing: IType): boolean {
-    const result = this.adapter.disable(feature, gate, thing)
+  async disable(feature: Feature, gate: IGate, thing: IType): Promise<boolean> {
+    const result = await this.adapter.disable(feature, gate, thing)
     this.expireFeature(feature)
     return result
   }
@@ -279,8 +278,8 @@ export default class Memoizable implements IAdapter {
    * @param options - Export options
    * @returns Export object
    */
-  export(options: { format?: string; version?: number } = {}): Export {
-    return this.adapter.export(options)
+  async export(options: { format?: string; version?: number } = {}): Promise<Export> {
+    return await this.adapter.export(options)
   }
 
   /**
@@ -289,8 +288,8 @@ export default class Memoizable implements IAdapter {
    * @param source - The source to import from
    * @returns True if successful
    */
-  import(source: IAdapter | Export | Dsl): boolean {
-    const result = this.adapter.import(source)
+  async import(source: IAdapter | Export | Dsl): Promise<boolean> {
+    const result = await this.adapter.import(source)
     if (this._memoize) {
       // Clear entire cache after import
       Object.keys(this.cache).forEach(key => delete this.cache[key])

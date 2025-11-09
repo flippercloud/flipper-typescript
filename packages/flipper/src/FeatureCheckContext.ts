@@ -8,7 +8,6 @@ import GateValues from './GateValues'
  * actor/thing being checked.
  *
  * @example
- * ```typescript
  * const values = new GateValues(rawValues);
  * const actor = { flipperId: 'user-123' };
  * const context = new FeatureCheckContext('new-ui', values, actor);
@@ -17,7 +16,6 @@ import GateValues from './GateValues'
  * if (actorGate.isOpen(context)) {
  *   // Feature is enabled for this actor
  * }
- * ```
  */
 class FeatureCheckContext {
   /**

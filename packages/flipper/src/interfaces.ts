@@ -10,18 +10,18 @@ export interface IActor {
 
 export interface IAdapter {
   name: string
-  features: () => Feature[]
-  add: (feature: Feature) => boolean
-  remove: (feature: Feature) => boolean
-  clear: (feature: Feature) => boolean
-  get: (feature: Feature) => Record<string, unknown>
-  getMulti: (features: Feature[]) => Record<string, Record<string, unknown>>
-  getAll: () => Record<string, Record<string, unknown>>
-  enable: (feature: Feature, gate: IGate, thing: IType) => boolean
-  disable: (feature: Feature, gate: IGate, thing: IType) => boolean
+  features: () => Promise<Feature[]>
+  add: (feature: Feature) => Promise<boolean>
+  remove: (feature: Feature) => Promise<boolean>
+  clear: (feature: Feature) => Promise<boolean>
+  get: (feature: Feature) => Promise<Record<string, unknown>>
+  getMulti: (features: Feature[]) => Promise<Record<string, Record<string, unknown>>>
+  getAll: () => Promise<Record<string, Record<string, unknown>>>
+  enable: (feature: Feature, gate: IGate, thing: IType) => Promise<boolean>
+  disable: (feature: Feature, gate: IGate, thing: IType) => Promise<boolean>
   readOnly: () => boolean
-  export: (options?: { format?: string; version?: number }) => Export
-  import: (source: IAdapter | Export | Dsl) => boolean
+  export: (options?: { format?: string; version?: number }) => Promise<Export>
+  import: (source: IAdapter | Export | Dsl) => Promise<boolean>
 }
 
 export interface IGate {
@@ -95,7 +95,6 @@ export interface InstrumentationPayload {
  * debugging, monitoring, or analytics purposes.
  *
  * @example
- * ```typescript
  * class CustomInstrumenter implements IInstrumenter {
  *   instrument<T>(name: string, payload: InstrumentationPayload, fn: (payload: InstrumentationPayload) => T): T {
  *     console.log('Starting:', name, payload);
@@ -104,7 +103,6 @@ export interface InstrumentationPayload {
  *     return result;
  *   }
  * }
- * ```
  */
 export interface IInstrumenter {
   /**
@@ -115,5 +113,5 @@ export interface IInstrumenter {
    * @param fn - The function to execute and instrument
    * @returns The result of the function
    */
-  instrument<T>(name: string, payload: InstrumentationPayload, fn: (payload: InstrumentationPayload) => T): T
+  instrument<T>(name: string, payload: InstrumentationPayload, fn: (payload: InstrumentationPayload) => T | Promise<T>): T | Promise<T>
 }

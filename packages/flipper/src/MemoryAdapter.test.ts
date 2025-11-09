@@ -15,74 +15,72 @@ describe('MemoryAdapter', () => {
     expect(adapter.name).toBe('memory')
   })
 
-  test('starts with no features', () => {
-    expect(adapter.features()).toBeInstanceOf(Array)
-    expect(adapter.features()).toHaveLength(0)
+  test('starts with no features', async () => {
+    expect(await adapter.features()).toBeInstanceOf(Array)
+    expect(await adapter.features()).toHaveLength(0)
   })
 
-  test('adds feature', () => {
-    adapter.add(feature)
-    expect(adapter.features()).toHaveLength(1)
-    expect(adapter.features()[0]).toBe(feature)
+  test('adds feature', async () => {
+    await adapter.add(feature)
+    expect(await adapter.features()).toHaveLength(1)
+    const features = await adapter.features()
+    expect(features[0]?.key).toBe(feature.key)
   })
 
-  test('adds and removes feature and clears feature gates', () => {
+  test('adds and removes feature and clears feature gates', async () => {
     let gates
     const gate = new BooleanGate()
-    adapter.add(feature)
-    adapter.enable(feature, gate, gate.wrap(true))
-    expect(adapter.features()).toHaveLength(1)
-    gates = adapter.get(feature)
+    await adapter.add(feature)
+    await adapter.enable(feature, gate, gate.wrap(true))
+    expect(await adapter.features()).toHaveLength(1)
+    gates = await adapter.get(feature)
     expect(gates['boolean']).toBe('true')
-    adapter.remove(feature)
-    expect(adapter.features()).toHaveLength(0)
-    gates = adapter.get(feature)
+    await adapter.remove(feature)
+    expect(await adapter.features()).toHaveLength(0)
+    gates = await adapter.get(feature)
     expect(gates['boolean']).toBeUndefined()
-    expect(gates['actors']).toBeInstanceOf(Set)
-    expect((gates['actors'] as Set<string>).size).toBe(0)
+    expect(Object.keys(gates)).toHaveLength(0)
   })
 
-  test('gets, enables, disables, and clears boolean feature gate', () => {
+  test('gets, enables, disables, and clears boolean feature gate', async () => {
     let gates
     const gate = new BooleanGate()
-    adapter.enable(feature, gate, gate.wrap(true))
-    gates = adapter.get(feature)
+    await adapter.enable(feature, gate, gate.wrap(true))
+    gates = await adapter.get(feature)
     expect(gates['boolean']).toBe('true')
-    adapter.disable(feature, gate, gate.wrap(true))
-    gates = adapter.get(feature)
+    await adapter.disable(feature, gate, gate.wrap(true))
+    gates = await adapter.get(feature)
     expect(gates['boolean']).toBeUndefined()
-    adapter.clear(feature)
-    gates = adapter.get(feature)
-    expect(gates['boolean']).toBeUndefined()
-    expect(gates['actors']).toBeInstanceOf(Set)
-    expect((gates['actors'] as Set<string>).size).toBe(0)
+    await adapter.clear(feature)
+    gates = await adapter.get(feature)
+    expect(Object.keys(gates)).toHaveLength(0)
   })
 
-  test('getMulti returns gate values for multiple features', () => {
+  test('getMulti returns gate values for multiple features', async () => {
     const feature1 = new Feature('feature-1', adapter, {})
     const feature2 = new Feature('feature-2', adapter, {})
     const gate = new BooleanGate()
 
-    adapter.add(feature1)
-    adapter.add(feature2)
-    adapter.enable(feature1, gate, gate.wrap(true))
+    await adapter.add(feature1)
+    await adapter.add(feature2)
+    await adapter.enable(feature1, gate, gate.wrap(true))
 
-    const result = adapter.getMulti([feature1, feature2])
+    const result = await adapter.getMulti([feature1, feature2])
 
     expect(result['feature-1']?.['boolean']).toBe('true')
     expect(result['feature-2']?.['boolean']).toBeUndefined()
   })
 
-  test('getAll returns gate values for all features', () => {
+  test('getAll returns gate values for all features', async () => {
     const feature1 = new Feature('feature-1', adapter, {})
     const feature2 = new Feature('feature-2', adapter, {})
     const gate = new BooleanGate()
 
-    adapter.add(feature1)
-    adapter.add(feature2)
-    adapter.enable(feature1, gate, gate.wrap(true))
+    await adapter.add(feature1)
+    await adapter.add(feature2)
+    await adapter.enable(feature1, gate, gate.wrap(true))
 
-    const result = adapter.getAll()
+    const result = await adapter.getAll()
 
     expect(result['feature-1']?.['boolean']).toBe('true')
     expect(result['feature-2']?.['boolean']).toBeUndefined()

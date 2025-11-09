@@ -35,7 +35,7 @@ const adapter = new MemoryAdapter();
 const flipper = new Flipper(adapter);
 
 // Check if search is enabled
-if (flipper.isFeatureEnabled('search', currentUser)) {
+if (await flipper.isFeatureEnabled('search', currentUser)) {
   console.log('Search away!');
 } else {
   console.log('No search for you!');
@@ -46,16 +46,16 @@ All features are disabled by default, so you'll need to explicitly enable them.
 
 ```typescript
 // Enable a feature for everyone
-flipper.enable('search');
+await flipper.enable('search');
 
 // Enable a feature for a specific actor
-flipper.enableActor('search', currentUser);
+await flipper.enableActor('search', currentUser);
 
 // Enable a feature for a group of actors
-flipper.enableGroup('search', 'admin');
+await flipper.enableGroup('search', 'admin');
 
 // Enable a feature for a percentage of actors
-flipper.enablePercentageOfActors('search', 25);
+await flipper.enablePercentageOfActors('search', 25);
 ```
 
 Read more about [getting started with Flipper](docs/QUICK_REFERENCE.md) and see the [Quick Reference](docs/QUICK_REFERENCE.md) for the full API.

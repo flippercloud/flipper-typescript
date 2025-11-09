@@ -13,7 +13,6 @@ import type Export from './Export'
  * This class is the foundation of the Flipper API, extended by the Flipper class.
  *
  * @example
- * ```typescript
  * const adapter = new MemoryAdapter();
  * const dsl = new Dsl(adapter);
  *
@@ -21,15 +20,14 @@ import type Export from './Export'
  * dsl.register('admins', (actor) => actor.isAdmin === true);
  *
  * // Enable feature for a group
- * dsl.enableGroup('admin-panel', 'admins');
+ * await dsl.enableGroup('admin-panel', 'admins');
  *
  * // Check if enabled for an actor
  * const user = { flipperId: 'user-123', isAdmin: true };
- * dsl.isFeatureEnabled('admin-panel', user); // true
+ * await dsl.isFeatureEnabled('admin-panel', user); // true
  *
  * // Preload features for efficiency
- * dsl.preloadAll();
- * ```
+ * await dsl.preloadAll();
  */
 class Dsl {
   /**
@@ -71,8 +69,8 @@ class Dsl {
    * @param thing - Optional actor or context to check against
    * @returns True if the feature is enabled
    */
-  public isFeatureEnabled(featureName: string, thing?: unknown): boolean {
-    return this.feature(featureName).isEnabled(thing)
+  public async isFeatureEnabled(featureName: string, thing?: unknown): Promise<boolean> {
+    return await this.feature(featureName).isEnabled(thing)
   }
 
   /**
@@ -80,8 +78,8 @@ class Dsl {
    * @param featureName - The name of the feature to enable
    * @returns True if successful
    */
-  public enable(featureName: string) {
-    this.feature(featureName).enable()
+  public async enable(featureName: string): Promise<boolean> {
+    await this.feature(featureName).enable()
     return true
   }
 
@@ -91,8 +89,8 @@ class Dsl {
    * @param actor - The actor to enable the feature for
    * @returns True if successful
    */
-  public enableActor(featureName: string, actor: IActor) {
-    this.feature(featureName).enableActor(actor)
+  public async enableActor(featureName: string, actor: IActor): Promise<boolean> {
+    await this.feature(featureName).enableActor(actor)
     return true
   }
 
@@ -102,8 +100,8 @@ class Dsl {
    * @param groupName - The name of the group to enable for
    * @returns True if successful
    */
-  public enableGroup(featureName: string, groupName: string) {
-    this.feature(featureName).enableGroup(groupName)
+  public async enableGroup(featureName: string, groupName: string): Promise<boolean> {
+    await this.feature(featureName).enableGroup(groupName)
     return true
   }
 
@@ -112,8 +110,8 @@ class Dsl {
    * @param featureName - The name of the feature
    * @param percentage - Percentage of actors (0-100)
    */
-  public enablePercentageOfActors(featureName: string, percentage: number) {
-    this.feature(featureName).enablePercentageOfActors(percentage)
+  public async enablePercentageOfActors(featureName: string, percentage: number): Promise<boolean> {
+    return await this.feature(featureName).enablePercentageOfActors(percentage)
   }
 
   /**
@@ -121,8 +119,8 @@ class Dsl {
    * @param featureName - The name of the feature
    * @param percentage - Percentage of time (0-100)
    */
-  public enablePercentageOfTime(featureName: string, percentage: number) {
-    this.feature(featureName).enablePercentageOfTime(percentage)
+  public async enablePercentageOfTime(featureName: string, percentage: number): Promise<boolean> {
+    return await this.feature(featureName).enablePercentageOfTime(percentage)
   }
 
   /**
@@ -130,8 +128,8 @@ class Dsl {
    * @param featureName - The name of the feature to disable
    * @returns True if successful
    */
-  public disable(featureName: string) {
-    this.feature(featureName).disable()
+  public async disable(featureName: string): Promise<boolean> {
+    await this.feature(featureName).disable()
     return true
   }
 
@@ -141,8 +139,8 @@ class Dsl {
    * @param actor - The actor to disable the feature for
    * @returns True if successful
    */
-  public disableActor(featureName: string, actor: IActor) {
-    this.feature(featureName).disableActor(actor)
+  public async disableActor(featureName: string, actor: IActor): Promise<boolean> {
+    await this.feature(featureName).disableActor(actor)
     return true
   }
 
@@ -152,8 +150,8 @@ class Dsl {
    * @param groupName - The name of the group to disable for
    * @returns True if successful
    */
-  public disableGroup(featureName: string, groupName: string) {
-    this.feature(featureName).disableGroup(groupName)
+  public async disableGroup(featureName: string, groupName: string): Promise<boolean> {
+    await this.feature(featureName).disableGroup(groupName)
     return true
   }
 
@@ -162,8 +160,8 @@ class Dsl {
    * @param featureName - The name of the feature
    * @returns True if successful
    */
-  public disablePercentageOfActors(featureName: string) {
-    this.feature(featureName).disablePercentageOfActors()
+  public async disablePercentageOfActors(featureName: string): Promise<boolean> {
+    await this.feature(featureName).disablePercentageOfActors()
     return true
   }
 
@@ -172,8 +170,8 @@ class Dsl {
    * @param featureName - The name of the feature
    * @returns True if successful
    */
-  public disablePercentageOfTime(featureName: string) {
-    this.feature(featureName).disablePercentageOfTime()
+  public async disablePercentageOfTime(featureName: string): Promise<boolean> {
+    await this.feature(featureName).disablePercentageOfTime()
     return true
   }
 
@@ -182,8 +180,8 @@ class Dsl {
    * @param featureName - The name of the feature to add
    * @returns True if successful
    */
-  public add(featureName: string): boolean {
-    return this.feature(featureName).add()
+  public async add(featureName: string): Promise<boolean> {
+    return await this.feature(featureName).add()
   }
 
   /**
@@ -191,8 +189,8 @@ class Dsl {
    * @param featureName - The name of the feature to check
    * @returns True if the feature exists
    */
-  public exist(featureName: string): boolean {
-    return this.feature(featureName).exist()
+  public async exist(featureName: string): Promise<boolean> {
+    return await this.feature(featureName).exist()
   }
 
   /**
@@ -200,16 +198,16 @@ class Dsl {
    * @param featureName - The name of the feature to remove
    * @returns True if successful
    */
-  public remove(featureName: string): boolean {
-    return this.feature(featureName).remove()
+  public async remove(featureName: string): Promise<boolean> {
+    return await this.feature(featureName).remove()
   }
 
   /**
    * Get all features from the adapter.
    * @returns Array of Feature instances
    */
-  public features(): Feature[] {
-    const featureObjects = this.adapter.features()
+  public async features(): Promise<Feature[]> {
+    const featureObjects = await this.adapter.features()
     // Return memoized versions or create new ones
     return featureObjects.map(f => this.feature(f.name))
   }
@@ -236,9 +234,9 @@ class Dsl {
    * @param featureNames - Array of feature names to preload
    * @returns Array of preloaded Feature instances
    */
-  public preload(featureNames: string[]): Feature[] {
+  public async preload(featureNames: string[]): Promise<Feature[]> {
     const features = featureNames.map(name => this.feature(name))
-    this.adapter.getMulti(features)
+    await this.adapter.getMulti(features)
     return features
   }
 
@@ -246,8 +244,8 @@ class Dsl {
    * Preload all features from the adapter in a single call.
    * @returns Array of all Feature instances
    */
-  public preloadAll(): Feature[] {
-    const allData = this.adapter.getAll()
+  public async preloadAll(): Promise<Feature[]> {
+    const allData = await this.adapter.getAll()
     const keys = Object.keys(allData)
     return keys.map(key => this.feature(key))
   }
@@ -266,8 +264,9 @@ class Dsl {
    * @param callback - Function that returns true if actor is in the group
    *
    * @example
-   * ```typescript
-   * flipper.register('admins', (actor) => actor.role === 'admin');\n * flipper.enableGroup('admin-features', 'admins');\n * ```\n   */
+   * flipper.register('admins', (actor) => actor.role === 'admin');
+   * await flipper.enableGroup('admin-features', 'admins');
+   */
   public register(groupName: string, callback: GroupCallback): void {
     this.groups[groupName] = new GroupType(groupName, callback)
   }
@@ -297,17 +296,15 @@ class Dsl {
    * @returns Export object containing serialized feature data
    *
    * @example
-   * ```typescript
    * // Export to JSON
-   * const exportObj = flipper.export({ format: 'json', version: 1 });
+   * const exportObj = await flipper.export({ format: 'json', version: 1 });
    * const jsonString = exportObj.contents;
    *
    * // Save to file
    * fs.writeFileSync('backup.json', jsonString);
-   * ```
    */
-  public export(options: { format?: string; version?: number } = {}): Export {
-    return this.adapter.export(options)
+  async export(options?: { format?: string; version?: number }): Promise<Export> {
+    return await this.adapter.export(options)
   }
 
   /**
@@ -320,22 +317,20 @@ class Dsl {
    * @returns True if successful
    *
    * @example
-   * ```typescript
    * // Import from another Flipper instance
    * const source = new Flipper(sourceAdapter);
-   * destination.import(source);
+   * await destination.import(source);
    *
    * // Import from an export
    * const contents = fs.readFileSync('backup.json', 'utf-8');
    * const exportObj = new JsonExport({ contents });
-   * flipper.import(exportObj);
+   * await flipper.import(exportObj);
    *
    * // Import from another adapter
-   * flipper.import(sourceAdapter);
-   * ```
+   * await flipper.import(sourceAdapter);
    */
-  public import(source: IAdapter | Export | Dsl): boolean {
-    return this.adapter.import(source)
+  async import(source: IAdapter | Export | Dsl): Promise<boolean> {
+    return await this.adapter.import(source)
   }
 }
 

@@ -11,23 +11,21 @@ import Dsl from '../Dsl'
  * All reads come from the local adapter only.
  *
  * @example
- * ```typescript
  * const local = new MemoryAdapter();
  * const remote = new RedisAdapter();
  * const dualWrite = new DualWrite(local, remote);
  *
  * // Writes go to both (remote first, then local)
- * dualWrite.enable(feature, gate, thing);
+ * await dualWrite.enable(feature, gate, thing);
  *
  * // Reads come from local only
- * dualWrite.get(feature);
+ * await dualWrite.get(feature);
  *
  * // Migration pattern: gradually shift reads to remote
  * // Step 1: DualWrite(old, new) - write to both, read from old
  * // Step 2: Verify new adapter has all data
  * // Step 3: Switch to reading from new adapter
  * // Step 4: Remove dual write
- * ```
  */
 export default class DualWrite implements IAdapter {
   /**
@@ -62,8 +60,8 @@ export default class DualWrite implements IAdapter {
    * Get all features from the local adapter.
    * @returns Array of all features
    */
-  features(): Feature[] {
-    return this.local.features()
+  async features(): Promise<Feature[]> {
+    return await this.local.features()
   }
 
   /**
@@ -71,8 +69,8 @@ export default class DualWrite implements IAdapter {
    * @param feature - Feature to get state for
    * @returns Feature gate values
    */
-  get(feature: Feature): Record<string, unknown> {
-    return this.local.get(feature)
+  async get(feature: Feature): Promise<Record<string, unknown>> {
+    return await this.local.get(feature)
   }
 
   /**
@@ -80,16 +78,16 @@ export default class DualWrite implements IAdapter {
    * @param features - Features to get state for
    * @returns Map of feature keys to gate values
    */
-  getMulti(features: Feature[]): Record<string, Record<string, unknown>> {
-    return this.local.getMulti(features)
+  async getMulti(features: Feature[]): Promise<Record<string, Record<string, unknown>>> {
+    return await this.local.getMulti(features)
   }
 
   /**
    * Get all features' state from the local adapter.
    * @returns Map of all feature keys to gate values
    */
-  getAll(): Record<string, Record<string, unknown>> {
-    return this.local.getAll()
+  async getAll(): Promise<Record<string, Record<string, unknown>>> {
+    return await this.local.getAll()
   }
 
   /**
@@ -98,9 +96,9 @@ export default class DualWrite implements IAdapter {
    * @param feature - Feature to add
    * @returns Result from the remote adapter
    */
-  add(feature: Feature): boolean {
-    const result = this.remote.add(feature)
-    this.local.add(feature)
+  async add(feature: Feature): Promise<boolean> {
+    const result = await this.remote.add(feature)
+    await this.local.add(feature)
     return result
   }
 
@@ -110,9 +108,9 @@ export default class DualWrite implements IAdapter {
    * @param feature - Feature to remove
    * @returns Result from the remote adapter
    */
-  remove(feature: Feature): boolean {
-    const result = this.remote.remove(feature)
-    this.local.remove(feature)
+  async remove(feature: Feature): Promise<boolean> {
+    const result = await this.remote.remove(feature)
+    await this.local.remove(feature)
     return result
   }
 
@@ -122,9 +120,9 @@ export default class DualWrite implements IAdapter {
    * @param feature - Feature to clear
    * @returns Result from the remote adapter
    */
-  clear(feature: Feature): boolean {
-    const result = this.remote.clear(feature)
-    this.local.clear(feature)
+  async clear(feature: Feature): Promise<boolean> {
+    const result = await this.remote.clear(feature)
+    await this.local.clear(feature)
     return result
   }
 
@@ -136,9 +134,9 @@ export default class DualWrite implements IAdapter {
    * @param thing - Value to enable for the gate
    * @returns Result from the remote adapter
    */
-  enable(feature: Feature, gate: IGate, thing: IType): boolean {
-    const result = this.remote.enable(feature, gate, thing)
-    this.local.enable(feature, gate, thing)
+  async enable(feature: Feature, gate: IGate, thing: IType): Promise<boolean> {
+    const result = await this.remote.enable(feature, gate, thing)
+    await this.local.enable(feature, gate, thing)
     return result
   }
 
@@ -150,9 +148,9 @@ export default class DualWrite implements IAdapter {
    * @param thing - Value to disable for the gate
    * @returns Result from the remote adapter
    */
-  disable(feature: Feature, gate: IGate, thing: IType): boolean {
-    const result = this.remote.disable(feature, gate, thing)
-    this.local.disable(feature, gate, thing)
+  async disable(feature: Feature, gate: IGate, thing: IType): Promise<boolean> {
+    const result = await this.remote.disable(feature, gate, thing)
+    await this.local.disable(feature, gate, thing)
     return result
   }
 
@@ -169,8 +167,8 @@ export default class DualWrite implements IAdapter {
    * @param options - Export options
    * @returns Export object
    */
-  export(options: { format?: string; version?: number } = {}): Export {
-    return this.local.export(options)
+  async export(options: { format?: string; version?: number } = {}): Promise<Export> {
+    return await this.local.export(options)
   }
 
   /**
@@ -179,9 +177,9 @@ export default class DualWrite implements IAdapter {
    * @param source - The source to import from
    * @returns Result from the remote adapter
    */
-  import(source: IAdapter | Export | Dsl): boolean {
-    const result = this.remote.import(source)
-    this.local.import(source)
+  async import(source: IAdapter | Export | Dsl): Promise<boolean> {
+    const result = await this.remote.import(source)
+    await this.local.import(source)
     return result
   }
 }

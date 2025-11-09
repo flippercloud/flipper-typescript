@@ -27,11 +27,10 @@ export interface InstrumentationEvent {
  * captures all Flipper operations and allows you to inspect them.
  *
  * @example
- * ```typescript
  * const instrumenter = new MemoryInstrumenter();
  * const dsl = new Dsl(adapter, { instrumenter });
  *
- * dsl.enable('my-feature');
+ * await dsl.enable('my-feature');
  *
  * // Check what operations occurred
  * console.log(instrumenter.events); // Array of events
@@ -43,7 +42,6 @@ export interface InstrumentationEvent {
  *
  * // Reset for next test
  * instrumenter.reset();
- * ```
  */
 class MemoryInstrumenter implements IInstrumenter {
   /**
@@ -63,14 +61,47 @@ class MemoryInstrumenter implements IInstrumenter {
    * @param fn - The function to execute
    * @returns The result of the function
    */
-  instrument<T>(name: string, payload: InstrumentationPayload, fn: (payload: InstrumentationPayload) => T): T {
+  /**
+   * Instrument an operation.
+   *
+   * @param name - The name of the instrumentation event
+   * @param payload - The payload containing operation details
+   * @param fn - The function to execute
+   * @returns The result of the function
+   */
+  instrument<T>(name: string, payload: InstrumentationPayload, fn: (payload: InstrumentationPayload) => T | Promise<T>): T | Promise<T> {
     // Copy payload to prevent modifications from affecting the recorded event
     // Using Object.assign to avoid spread operator type issues
     const payloadCopy: InstrumentationPayload = Object.assign({}, payload)
 
     try {
       const result = fn(payloadCopy)
-      // Record successful execution
+
+      // Handle async results
+      if (result instanceof Promise) {
+        return result.then(
+          (resolvedResult) => {
+            // Record successful execution
+            this.events.push({
+              name,
+              payload: payloadCopy,
+              result: resolvedResult,
+            })
+            return resolvedResult
+          },
+          (error: Error) => {
+            payloadCopy.exception = [error.name, error.message]
+            this.events.push({
+              name,
+              payload: payloadCopy,
+              result: undefined,
+            })
+            throw error
+          }
+        ) as T | Promise<T>
+      }
+
+      // Record successful execution for sync results
       this.events.push({
         name,
         payload: payloadCopy,

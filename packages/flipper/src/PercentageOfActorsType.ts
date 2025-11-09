@@ -7,14 +7,12 @@ import { IType } from './interfaces'
  * Values must be between 0 and 100 (inclusive).
  *
  * @example
- * ```typescript
  * const twentyFivePercent = PercentageOfActorsType.wrap(25);
  * console.log(twentyFivePercent.value); // 25
  *
  * // Throws error for invalid values
  * PercentageOfActorsType.wrap(150); // Error: value must be <= 100
  * PercentageOfActorsType.wrap(-10); // Error: value must be >= 0
- * ```
  */
 class PercentageOfActorsType implements IType {
   /**

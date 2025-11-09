@@ -31,46 +31,46 @@ describe('DualWrite', () => {
   })
 
   describe('read operations', () => {
-    it('reads features from local only', () => {
-      local.add(feature)
+    it('reads features from local only', async () => {
+      await local.add(feature)
 
-      expect(dualWrite.features()).toEqual([feature])
+      expect(await dualWrite.features()).toEqual([feature])
     })
 
-    it('does not read from remote', () => {
-      remote.add(feature)
+    it('does not read from remote', async () => {
+      await remote.add(feature)
 
-      expect(dualWrite.features()).toEqual([])
+      expect(await dualWrite.features()).toEqual([])
     })
 
-    it('reads get from local only', () => {
-      local.add(feature)
+    it('reads get from local only', async () => {
+      await local.add(feature)
       const localSpy = jest.spyOn(local, 'get')
       const remoteSpy = jest.spyOn(remote, 'get')
 
-      dualWrite.get(feature)
+      await dualWrite.get(feature)
 
       expect(localSpy).toHaveBeenCalled()
       expect(remoteSpy).not.toHaveBeenCalled()
     })
 
-    it('reads getMulti from local only', () => {
-      local.add(feature)
+    it('reads getMulti from local only', async () => {
+      await local.add(feature)
       const localSpy = jest.spyOn(local, 'getMulti')
       const remoteSpy = jest.spyOn(remote, 'getMulti')
 
-      dualWrite.getMulti([feature])
+      await dualWrite.getMulti([feature])
 
       expect(localSpy).toHaveBeenCalled()
       expect(remoteSpy).not.toHaveBeenCalled()
     })
 
-    it('reads getAll from local only', () => {
-      local.add(feature)
+    it('reads getAll from local only', async () => {
+      await local.add(feature)
       const localSpy = jest.spyOn(local, 'getAll')
       const remoteSpy = jest.spyOn(remote, 'getAll')
 
-      dualWrite.getAll()
+      await dualWrite.getAll()
 
       expect(localSpy).toHaveBeenCalled()
       expect(remoteSpy).not.toHaveBeenCalled()
@@ -78,27 +78,27 @@ describe('DualWrite', () => {
   })
 
   describe('write operations', () => {
-    it('writes add to both adapters', () => {
-      dualWrite.add(feature)
+    it('writes add to both adapters', async () => {
+      await dualWrite.add(feature)
 
-      expect(local.features()).toContainEqual(feature)
-      expect(remote.features()).toContainEqual(feature)
+      expect(await local.features()).toContainEqual(feature)
+      expect(await remote.features()).toContainEqual(feature)
     })
 
-    it('writes add to remote first', () => {
+    it('writes add to remote first', async () => {
       const order: string[] = []
 
-      const localSpy = jest.spyOn(local, 'add').mockImplementation(() => {
+      const localSpy = jest.spyOn(local, 'add').mockImplementation(async () => {
         order.push('local')
-        return true
+        return await Promise.resolve(true)
       })
 
-      const remoteSpy = jest.spyOn(remote, 'add').mockImplementation(() => {
+      const remoteSpy = jest.spyOn(remote, 'add').mockImplementation(async () => {
         order.push('remote')
-        return true
+        return await Promise.resolve(true)
       })
 
-      dualWrite.add(feature)
+      await dualWrite.add(feature)
 
       expect(order).toEqual(['remote', 'local'])
 
@@ -106,50 +106,50 @@ describe('DualWrite', () => {
       remoteSpy.mockRestore()
     })
 
-    it('writes remove to both adapters', () => {
-      local.add(feature)
-      remote.add(feature)
+    it('writes remove to both adapters', async () => {
+      await local.add(feature)
+      await remote.add(feature)
 
-      dualWrite.remove(feature)
+      await dualWrite.remove(feature)
 
-      expect(local.features()).toHaveLength(0)
-      expect(remote.features()).toHaveLength(0)
+      expect(await local.features()).toHaveLength(0)
+      expect(await remote.features()).toHaveLength(0)
     })
 
-    it('writes clear to both adapters', () => {
-      local.add(feature)
-      remote.add(feature)
+    it('writes clear to both adapters', async () => {
+      await local.add(feature)
+      await remote.add(feature)
 
       const localSpy = jest.spyOn(local, 'clear')
       const remoteSpy = jest.spyOn(remote, 'clear')
 
-      dualWrite.clear(feature)
+      await dualWrite.clear(feature)
 
       expect(localSpy).toHaveBeenCalled()
       expect(remoteSpy).toHaveBeenCalled()
     })
 
-    it('writes enable to both adapters', () => {
-      local.add(feature)
-      remote.add(feature)
+    it('writes enable to both adapters', async () => {
+      await local.add(feature)
+      await remote.add(feature)
 
       const localSpy = jest.spyOn(local, 'enable')
       const remoteSpy = jest.spyOn(remote, 'enable')
 
-      dualWrite.enable(feature, gate, thing)
+      await dualWrite.enable(feature, gate, thing)
 
       expect(localSpy).toHaveBeenCalled()
       expect(remoteSpy).toHaveBeenCalled()
     })
 
-    it('writes disable to both adapters', () => {
-      local.add(feature)
-      remote.add(feature)
+    it('writes disable to both adapters', async () => {
+      await local.add(feature)
+      await remote.add(feature)
 
       const localSpy = jest.spyOn(local, 'disable')
       const remoteSpy = jest.spyOn(remote, 'disable')
 
-      dualWrite.disable(feature, gate, thing)
+      await dualWrite.disable(feature, gate, thing)
 
       expect(localSpy).toHaveBeenCalled()
       expect(remoteSpy).toHaveBeenCalled()
@@ -163,50 +163,50 @@ describe('DualWrite', () => {
   })
 
   describe('migration scenario', () => {
-    it('supports gradual migration pattern', () => {
+    it('supports gradual migration pattern', async () => {
       // Step 1: Write to both, read from old (local)
       const dsl = new Dsl(dualWrite)
 
       // Enable in both adapters
-      dsl.add('new_feature')
-      dsl.enable('new_feature')
+      await dsl.add('new_feature')
+      await dsl.enable('new_feature')
 
       // Verify both have it
-      expect(local.features().some((f) => f.name === 'new_feature')).toBe(true)
-      expect(remote.features().some((f) => f.name === 'new_feature')).toBe(true)
+      expect((await local.features()).some((f) => f.name === 'new_feature')).toBe(true)
+      expect((await remote.features()).some((f) => f.name === 'new_feature')).toBe(true)
 
       // But reads come from local
-      const localResult = local.get(feature)
-      const dualResult = dualWrite.get(feature)
+      const localResult = await local.get(feature)
+      const dualResult = await dualWrite.get(feature)
       expect(dualResult).toEqual(localResult)
     })
 
-    it('allows verifying sync between adapters', () => {
+    it('allows verifying sync between adapters', async () => {
       // Add to both
-      dualWrite.add(feature)
+      await dualWrite.add(feature)
 
       // Enable in both
-      dualWrite.enable(feature, gate, thing)
+      await dualWrite.enable(feature, gate, thing)
 
       // Verify they match
-      const localData = local.get(feature)
-      const remoteData = remote.get(feature)
+      const localData = await local.get(feature)
+      const remoteData = await remote.get(feature)
 
       expect(localData).toEqual(remoteData)
     })
   })
 
   describe('error handling', () => {
-    it('returns remote result even if local fails', () => {
+    it('returns remote result even if local fails', async () => {
       const failingLocal = new MemoryAdapter()
-      jest.spyOn(failingLocal, 'add').mockImplementation(() => {
-        throw new Error('Local failed')
+      jest.spyOn(failingLocal, 'add').mockImplementation(async () => {
+        return await Promise.reject(new Error('Local failed'))
       })
 
       const dualWrite = new DualWrite(failingLocal, remote)
 
-      // Should not throw, returns remote result
-      expect(() => dualWrite.add(feature)).toThrow('Local failed')
+      // Should throw when local fails
+      await expect(dualWrite.add(feature)).rejects.toThrow('Local failed')
     })
   })
 })

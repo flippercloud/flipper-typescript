@@ -24,18 +24,16 @@ interface IFeatureGates {
  * Ideal for testing, development, and single-process applications.
  *
  * @example
- * ```typescript
  * const adapter = new MemoryAdapter();
  * const flipper = new Flipper(adapter);
  *
  * // Enable a feature
- * flipper.enable('new-feature');
+ * await flipper.enable('new-feature');
  *
  * // Data is stored in memory
- * flipper.isFeatureEnabled('new-feature'); // true
+ * await flipper.isFeatureEnabled('new-feature'); // true
  *
  * // Data is lost on restart (not persisted)
- * ```
  */
 class MemoryAdapter implements IAdapter {
   /**
@@ -49,6 +47,11 @@ class MemoryAdapter implements IAdapter {
   private featuresStore: IFeatures
 
   /**
+   * Internal storage for feature gates (new async structure).
+   */
+  private features_store: Record<string, Map<string, unknown>>
+
+  /**
    * Internal storage for gate values.
    */
   private sourceStore: IFeatureGates
@@ -56,6 +59,7 @@ class MemoryAdapter implements IAdapter {
   constructor() {
     this.name = 'memory'
     this.featuresStore = {}
+    this.features_store = {}
     this.sourceStore = {}
   }
 
@@ -63,10 +67,12 @@ class MemoryAdapter implements IAdapter {
    * Get all features.
    * @returns Array of all features
    */
-  public features(): Feature[] {
-    return Object.keys(this.featuresStore)
-      .map((key) => this.featuresStore[key])
-      .filter((feature): feature is Feature => feature !== undefined)
+  async features(): Promise<Feature[]> {
+    return await Promise.resolve(
+      Object.keys(this.features_store).map((key) => {
+        return new Feature(key, this, {})
+      })
+    )
   }
 
   /**
@@ -74,11 +80,13 @@ class MemoryAdapter implements IAdapter {
    * @param feature - Feature to add
    * @returns True if successful
    */
-  public add(feature: Feature) {
-    if (this.featuresStore[feature.name] === undefined) {
-      this.featuresStore[feature.name] = feature
+  async add(feature: Feature): Promise<boolean> {
+    if (!this.features_store[feature.key]) {
+      this.features_store[feature.key] = new Map<string, unknown>()
+      return await Promise.resolve(true)
     }
-    return true
+
+    return await Promise.resolve(false)
   }
 
   /**
@@ -86,9 +94,10 @@ class MemoryAdapter implements IAdapter {
    * @param feature - Feature to remove
    * @returns True if successful
    */
-  public remove(feature: Feature) {
+  public async remove(feature: Feature): Promise<boolean> {
     delete this.featuresStore[feature.name]
-    this.clear(feature)
+    delete this.features_store[feature.key]
+    await this.clear(feature)
     return true
   }
 
@@ -97,44 +106,35 @@ class MemoryAdapter implements IAdapter {
    * @param feature - Feature to get state for
    * @returns Feature gate values
    */
-  public get(feature: Feature): Record<string, unknown> {
-    const result: Record<string, unknown> = {}
+  async get(feature: Feature): Promise<Record<string, unknown>> {
+    const gates: Record<string, unknown> = {}
+    const prefix = `${feature.key}/`
 
-    feature.gates.forEach((gate) => {
-      switch (gate.dataType) {
-        case 'boolean': {
-          result[gate.key] = this.read(this.key(feature, gate))
-          break
-        }
-        case 'number': {
-          result[gate.key] = this.read(this.key(feature, gate))
-          break
-        }
-        case 'set': {
-          result[gate.key] = this.setMembers(this.key(feature, gate))
-          break
-        }
-        case 'json': {
-          const rawValue = this.read(this.key(feature, gate))
-          // Parse JSON string back to object
-          if (rawValue && typeof rawValue === 'string') {
+    // Iterate through sourceStore to find all keys for this feature
+    for (const [key, value] of Object.entries(this.sourceStore)) {
+      if (key.startsWith(prefix)) {
+        const gateKey = key.slice(prefix.length)
+
+        // Check if this is a JSON gate by finding the gate type
+        const gate = feature.gates.find(g => g.key === gateKey)
+        if (gate && gate.dataType === 'json') {
+          // Parse JSON strings back to objects
+          if (value && typeof value === 'string') {
             try {
-              result[gate.key] = JSON.parse(rawValue)
+              gates[gateKey] = JSON.parse(value)
             } catch {
-              result[gate.key] = null
+              gates[gateKey] = null
             }
           } else {
-            result[gate.key] = null
+            gates[gateKey] = null
           }
-          break
-        }
-        default: {
-          throw new Error(`${gate.name} is not supported by this adapter yet`)
+        } else {
+          gates[gateKey] = value
         }
       }
-    })
+    }
 
-    return result
+    return await Promise.resolve(gates)
   }
 
   /**
@@ -142,11 +142,11 @@ class MemoryAdapter implements IAdapter {
    * @param features - Features to get state for
    * @returns Map of feature keys to gate values
    */
-  public getMulti(features: Feature[]): Record<string, Record<string, unknown>> {
+  public async getMulti(features: Feature[]): Promise<Record<string, Record<string, unknown>>> {
     const result: Record<string, Record<string, unknown>> = {}
-    features.forEach((feature) => {
-      result[feature.key] = this.get(feature)
-    })
+    for (const feature of features) {
+      result[feature.key] = await this.get(feature)
+    }
     return result
   }
 
@@ -154,12 +154,12 @@ class MemoryAdapter implements IAdapter {
    * Get all features' state from the adapter.
    * @returns Map of all feature keys to gate values
    */
-  public getAll(): Record<string, Record<string, unknown>> {
+  public async getAll(): Promise<Record<string, Record<string, unknown>>> {
     const result: Record<string, Record<string, unknown>> = {}
-    const allFeatures = this.features()
-    allFeatures.forEach((feature) => {
-      result[feature.key] = this.get(feature)
-    })
+    const allFeatures = await this.features()
+    for (const feature of allFeatures) {
+      result[feature.key] = await this.get(feature)
+    }
     return result
   }
 
@@ -176,11 +176,11 @@ class MemoryAdapter implements IAdapter {
    * @param options - Export options
    * @returns Export object
    */
-  public export(options: { format?: string; version?: number } = {}): Export {
+  public async export(options: { format?: string; version?: number } = {}): Promise<Export> {
     const format = options.format ?? 'json'
     const version = options.version ?? 1
     const exporter = Exporter.build({ format, version })
-    return exporter.call(this)
+    return await exporter.call(this)
   }
 
   /**
@@ -192,10 +192,10 @@ class MemoryAdapter implements IAdapter {
    * @param source - The source to import from (Dsl, Adapter, or Export)
    * @returns True if successful
    */
-  public import(source: IAdapter | Export | Dsl): boolean {
-    const sourceAdapter = this.getSourceAdapter(source)
+  public async import(source: IAdapter | Export | Dsl): Promise<boolean> {
+    const sourceAdapter = await this.getSourceAdapter(source)
     const synchronizer = new Synchronizer(this, sourceAdapter, { raise: true })
-    return synchronizer.call()
+    return await synchronizer.call()
   }
 
   /**
@@ -204,14 +204,14 @@ class MemoryAdapter implements IAdapter {
    * @param source - The source to extract from
    * @returns The adapter
    */
-  private getSourceAdapter(source: IAdapter | Export | Dsl): IAdapter {
+  private async getSourceAdapter(source: IAdapter | Export | Dsl): Promise<IAdapter> {
     // Check if it has an adapter property (Dsl)
     if ('adapter' in source && source.adapter && typeof source.adapter !== 'function') {
       return source.adapter
     }
     // Check if it has an adapter() method (Export)
     if ('adapter' in source && typeof source.adapter === 'function') {
-      return source.adapter()
+      return await source.adapter()
     }
     // It's already an adapter
     return source as IAdapter
@@ -224,7 +224,7 @@ class MemoryAdapter implements IAdapter {
    * @param thing - Value to enable for the gate
    * @returns True if successful
    */
-  public enable(feature: Feature, gate: IGate, thing: IType): boolean {
+  public async enable(feature: Feature, gate: IGate, thing: IType): Promise<boolean> {
     switch (gate.dataType) {
       case 'boolean': {
         this.write(this.key(feature, gate), String(true))
@@ -247,7 +247,7 @@ class MemoryAdapter implements IAdapter {
         throw new Error(`${gate.name} is not supported by this adapter yet`)
       }
     }
-    return true
+    return await Promise.resolve(true)
   }
 
   /**
@@ -257,14 +257,14 @@ class MemoryAdapter implements IAdapter {
    * @param thing - Value to disable for the gate
    * @returns True if successful
    */
-  public disable(feature: Feature, gate: IGate, thing: IType): boolean {
+  public async disable(feature: Feature, gate: IGate, thing: IType): Promise<boolean> {
     switch (gate.dataType) {
       case 'boolean': {
-        this.clear(feature)
+        await this.clear(feature)
         break
       }
       case 'number': {
-        this.clear(feature)
+        await this.clear(feature)
         break
       }
       case 'set': {
@@ -288,11 +288,23 @@ class MemoryAdapter implements IAdapter {
    * @param feature - Feature to clear
    * @returns True if successful
    */
-  public  clear(feature: Feature) {
-    feature.gates.forEach((gate) => {
-      this.delete(this.key(feature, gate))
-    })
-    return true
+  async clear(feature: Feature): Promise<boolean> {
+    const prefix = `${feature.key}/`
+    const keysToDelete: string[] = []
+
+    // Find all keys for this feature
+    for (const key of Object.keys(this.sourceStore)) {
+      if (key.startsWith(prefix)) {
+        keysToDelete.push(key)
+      }
+    }
+
+    // Delete all found keys
+    for (const key of keysToDelete) {
+      delete this.sourceStore[key]
+    }
+
+    return await Promise.resolve(true)
   }
 
   /**
@@ -304,16 +316,6 @@ class MemoryAdapter implements IAdapter {
    */
   private key(feature: Feature, gate: IGate) {
     return `${feature.key}/${gate.key}`
-  }
-
-  /**
-   * Read a value from storage.
-   * @private
-   * @param key - Storage key
-   * @returns Stored value or undefined
-   */
-  private read(key: string): StorageValue {
-    return this.sourceStore[key]
   }
 
   /**
@@ -362,18 +364,6 @@ class MemoryAdapter implements IAdapter {
     if (set instanceof Set) {
       set.delete(value)
     }
-  }
-
-  /**
-   * Get all members of a set from storage.
-   * @private
-   * @param key - Storage key
-   * @returns Set of members
-   */
-  private setMembers(key: string): Set<string> {
-    this.ensure_set_initialized(key)
-    const set = this.sourceStore[key]
-    return set instanceof Set ? set : new Set()
   }
 
   /**

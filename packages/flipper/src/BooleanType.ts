@@ -6,13 +6,11 @@ import { IType } from './interfaces'
  * Used by BooleanGate to enable or disable features for everyone.
  *
  * @example
- * ```typescript
  * const enabled = BooleanType.wrap(true);
  * console.log(enabled.value); // true
  *
  * const disabled = BooleanType.wrap(false);
  * console.log(disabled.value); // false
- * ```
  */
 class BooleanType implements IType {
   /**

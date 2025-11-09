@@ -20,32 +20,32 @@ describe('Strict', () => {
       strict = new Strict(adapter)
     })
 
-    it('throws when getting non-existent feature', () => {
-      expect(() => strict.get(feature)).toThrow(FeatureNotFoundError)
-      expect(() => strict.get(feature)).toThrow(
+    it('throws when getting non-existent feature', async () => {
+      await expect(strict.get(feature)).rejects.toThrow(FeatureNotFoundError)
+      await expect(strict.get(feature)).rejects.toThrow(
         'Could not find feature "test_feature"'
       )
     })
 
-    it('throws when getting multiple features with non-existent one', () => {
+    it('throws when getting multiple features with non-existent one', async () => {
       const feature2 = new Feature('other_feature', adapter, {})
-      adapter.add(feature)
+      await adapter.add(feature)
 
-      expect(() => strict.getMulti([feature, feature2])).toThrow(
+      await expect(strict.getMulti([feature, feature2])).rejects.toThrow(
         FeatureNotFoundError
       )
     })
 
-    it('allows operations on existing features', () => {
-      adapter.add(feature)
+    it('allows operations on existing features', async () => {
+      await adapter.add(feature)
 
-      expect(() => strict.get(feature)).not.toThrow()
-      expect(() => strict.getMulti([feature])).not.toThrow()
+      await expect(strict.get(feature)).resolves.not.toThrow()
+      await expect(strict.getMulti([feature])).resolves.not.toThrow()
     })
 
-    it('does not throw for other operations', () => {
-      expect(() => strict.add(feature)).not.toThrow()
-      expect(() => strict.features()).not.toThrow()
+    it('does not throw for other operations', async () => {
+      await expect(strict.add(feature)).resolves.not.toThrow()
+      await expect(strict.features()).resolves.not.toThrow()
     })
   })
 
@@ -54,12 +54,12 @@ describe('Strict', () => {
       strict = new Strict(adapter, 'warn')
     })
 
-    it('logs warning instead of throwing', () => {
+    it('logs warning instead of throwing', async () => {
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {
         // no-op
       })
 
-      expect(() => strict.get(feature)).not.toThrow()
+      await expect(strict.get(feature)).resolves.not.toThrow()
       expect(warnSpy).toHaveBeenCalledWith(
         expect.stringContaining('Could not find feature "test_feature"')
       )
@@ -69,50 +69,50 @@ describe('Strict', () => {
   })
 
   describe('with noop handler', () => {
-    it('does nothing on missing feature', () => {
+    it('does nothing on missing feature', async () => {
       strict = new Strict(adapter, 'noop')
 
-      expect(() => strict.get(feature)).not.toThrow()
+      await expect(strict.get(feature)).resolves.not.toThrow()
     })
 
-    it('accepts false as noop', () => {
+    it('accepts false as noop', async () => {
       strict = new Strict(adapter, false)
 
-      expect(() => strict.get(feature)).not.toThrow()
+      await expect(strict.get(feature)).resolves.not.toThrow()
     })
   })
 
   describe('with raise handler', () => {
-    it('throws on missing feature', () => {
+    it('throws on missing feature', async () => {
       strict = new Strict(adapter, 'raise')
 
-      expect(() => strict.get(feature)).toThrow(FeatureNotFoundError)
+      await expect(strict.get(feature)).rejects.toThrow(FeatureNotFoundError)
     })
 
-    it('accepts true as raise', () => {
+    it('accepts true as raise', async () => {
       strict = new Strict(adapter, true)
 
-      expect(() => strict.get(feature)).toThrow(FeatureNotFoundError)
+      await expect(strict.get(feature)).rejects.toThrow(FeatureNotFoundError)
     })
   })
 
   describe('with custom function handler', () => {
-    it('calls handler function', () => {
+    it('calls handler function', async () => {
       const handler = jest.fn()
       strict = new Strict(adapter, handler)
 
-      strict.get(feature)
+      await strict.get(feature)
 
       expect(handler).toHaveBeenCalledWith(feature)
     })
 
-    it('allows handler to throw custom error', () => {
+    it('allows handler to throw custom error', async () => {
       const handler = (f: Feature) => {
         throw new Error(`Custom error for ${f.name}`)
       }
       strict = new Strict(adapter, handler)
 
-      expect(() => strict.get(feature)).toThrow('Custom error for test_feature')
+      await expect(strict.get(feature)).rejects.toThrow('Custom error for test_feature')
     })
   })
 
@@ -127,19 +127,19 @@ describe('Strict', () => {
   })
 
   describe('integration with Dsl', () => {
-    it('throws when checking non-existent feature', () => {
+    it('throws when checking non-existent feature', async () => {
       strict = new Strict(adapter)
       const dsl = new Dsl(strict)
 
-      expect(() => dsl.isFeatureEnabled('nonexistent')).toThrow(FeatureNotFoundError)
+      await expect(dsl.isFeatureEnabled('nonexistent')).rejects.toThrow(FeatureNotFoundError)
     })
 
-    it('works after adding feature', () => {
+    it('works after adding feature', async () => {
       strict = new Strict(adapter)
       const dsl = new Dsl(strict)
 
-      dsl.add('test_feature')
-      expect(() => dsl.isFeatureEnabled('test_feature')).not.toThrow()
+      await dsl.add('test_feature')
+      await expect(dsl.isFeatureEnabled('test_feature')).resolves.not.toThrow()
     })
   })
 })

@@ -36,198 +36,198 @@ describe('Failsafe', () => {
   })
 
   describe('successful operations', () => {
-    it('passes through features() when successful', () => {
-      adapter.add(feature)
+    it('passes through features() when successful', async () => {
+      await adapter.add(feature)
 
-      expect(failsafe.features()).toEqual([feature])
+      expect(await failsafe.features()).toEqual([feature])
     })
 
-    it('passes through get() when successful', () => {
-      adapter.add(feature)
-      adapter.enable(feature, gate, thing)
+    it('passes through get() when successful', async () => {
+      await adapter.add(feature)
+      await adapter.enable(feature, gate, thing)
 
-      const result = failsafe.get(feature)
-      expect(result).toEqual(adapter.get(feature))
+      const result = await failsafe.get(feature)
+      expect(result).toEqual(await adapter.get(feature))
     })
 
-    it('passes through getMulti() when successful', () => {
-      adapter.add(feature)
+    it('passes through getMulti() when successful', async () => {
+      await adapter.add(feature)
 
-      const result = failsafe.getMulti([feature])
-      expect(result).toEqual(adapter.getMulti([feature]))
+      const result = await failsafe.getMulti([feature])
+      expect(result).toEqual(await adapter.getMulti([feature]))
     })
 
-    it('passes through getAll() when successful', () => {
-      adapter.add(feature)
+    it('passes through getAll() when successful', async () => {
+      await adapter.add(feature)
 
-      const result = failsafe.getAll()
-      expect(result).toEqual(adapter.getAll())
+      const result = await failsafe.getAll()
+      expect(result).toEqual(await adapter.getAll())
     })
 
-    it('passes through add() when successful', () => {
-      const result = failsafe.add(feature)
+    it('passes through add() when successful', async () => {
+      const result = await failsafe.add(feature)
       expect(result).toBe(true)
-      expect(adapter.features()).toContainEqual(feature)
+      expect(await adapter.features()).toContainEqual(feature)
     })
 
-    it('passes through remove() when successful', () => {
-      adapter.add(feature)
+    it('passes through remove() when successful', async () => {
+      await adapter.add(feature)
 
-      const result = failsafe.remove(feature)
+      const result = await failsafe.remove(feature)
       expect(result).toBe(true)
-      expect(adapter.features()).toHaveLength(0)
+      expect(await adapter.features()).toHaveLength(0)
     })
 
-    it('passes through clear() when successful', () => {
-      adapter.add(feature)
+    it('passes through clear() when successful', async () => {
+      await adapter.add(feature)
 
-      const result = failsafe.clear(feature)
-      expect(result).toBe(true)
-    })
-
-    it('passes through enable() when successful', () => {
-      adapter.add(feature)
-
-      const result = failsafe.enable(feature, gate, thing)
+      const result = await failsafe.clear(feature)
       expect(result).toBe(true)
     })
 
-    it('passes through disable() when successful', () => {
-      adapter.add(feature)
+    it('passes through enable() when successful', async () => {
+      await adapter.add(feature)
 
-      const result = failsafe.disable(feature, gate, thing)
+      const result = await failsafe.enable(feature, gate, thing)
       expect(result).toBe(true)
     })
 
-    it('passes through export() when successful', () => {
-      adapter.add(feature)
+    it('passes through disable() when successful', async () => {
+      await adapter.add(feature)
 
-      const result = failsafe.export()
+      const result = await failsafe.disable(feature, gate, thing)
+      expect(result).toBe(true)
+    })
+
+    it('passes through export() when successful', async () => {
+      await adapter.add(feature)
+
+      const result = await failsafe.export()
       expect(result).toBeTruthy()
     })
 
-    it('passes through import() when successful', () => {
-      const result = failsafe.import(new Dsl(adapter))
+    it('passes through import() when successful', async () => {
+      const result = await failsafe.import(new Dsl(adapter))
       expect(result).toBe(true)
     })
   })
 
   describe('failed operations', () => {
     describe('features()', () => {
-      it('returns empty array on error', () => {
+      it('returns empty array on error', async () => {
         jest.spyOn(adapter, 'features').mockImplementation(() => {
           throw new Error('Adapter failed')
         })
 
-        expect(failsafe.features()).toEqual([])
+        expect(await failsafe.features()).toEqual([])
       })
     })
 
     describe('get()', () => {
-      it('returns empty object on error', () => {
+      it('returns empty object on error', async () => {
         jest.spyOn(adapter, 'get').mockImplementation(() => {
           throw new Error('Adapter failed')
         })
 
-        expect(failsafe.get(feature)).toEqual({})
+        expect(await failsafe.get(feature)).toEqual({})
       })
     })
 
     describe('getMulti()', () => {
-      it('returns empty object on error', () => {
+      it('returns empty object on error', async () => {
         jest.spyOn(adapter, 'getMulti').mockImplementation(() => {
           throw new Error('Adapter failed')
         })
 
-        expect(failsafe.getMulti([feature])).toEqual({})
+        expect(await failsafe.getMulti([feature])).toEqual({})
       })
     })
 
     describe('getAll()', () => {
-      it('returns empty object on error', () => {
+      it('returns empty object on error', async () => {
         jest.spyOn(adapter, 'getAll').mockImplementation(() => {
           throw new Error('Adapter failed')
         })
 
-        expect(failsafe.getAll()).toEqual({})
+        expect(await failsafe.getAll()).toEqual({})
       })
     })
 
     describe('add()', () => {
-      it('returns false on error', () => {
+      it('returns false on error', async () => {
         jest.spyOn(adapter, 'add').mockImplementation(() => {
           throw new Error('Adapter failed')
         })
 
-        expect(failsafe.add(feature)).toBe(false)
+        expect(await failsafe.add(feature)).toBe(false)
       })
     })
 
     describe('remove()', () => {
-      it('returns false on error', () => {
+      it('returns false on error', async () => {
         jest.spyOn(adapter, 'remove').mockImplementation(() => {
           throw new Error('Adapter failed')
         })
 
-        expect(failsafe.remove(feature)).toBe(false)
+        expect(await failsafe.remove(feature)).toBe(false)
       })
     })
 
     describe('clear()', () => {
-      it('returns false on error', () => {
+      it('returns false on error', async () => {
         jest.spyOn(adapter, 'clear').mockImplementation(() => {
           throw new Error('Adapter failed')
         })
 
-        expect(failsafe.clear(feature)).toBe(false)
+        expect(await failsafe.clear(feature)).toBe(false)
       })
     })
 
     describe('enable()', () => {
-      it('returns false on error', () => {
+      it('returns false on error', async () => {
         jest.spyOn(adapter, 'enable').mockImplementation(() => {
           throw new Error('Adapter failed')
         })
 
-        expect(failsafe.enable(feature, gate, thing)).toBe(false)
+        expect(await failsafe.enable(feature, gate, thing)).toBe(false)
       })
     })
 
     describe('disable()', () => {
-      it('returns false on error', () => {
+      it('returns false on error', async () => {
         jest.spyOn(adapter, 'disable').mockImplementation(() => {
           throw new Error('Adapter failed')
         })
 
-        expect(failsafe.disable(feature, gate, thing)).toBe(false)
+        expect(await failsafe.disable(feature, gate, thing)).toBe(false)
       })
     })
 
     describe('export()', () => {
-      it('returns empty export on error', () => {
+      it('returns empty export on error', async () => {
         jest.spyOn(adapter, 'export').mockImplementation(() => {
           throw new Error('Adapter failed')
         })
 
-        const result = failsafe.export()
+        const result = await failsafe.export()
         expect(result).toBeTruthy()
         expect(result.features()).toEqual({})
       })
     })
 
     describe('import()', () => {
-      it('returns false on error', () => {
+      it('returns false on error', async () => {
         jest.spyOn(adapter, 'import').mockImplementation(() => {
           throw new Error('Adapter failed')
         })
 
-        expect(failsafe.import(new Dsl(adapter))).toBe(false)
+        expect(await failsafe.import(new Dsl(adapter))).toBe(false)
       })
     })
   })
 
   describe('custom error types', () => {
-    it('only catches specified error types', () => {
+    it('only catches specified error types', async () => {
       failsafe = new Failsafe(adapter, { errors: [CustomError] })
 
       jest.spyOn(adapter, 'features').mockImplementation(() => {
@@ -235,10 +235,10 @@ describe('Failsafe', () => {
       })
 
       // Should catch CustomError
-      expect(failsafe.features()).toEqual([])
+      expect(await failsafe.features()).toEqual([])
     })
 
-    it('does not catch non-specified error types', () => {
+    it('does not catch non-specified error types', async () => {
       failsafe = new Failsafe(adapter, { errors: [CustomError] })
 
       jest.spyOn(adapter, 'features').mockImplementation(() => {
@@ -246,10 +246,10 @@ describe('Failsafe', () => {
       })
 
       // Should throw regular error
-      expect(() => failsafe.features()).toThrow('Regular error')
+      await expect(failsafe.features()).rejects.toThrow('Regular error')
     })
 
-    it('supports multiple error types', () => {
+    it('supports multiple error types', async () => {
       class AnotherError extends Error {}
 
       failsafe = new Failsafe(adapter, {
@@ -260,31 +260,31 @@ describe('Failsafe', () => {
       jest.spyOn(adapter, 'features').mockImplementation(() => {
         throw new CustomError('Custom error')
       })
-      expect(failsafe.features()).toEqual([])
+      expect(await failsafe.features()).toEqual([])
 
       // Test AnotherError
       jest.spyOn(adapter, 'features').mockImplementation(() => {
         throw new AnotherError('Another error')
       })
-      expect(failsafe.features()).toEqual([])
+      expect(await failsafe.features()).toEqual([])
     })
   })
 
   describe('default error handling', () => {
-    it('catches any Error by default', () => {
+    it('catches any Error by default', async () => {
       jest.spyOn(adapter, 'features').mockImplementation(() => {
         throw new Error('Any error')
       })
 
-      expect(failsafe.features()).toEqual([])
+      expect(await failsafe.features()).toEqual([])
     })
 
-    it('catches custom errors by default', () => {
+    it('catches custom errors by default', async () => {
       jest.spyOn(adapter, 'features').mockImplementation(() => {
         throw new CustomError('Custom error')
       })
 
-      expect(failsafe.features()).toEqual([])
+      expect(await failsafe.features()).toEqual([])
     })
   })
 
@@ -295,15 +295,15 @@ describe('Failsafe', () => {
   })
 
   describe('fail closed behavior', () => {
-    it('disables all features when adapter fails', () => {
+    it('disables all features when adapter fails', async () => {
       const dsl = new Dsl(failsafe)
 
       // Add feature normally
-      dsl.add('new_feature')
-      dsl.enable('new_feature')
+      await dsl.add('new_feature')
+      await dsl.enable('new_feature')
 
       // Verify it's enabled
-      expect(dsl.isFeatureEnabled('new_feature')).toBe(true)
+      expect(await dsl.isFeatureEnabled('new_feature')).toBe(true)
 
       // Simulate adapter failure
       jest.spyOn(adapter, 'get').mockImplementation(() => {
@@ -311,10 +311,10 @@ describe('Failsafe', () => {
       })
 
       // Feature should now be disabled (fail closed)
-      expect(dsl.isFeatureEnabled('new_feature')).toBe(false)
+      expect(await dsl.isFeatureEnabled('new_feature')).toBe(false)
     })
 
-    it('returns safe defaults for all operations', () => {
+    it('returns safe defaults for all operations', async () => {
       // Simulate complete adapter failure
       jest.spyOn(adapter, 'features').mockImplementation(() => {
         throw new Error('Adapter failed')
@@ -329,27 +329,27 @@ describe('Failsafe', () => {
       const dsl = new Dsl(failsafe)
 
       // All operations should return safe defaults
-      expect(failsafe.features()).toEqual([])
-      expect(failsafe.get(feature)).toEqual({})
-      expect(failsafe.getAll()).toEqual({})
+      expect(await failsafe.features()).toEqual([])
+      expect(await failsafe.get(feature)).toEqual({})
+      expect(await failsafe.getAll()).toEqual({})
 
       // Feature checks should return false
-      expect(dsl.isFeatureEnabled('any_feature')).toBe(false)
+      expect(await dsl.isFeatureEnabled('any_feature')).toBe(false)
     })
   })
 
   describe('integration scenario', () => {
-    it('allows application to continue when storage fails', () => {
+    it('allows application to continue when storage fails', async () => {
       const dsl = new Dsl(failsafe)
 
       // Setup features normally
-      dsl.add('feature1')
-      dsl.add('feature2')
-      dsl.enable('feature1')
+      await dsl.add('feature1')
+      await dsl.add('feature2')
+      await dsl.enable('feature1')
 
       // Verify normal operation
-      expect(dsl.isFeatureEnabled('feature1')).toBe(true)
-      expect(dsl.isFeatureEnabled('feature2')).toBe(false)
+      expect(await dsl.isFeatureEnabled('feature1')).toBe(true)
+      expect(await dsl.isFeatureEnabled('feature2')).toBe(false)
 
       // Storage becomes unavailable
       jest.spyOn(adapter, 'get').mockImplementation(() => {
@@ -360,23 +360,23 @@ describe('Failsafe', () => {
       })
 
       // Application continues, all features disabled
-      expect(dsl.isFeatureEnabled('feature1')).toBe(false)
-      expect(dsl.isFeatureEnabled('feature2')).toBe(false)
+      expect(await dsl.isFeatureEnabled('feature1')).toBe(false)
+      expect(await dsl.isFeatureEnabled('feature2')).toBe(false)
 
       // Write operations fail gracefully
-      expect(() => dsl.enable('feature1')).not.toThrow()
-      expect(() => dsl.disable('feature1')).not.toThrow()
+      await expect(dsl.enable('feature1')).resolves.not.toThrow()
+      await expect(dsl.disable('feature1')).resolves.not.toThrow()
     })
   })
 
   describe('non-Error throws', () => {
-    it('does not catch non-Error throws', () => {
+    it('does not catch non-Error throws', async () => {
       jest.spyOn(adapter, 'features').mockImplementation(() => {
-        // eslint-disable-next-line @typescript-eslint/only-throw-error
-        throw 'string error'
+        // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
+        return Promise.reject('string error')
       })
 
-      expect(() => failsafe.features()).toThrow('string error')
+      await expect(failsafe.features()).rejects.toBe('string error')
     })
   })
 })

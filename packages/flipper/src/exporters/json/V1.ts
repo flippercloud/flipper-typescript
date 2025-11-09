@@ -9,7 +9,6 @@ import Typecast from '../../Typecast'
  * Compatible with Ruby Flipper's JSON V1 export format.
  *
  * @example
- * ```typescript
  * const adapter = new MemoryAdapter();
  * const exporter = new V1();
  * const exportObj = exporter.call(adapter);
@@ -28,7 +27,6 @@ import Typecast from '../../Typecast'
  * //     }
  * //   }
  * // }
- * ```
  */
 class V1 {
   /**
@@ -42,8 +40,8 @@ class V1 {
    * @param adapter - The adapter to export from
    * @returns JSON Export object
    */
-  public call(adapter: IAdapter): JsonExport {
-    const features = adapter.getAll()
+  public async call(adapter: IAdapter): Promise<JsonExport> {
+    const features = await adapter.getAll()
 
     // Convert Sets to Arrays for JSON serialization
     Object.keys(features).forEach((featureKey) => {

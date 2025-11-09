@@ -8,7 +8,6 @@ import Typecast from './Typecast'
  * consistent access.
  *
  * @example
- * ```typescript
  * const rawValues = {
  *   boolean: true,
  *   actors: ['user-1', 'user-2'],
@@ -22,7 +21,6 @@ import Typecast from './Typecast'
  * console.log(gateValues.boolean); // true
  * console.log(gateValues.actors); // Set(['user-1', 'user-2'])
  * console.log(gateValues.expression); // { Property: 'admin' }
- * ```
  */
 class GateValues {
   /**

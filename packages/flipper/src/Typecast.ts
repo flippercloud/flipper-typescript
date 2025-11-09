@@ -5,7 +5,6 @@
  * consistent type-casting to ensure gate values are in the expected format.
  *
  * @example
- * ```typescript
  * // Convert various truthy values to boolean
  * Typecast.toBoolean(true); // true
  * Typecast.toBoolean('true'); // true
@@ -18,7 +17,6 @@
  * // Convert strings to numbers
  * Typecast.toNumber('42'); // 42
  * Typecast.toNumber('invalid'); // 0
- * ```
  */
 class Typecast {
   /**

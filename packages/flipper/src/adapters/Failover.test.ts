@@ -38,157 +38,161 @@ describe('Failover', () => {
   })
 
   describe('read operations without errors', () => {
-    it('reads features from primary', () => {
-      primary.add(feature)
+    it('reads features from primary', async () => {
+      await primary.add(feature)
 
-      expect(failover.features()).toEqual([feature])
+      const features = await failover.features()
+      expect(features).toHaveLength(1)
+      expect(features[0]?.key).toBe(feature.key)
     })
 
-    it('reads get from primary', () => {
-      primary.add(feature)
+    it('reads get from primary', async () => {
+      await primary.add(feature)
       const primarySpy = jest.spyOn(primary, 'get')
 
-      failover.get(feature)
+      await failover.get(feature)
 
       expect(primarySpy).toHaveBeenCalled()
     })
 
-    it('reads getMulti from primary', () => {
-      primary.add(feature)
+    it('reads getMulti from primary', async () => {
+      await primary.add(feature)
       const primarySpy = jest.spyOn(primary, 'getMulti')
 
-      failover.getMulti([feature])
+      await failover.getMulti([feature])
 
       expect(primarySpy).toHaveBeenCalled()
     })
 
-    it('reads getAll from primary', () => {
-      primary.add(feature)
+    it('reads getAll from primary', async () => {
+      await primary.add(feature)
       const primarySpy = jest.spyOn(primary, 'getAll')
 
-      failover.getAll()
+      await failover.getAll()
 
       expect(primarySpy).toHaveBeenCalled()
     })
   })
 
   describe('read operations with errors', () => {
-    it('fails over to secondary when primary features() fails', () => {
+    it('fails over to secondary when primary features() fails', async () => {
       jest.spyOn(primary, 'features').mockImplementation(() => {
         throw new Error('Primary failed')
       })
 
-      secondary.add(feature)
+      await secondary.add(feature)
 
-      expect(failover.features()).toEqual([feature])
+      const features = await failover.features()
+      expect(features).toHaveLength(1)
+      expect(features[0]?.key).toBe(feature.key)
     })
 
-    it('fails over to secondary when primary get() fails', () => {
+    it('fails over to secondary when primary get() fails', async () => {
       jest.spyOn(primary, 'get').mockImplementation(() => {
         throw new Error('Primary failed')
       })
 
-      secondary.add(feature)
-      secondary.enable(feature, gate, thing)
+      await secondary.add(feature)
+      await secondary.enable(feature, gate, thing)
 
-      const result = failover.get(feature)
-      expect(result).toEqual(secondary.get(feature))
+      const result = await failover.get(feature)
+      expect(result).toEqual(await secondary.get(feature))
     })
 
-    it('fails over to secondary when primary getMulti() fails', () => {
+    it('fails over to secondary when primary getMulti() fails', async () => {
       jest.spyOn(primary, 'getMulti').mockImplementation(() => {
         throw new Error('Primary failed')
       })
 
-      secondary.add(feature)
+      await secondary.add(feature)
 
-      const result = failover.getMulti([feature])
-      expect(result).toEqual(secondary.getMulti([feature]))
+      const result = await failover.getMulti([feature])
+      expect(result).toEqual(await secondary.getMulti([feature]))
     })
 
-    it('fails over to secondary when primary getAll() fails', () => {
+    it('fails over to secondary when primary getAll() fails', async () => {
       jest.spyOn(primary, 'getAll').mockImplementation(() => {
         throw new Error('Primary failed')
       })
 
-      secondary.add(feature)
+      await secondary.add(feature)
 
-      const result = failover.getAll()
-      expect(result).toEqual(secondary.getAll())
+      const result = await failover.getAll()
+      expect(result).toEqual(await secondary.getAll())
     })
 
-    it('fails over to secondary when primary export() fails', () => {
+    it('fails over to secondary when primary export() fails', async () => {
       jest.spyOn(primary, 'export').mockImplementation(() => {
         throw new Error('Primary failed')
       })
 
-      secondary.add(feature)
+      await secondary.add(feature)
 
-      const result = failover.export()
+      const result = await failover.export()
       expect(result).toBeTruthy()
     })
   })
 
   describe('write operations without dual write', () => {
-    it('writes add to primary only', () => {
+    it('writes add to primary only', async () => {
       const primarySpy = jest.spyOn(primary, 'add')
       const secondarySpy = jest.spyOn(secondary, 'add')
 
-      failover.add(feature)
+      await failover.add(feature)
 
       expect(primarySpy).toHaveBeenCalled()
       expect(secondarySpy).not.toHaveBeenCalled()
     })
 
-    it('writes remove to primary only', () => {
-      primary.add(feature)
+    it('writes remove to primary only', async () => {
+      await primary.add(feature)
       const primarySpy = jest.spyOn(primary, 'remove')
       const secondarySpy = jest.spyOn(secondary, 'remove')
 
-      failover.remove(feature)
+      await failover.remove(feature)
 
       expect(primarySpy).toHaveBeenCalled()
       expect(secondarySpy).not.toHaveBeenCalled()
     })
 
-    it('writes clear to primary only', () => {
-      primary.add(feature)
+    it('writes clear to primary only', async () => {
+      await primary.add(feature)
       const primarySpy = jest.spyOn(primary, 'clear')
       const secondarySpy = jest.spyOn(secondary, 'clear')
 
-      failover.clear(feature)
+      await failover.clear(feature)
 
       expect(primarySpy).toHaveBeenCalled()
       expect(secondarySpy).not.toHaveBeenCalled()
     })
 
-    it('writes enable to primary only', () => {
-      primary.add(feature)
+    it('writes enable to primary only', async () => {
+      await primary.add(feature)
       const primarySpy = jest.spyOn(primary, 'enable')
       const secondarySpy = jest.spyOn(secondary, 'enable')
 
-      failover.enable(feature, gate, thing)
+      await failover.enable(feature, gate, thing)
 
       expect(primarySpy).toHaveBeenCalled()
       expect(secondarySpy).not.toHaveBeenCalled()
     })
 
-    it('writes disable to primary only', () => {
-      primary.add(feature)
+    it('writes disable to primary only', async () => {
+      await primary.add(feature)
       const primarySpy = jest.spyOn(primary, 'disable')
       const secondarySpy = jest.spyOn(secondary, 'disable')
 
-      failover.disable(feature, gate, thing)
+      await failover.disable(feature, gate, thing)
 
       expect(primarySpy).toHaveBeenCalled()
       expect(secondarySpy).not.toHaveBeenCalled()
     })
 
-    it('writes import to primary only', () => {
+    it('writes import to primary only', async () => {
       const primarySpy = jest.spyOn(primary, 'import')
       const secondarySpy = jest.spyOn(secondary, 'import')
 
-      failover.import(new Dsl(primary))
+      await failover.import(new Dsl(primary))
 
       expect(primarySpy).toHaveBeenCalled()
       expect(secondarySpy).not.toHaveBeenCalled()
@@ -200,67 +204,69 @@ describe('Failover', () => {
       failover = new Failover(primary, secondary, { dualWrite: true })
     })
 
-    it('writes add to both adapters', () => {
-      failover.add(feature)
+    it('writes add to both adapters', async () => {
+      await failover.add(feature)
 
-      expect(primary.features()).toContainEqual(feature)
-      expect(secondary.features()).toContainEqual(feature)
+      const primaryFeatures = await primary.features()
+      expect(primaryFeatures.map(f => f.key)).toContain(feature.key)
+      const secondaryFeatures = await secondary.features()
+      expect(secondaryFeatures.map(f => f.key)).toContain(feature.key)
     })
 
-    it('writes remove to both adapters', () => {
-      primary.add(feature)
-      secondary.add(feature)
+    it('writes remove to both adapters', async () => {
+      await primary.add(feature)
+      await secondary.add(feature)
 
-      failover.remove(feature)
+      await failover.remove(feature)
 
-      expect(primary.features()).toHaveLength(0)
-      expect(secondary.features()).toHaveLength(0)
+      expect(await primary.features()).toHaveLength(0)
+      expect(await secondary.features()).toHaveLength(0)
     })
 
-    it('writes clear to both adapters', () => {
-      primary.add(feature)
-      secondary.add(feature)
+    it('writes clear to both adapters', async () => {
+      await primary.add(feature)
+      await secondary.add(feature)
 
       const primarySpy = jest.spyOn(primary, 'clear')
       const secondarySpy = jest.spyOn(secondary, 'clear')
 
-      failover.clear(feature)
+      await failover.clear(feature)
 
       expect(primarySpy).toHaveBeenCalled()
       expect(secondarySpy).toHaveBeenCalled()
     })
 
-    it('writes enable to both adapters', () => {
-      primary.add(feature)
-      secondary.add(feature)
+    it('writes enable to both adapters', async () => {
+      await primary.add(feature)
+      await secondary.add(feature)
 
       const primarySpy = jest.spyOn(primary, 'enable')
       const secondarySpy = jest.spyOn(secondary, 'enable')
 
-      failover.enable(feature, gate, thing)
+      await failover.enable(feature, gate, thing)
 
       expect(primarySpy).toHaveBeenCalled()
       expect(secondarySpy).toHaveBeenCalled()
     })
 
-    it('writes disable to both adapters', () => {
-      primary.add(feature)
-      secondary.add(feature)
+    it('writes disable to both adapters', async () => {
+      await primary.add(feature)
+      await secondary.add(feature)
 
       const primarySpy = jest.spyOn(primary, 'disable')
       const secondarySpy = jest.spyOn(secondary, 'disable')
 
-      failover.disable(feature, gate, thing)
+      await failover.disable(feature, gate, thing)
 
       expect(primarySpy).toHaveBeenCalled()
       expect(secondarySpy).toHaveBeenCalled()
     })
 
-    it('writes import to both adapters', () => {
+    it('writes import to both adapters', async () => {
       const primarySpy = jest.spyOn(primary, 'import')
       const secondarySpy = jest.spyOn(secondary, 'import')
 
-      failover.import(new Dsl(primary))
+      await failover.import(new Dsl(primary))
 
       expect(primarySpy).toHaveBeenCalled()
       expect(secondarySpy).toHaveBeenCalled()
@@ -268,20 +274,22 @@ describe('Failover', () => {
   })
 
   describe('custom error types', () => {
-    it('only fails over for specified error types', () => {
+    it('only fails over for specified error types', async () => {
       failover = new Failover(primary, secondary, { errors: [CustomError] })
 
       jest.spyOn(primary, 'features').mockImplementation(() => {
         throw new CustomError('Custom error')
       })
 
-      secondary.add(feature)
+      await secondary.add(feature)
 
       // Should failover for CustomError
-      expect(failover.features()).toEqual([feature])
+      const features = await failover.features()
+      expect(features).toHaveLength(1)
+      expect(features[0]?.key).toBe(feature.key)
     })
 
-    it('does not failover for non-specified error types', () => {
+    it('does not failover for non-specified error types', async () => {
       failover = new Failover(primary, secondary, { errors: [CustomError] })
 
       jest.spyOn(primary, 'features').mockImplementation(() => {
@@ -289,10 +297,10 @@ describe('Failover', () => {
       })
 
       // Should throw regular error
-      expect(() => failover.features()).toThrow('Regular error')
+      await expect(failover.features()).rejects.toThrow('Regular error')
     })
 
-    it('supports multiple error types', () => {
+    it('supports multiple error types', async () => {
       class AnotherError extends Error {}
 
       failover = new Failover(primary, secondary, {
@@ -303,36 +311,44 @@ describe('Failover', () => {
       jest.spyOn(primary, 'features').mockImplementation(() => {
         throw new CustomError('Custom error')
       })
-      secondary.add(feature)
-      expect(failover.features()).toEqual([feature])
+      await secondary.add(feature)
+      const features1 = await failover.features()
+      expect(features1).toHaveLength(1)
+      expect(features1[0]?.key).toBe(feature.key)
 
       // Test AnotherError
       jest.spyOn(primary, 'features').mockImplementation(() => {
         throw new AnotherError('Another error')
       })
-      expect(failover.features()).toEqual([feature])
+      const features2 = await failover.features()
+      expect(features2).toHaveLength(1)
+      expect(features2[0]?.key).toBe(feature.key)
     })
   })
 
   describe('default error handling', () => {
-    it('fails over for any Error by default', () => {
+    it('fails over for any Error by default', async () => {
       jest.spyOn(primary, 'features').mockImplementation(() => {
         throw new Error('Any error')
       })
 
-      secondary.add(feature)
+      await secondary.add(feature)
 
-      expect(failover.features()).toEqual([feature])
+      const features = await failover.features()
+      expect(features).toHaveLength(1)
+      expect(features[0]?.key).toBe(feature.key)
     })
 
-    it('fails over for custom errors by default', () => {
+    it('fails over for custom errors by default', async () => {
       jest.spyOn(primary, 'features').mockImplementation(() => {
         throw new CustomError('Custom error')
       })
 
-      secondary.add(feature)
+      await secondary.add(feature)
 
-      expect(failover.features()).toEqual([feature])
+      const features = await failover.features()
+      expect(features).toHaveLength(1)
+      expect(features[0]?.key).toBe(feature.key)
     })
   })
 
@@ -343,44 +359,46 @@ describe('Failover', () => {
   })
 
   describe('integration scenario', () => {
-    it('provides high availability for cache + database', () => {
+    it('provides high availability for cache + database', async () => {
       // Simulate cache (fast but can fail) + database (reliable)
       const cache = new MemoryAdapter()
       const database = new MemoryAdapter()
       const ha = new Failover(cache, database, { dualWrite: true })
 
       // Normal operation: writes to both
-      ha.add(feature)
-      expect(cache.features()).toContainEqual(feature)
-      expect(database.features()).toContainEqual(feature)
+      await ha.add(feature)
+      const cacheFeatures = await cache.features()
+      expect(cacheFeatures.map(f => f.key)).toContain(feature.key)
+      const dbFeatures = await database.features()
+      expect(dbFeatures.map(f => f.key)).toContain(feature.key)
 
       // Cache fails: reads from database
       jest.spyOn(cache, 'get').mockImplementation(() => {
         throw new Error('Cache unavailable')
       })
 
-      database.enable(feature, gate, thing)
-      const result = ha.get(feature)
-      expect(result).toEqual(database.get(feature))
+      await database.enable(feature, gate, thing)
+      const result = await ha.get(feature)
+      expect(result).toEqual(await database.get(feature))
     })
   })
 
   describe('write order', () => {
-    it('writes to primary first', () => {
+    it('writes to primary first', async () => {
       const order: string[] = []
 
-      const primarySpy = jest.spyOn(primary, 'add').mockImplementation(() => {
+      const primarySpy = jest.spyOn(primary, 'add').mockImplementation(async () => {
         order.push('primary')
-        return true
+        return await Promise.resolve(true)
       })
 
-      const secondarySpy = jest.spyOn(secondary, 'add').mockImplementation(() => {
+      const secondarySpy = jest.spyOn(secondary, 'add').mockImplementation(async () => {
         order.push('secondary')
-        return true
+        return await Promise.resolve(true)
       })
 
       failover = new Failover(primary, secondary, { dualWrite: true })
-      failover.add(feature)
+      await failover.add(feature)
 
       expect(order).toEqual(['primary', 'secondary'])
 

@@ -15,7 +15,7 @@ describe('NoopInstrumenter', () => {
 
     it('passes payload to the function', () => {
       const payload = { feature_name: 'test_feature' }
-      instrumenter.instrument('test', payload, (p) => {
+      void instrumenter.instrument('test', payload, (p) => {
         expect(p).toBe(payload)
       })
     })
@@ -27,7 +27,7 @@ describe('NoopInstrumenter', () => {
 
     it('allows function to modify payload', () => {
       const payload: { feature_name: string; result?: string } = { feature_name: 'test' }
-      instrumenter.instrument('test', payload, (p) => {
+      void instrumenter.instrument('test', payload, (p) => {
         p.result = 'modified'
       })
       expect(payload.result).toBe('modified')
@@ -45,7 +45,7 @@ describe('NoopInstrumenter', () => {
 
     it('propagates errors from the function', () => {
       expect(() => {
-        instrumenter.instrument('test', {}, () => {
+        void instrumenter.instrument('test', {}, () => {
           throw new Error('test error')
         })
       }).toThrow('test error')

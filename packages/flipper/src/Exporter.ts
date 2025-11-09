@@ -11,17 +11,15 @@ export interface IExporter {
    * @param adapter - The adapter to export from
    * @returns Export object
    */
-  call: (adapter: IAdapter) => Export
+  call: (adapter: IAdapter) => Promise<Export>
 }
 
 /**
  * Factory for building exporters based on format and version.
  *
  * @example
- * ```typescript
  * const exporter = Exporter.build({ format: 'json', version: 1 });
- * const exportObj = exporter.call(adapter);
- * ```
+ * const exportObj = await exporter.call(adapter);
  */
 class Exporter {
   /**
