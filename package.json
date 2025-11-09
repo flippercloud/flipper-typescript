@@ -1,42 +1,26 @@
 {
-  "name": "flipper-typescript",
-  "description": "Flipper implemented in TypeScript.",
+  "name": "@flippercloud/monorepo",
   "version": "0.0.1",
+  "private": true,
+  "description": "Flipper feature flag monorepo",
   "author": "Jonathan Hoyt",
   "license": "MIT",
-  "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
-  },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
+  "workspaces": [
+    "packages/*"
   ],
   "scripts": {
-    "build": "tsc",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "test:watch": "npm test -- --watch",
-    "test:coverage": "npm test -- --coverage",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "type-check": "tsc --noEmit",
-    "format": "prettier --write \"src/**/*.{ts,tsx,json,md}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,json,md}\"",
-    "clean": "node -e \"try { require('fs').rmSync('dist', {recursive:true, force:true}); require('fs').rmSync('coverage', {recursive:true, force:true}); } catch(e) {}\"",
-    "prepublishOnly": "npm run clean && npm run build && npm test"
-  },
-  "dependencies": {
-    "crc": "^4.3.2"
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "test:coverage": "npm run test:coverage --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "lint:fix": "npm run lint:fix --workspaces --if-present",
+    "type-check": "npm run type-check --workspaces --if-present",
+    "format": "prettier --write \"packages/**/src/**/*.{ts,tsx,json,md}\"",
+    "format:check": "prettier --check \"packages/**/src/**/*.{ts,tsx,json,md}\"",
+    "clean": "npm run clean --workspaces --if-present"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
-    "@types/crc": "^3.8.3",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.10.0",
     "eslint": "^9.15.0",
@@ -48,6 +32,7 @@
     "typescript-eslint": "^8.14.0"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   }
 }

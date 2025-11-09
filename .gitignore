@@ -1,11 +1,14 @@
 # Dependencies
 node_modules/
+package-lock.json
 
 # Build output
 dist/
+packages/*/dist/
 
 # Testing
 coverage/
+packages/*/coverage/
 
 # IDE
 .vscode/
