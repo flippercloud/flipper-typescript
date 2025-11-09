@@ -9,13 +9,6 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
 
-    // Output
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-
     // Type Checking
     "strict": true,
     "noUnusedLocals": true,
@@ -29,7 +22,5 @@
     // Interop
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  }
 }
