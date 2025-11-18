@@ -3,6 +3,9 @@ import type { Config } from 'jest'
 const config: Config = {
   preset: 'ts-jest',
   testEnvironment: 'node',
+  testEnvironmentOptions: {
+    'localstoragefile': '/tmp/jest-localStorage',
+  },
   testMatch: ['<rootDir>/src/**/*.test.ts'],
   collectCoverageFrom: ['src/**/*.ts', '!src/**/*.test.ts'],
   coverageDirectory: 'coverage',
