@@ -13,7 +13,7 @@ describe('Boolean', () => {
 
     test('accepts expression object via buildExpression', () => {
       const expr = buildExpression({
-        Boolean: { Constant: 1 }
+        Boolean: { Constant: 1 },
       }) as BooleanExpression
       const context = { feature_name: 'test', properties: {} }
       expect(expr.evaluate(context)).toBe(true)
@@ -72,25 +72,33 @@ describe('Boolean', () => {
     test('works with property expressions', () => {
       const expr = new BooleanExpression(new Property('active'))
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { active: 1 }
-      })).toBe(true)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { active: 1 },
+        })
+      ).toBe(true)
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { active: 0 }
-      })).toBe(false)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { active: 0 },
+        })
+      ).toBe(false)
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { active: 'yes' }
-      })).toBe(true)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { active: 'yes' },
+        })
+      ).toBe(true)
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { active: '' }
-      })).toBe(false)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { active: '' },
+        })
+      ).toBe(false)
     })
 
     test('converts array to true', () => {
@@ -122,14 +130,14 @@ describe('Boolean', () => {
     test('returns object notation', () => {
       const expr = new BooleanExpression(new Constant(1))
       expect(expr.value()).toEqual({
-        Boolean: 1
+        Boolean: 1,
       })
     })
 
     test('preserves nested expression structure', () => {
       const expr = new BooleanExpression(new Property('active'))
       expect(expr.value()).toEqual({
-        Boolean: { Property: 'active' }
+        Boolean: { Property: 'active' },
       })
     })
   })

@@ -22,18 +22,14 @@ describe('Strict', () => {
 
     it('throws when getting non-existent feature', async () => {
       await expect(strict.get(feature)).rejects.toThrow(FeatureNotFoundError)
-      await expect(strict.get(feature)).rejects.toThrow(
-        'Could not find feature "test_feature"'
-      )
+      await expect(strict.get(feature)).rejects.toThrow('Could not find feature "test_feature"')
     })
 
     it('throws when getting multiple features with non-existent one', async () => {
       const feature2 = new Feature('other_feature', adapter, {})
       await adapter.add(feature)
 
-      await expect(strict.getMulti([feature, feature2])).rejects.toThrow(
-        FeatureNotFoundError
-      )
+      await expect(strict.getMulti([feature, feature2])).rejects.toThrow(FeatureNotFoundError)
     })
 
     it('allows operations on existing features', async () => {

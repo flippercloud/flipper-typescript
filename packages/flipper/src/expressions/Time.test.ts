@@ -14,7 +14,7 @@ describe('Time', () => {
 
     test('accepts expression object via buildExpression', () => {
       const expr = buildExpression({
-        Time: { Constant: '2024-01-01T00:00:00Z' }
+        Time: { Constant: '2024-01-01T00:00:00Z' },
       }) as Time
       const context = { feature_name: 'test', properties: {} }
       expect(typeof expr.evaluate(context)).toBe('number')
@@ -82,7 +82,7 @@ describe('Time', () => {
 
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: { created_at: '2024-01-01T00:00:00Z' }
+        properties: { created_at: '2024-01-01T00:00:00Z' },
       })
 
       expect(result).toBe(1704067200)
@@ -95,7 +95,7 @@ describe('Time', () => {
         '2024-01-15T10:30:00.000Z',
         'January 15, 2024',
         '15 Jan 2024',
-        '01/15/2024'
+        '01/15/2024',
       ]
 
       const context = { feature_name: 'test', properties: {} }
@@ -150,7 +150,7 @@ describe('Time', () => {
         { date: '2021-01-01T00:00:00Z', expected: 1609459200 },
         { date: '2022-01-01T00:00:00Z', expected: 1640995200 },
         { date: '2023-01-01T00:00:00Z', expected: 1672531200 },
-        { date: '2024-01-01T00:00:00Z', expected: 1704067200 }
+        { date: '2024-01-01T00:00:00Z', expected: 1704067200 },
       ]
 
       const context = { feature_name: 'test', properties: {} }
@@ -167,14 +167,14 @@ describe('Time', () => {
     test('returns object notation', () => {
       const expr = new Time(new Constant('2024-01-01T00:00:00Z'))
       expect(expr.value()).toEqual({
-        Time: '2024-01-01T00:00:00Z'
+        Time: '2024-01-01T00:00:00Z',
       })
     })
 
     test('preserves nested expression structure', () => {
       const expr = new Time(new Property('timestamp'))
       expect(expr.value()).toEqual({
-        Time: { Property: 'timestamp' }
+        Time: { Property: 'timestamp' },
       })
     })
   })

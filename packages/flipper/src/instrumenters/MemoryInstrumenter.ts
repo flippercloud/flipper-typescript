@@ -69,7 +69,11 @@ class MemoryInstrumenter implements IInstrumenter {
    * @param fn - The function to execute
    * @returns The result of the function
    */
-  instrument<T>(name: string, payload: InstrumentationPayload, fn: (payload: InstrumentationPayload) => T | Promise<T>): T | Promise<T> {
+  instrument<T>(
+    name: string,
+    payload: InstrumentationPayload,
+    fn: (payload: InstrumentationPayload) => T | Promise<T>
+  ): T | Promise<T> {
     // Copy payload to prevent modifications from affecting the recorded event
     // Using Object.assign to avoid spread operator type issues
     const payloadCopy: InstrumentationPayload = Object.assign({}, payload)
@@ -80,7 +84,7 @@ class MemoryInstrumenter implements IInstrumenter {
       // Handle async results
       if (result instanceof Promise) {
         return result.then(
-          (resolvedResult) => {
+          resolvedResult => {
             // Record successful execution
             this.events.push({
               name,
@@ -129,7 +133,7 @@ class MemoryInstrumenter implements IInstrumenter {
    * @returns Array of matching events
    */
   eventsByName(name: string): InstrumentationEvent[] {
-    return this.events.filter((event) => event.name === name)
+    return this.events.filter(event => event.name === name)
   }
 
   /**

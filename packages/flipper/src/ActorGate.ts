@@ -81,8 +81,12 @@ class ActorGate implements IGate {
    * @returns True if the value is an ActorType or has a flipperId property
    */
   public protectsThing(thing: unknown): boolean {
-    if (thing instanceof ActorType) { return true }
-    if (typeof(thing) === 'object' && thing !== null && 'flipperId' in thing) { return true }
+    if (thing instanceof ActorType) {
+      return true
+    }
+    if (typeof thing === 'object' && thing !== null && 'flipperId' in thing) {
+      return true
+    }
     return false
   }
 

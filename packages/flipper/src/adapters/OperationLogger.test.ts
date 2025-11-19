@@ -118,7 +118,7 @@ describe('OperationLogger', () => {
       const adds = logger.type('add')
 
       expect(adds).toHaveLength(2)
-      expect(adds.every((op) => op.type === 'add')).toBe(true)
+      expect(adds.every(op => op.type === 'add')).toBe(true)
     })
 
     it('returns empty array for operations that did not happen', async () => {
@@ -232,9 +232,7 @@ describe('OperationLogger', () => {
 
   describe('external operations array', () => {
     it('accepts external operations array', () => {
-      const operations: Array<{ type: string; args: unknown[] }> = [
-        { type: 'add', args: [] },
-      ]
+      const operations: Array<{ type: string; args: unknown[] }> = [{ type: 'add', args: [] }]
       const logger = new OperationLogger(adapter, operations)
 
       expect(logger.count()).toBe(1)

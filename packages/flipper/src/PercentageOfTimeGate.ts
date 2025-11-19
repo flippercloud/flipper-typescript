@@ -60,7 +60,7 @@ class PercentageOfTimeGate implements IGate {
    * @returns True if random number falls within the percentage
    */
   public isOpen(context: FeatureCheckContext): boolean {
-    return Math.random() < (context.percentageOfTimeValue / 100)
+    return Math.random() < context.percentageOfTimeValue / 100
   }
 
   /**
@@ -69,7 +69,9 @@ class PercentageOfTimeGate implements IGate {
    * @returns True if the value is a PercentageOfTimeType
    */
   public protectsThing(thing: unknown): boolean {
-    if (thing instanceof PercentageOfTimeType) { return true }
+    if (thing instanceof PercentageOfTimeType) {
+      return true
+    }
     return false
   }
 

@@ -20,10 +20,18 @@ class ExpressionType implements IType {
    * @throws Error if the value is not a valid expression
    */
   public static wrap(thing: unknown): ExpressionType {
-    if (thing instanceof ExpressionType) { return thing }
+    if (thing instanceof ExpressionType) {
+      return thing
+    }
 
     // Check if it's an ExpressionLike
-    if (thing && typeof thing === 'object' && 'evaluate' in thing && 'value' in thing && 'equals' in thing) {
+    if (
+      thing &&
+      typeof thing === 'object' &&
+      'evaluate' in thing &&
+      'value' in thing &&
+      'equals' in thing
+    ) {
       return new ExpressionType(thing as ExpressionLike)
     }
 
@@ -57,12 +65,13 @@ class ExpressionType implements IType {
 
     // For Constants, we need to wrap the primitive value in { Constant: value }
     // so it's recognized as an expression when stored and retrieved
-    if (thing.constructor.name === 'Constant' && (
-      typeof val === 'string' ||
-      typeof val === 'number' ||
-      typeof val === 'boolean' ||
-      val === null
-    )) {
+    if (
+      thing.constructor.name === 'Constant' &&
+      (typeof val === 'string' ||
+        typeof val === 'number' ||
+        typeof val === 'boolean' ||
+        val === null)
+    ) {
       this.value = JSON.stringify({ Constant: val })
     } else {
       this.value = JSON.stringify(val)

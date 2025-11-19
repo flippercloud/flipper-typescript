@@ -6,17 +6,14 @@ import { buildExpression } from './index'
 describe('Percentage', () => {
   describe('constructor', () => {
     test('accepts two expression arguments', () => {
-      const expr = new Percentage(
-        new Constant(25),
-        new Constant(50)
-      )
+      const expr = new Percentage(new Constant(25), new Constant(50))
       const context = { feature_name: 'test', properties: {} }
       expect(expr.evaluate(context)).toBe(true)
     })
 
     test('accepts expression objects via buildExpression', () => {
       const expr = buildExpression({
-        Percentage: [{ Constant: 25 }, { Constant: 50 }]
+        Percentage: [{ Constant: 25 }, { Constant: 50 }],
       }) as Percentage
       const context = { feature_name: 'test', properties: {} }
       expect(expr.evaluate(context)).toBe(true)
@@ -61,37 +58,39 @@ describe('Percentage', () => {
     })
 
     test('works with property expressions', () => {
-      const expr = new Percentage(
-        new Property('current'),
-        new Constant(50)
-      )
+      const expr = new Percentage(new Property('current'), new Constant(50))
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { current: 25 }
-      })).toBe(true)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { current: 25 },
+        })
+      ).toBe(true)
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { current: 75 }
-      })).toBe(false)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { current: 75 },
+        })
+      ).toBe(false)
     })
 
     test('compares two properties', () => {
-      const expr = new Percentage(
-        new Property('value'),
-        new Property('threshold')
-      )
+      const expr = new Percentage(new Property('value'), new Property('threshold'))
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { value: 30, threshold: 50 }
-      })).toBe(true)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { value: 30, threshold: 50 },
+        })
+      ).toBe(true)
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { value: 60, threshold: 50 }
-      })).toBe(false)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { value: 60, threshold: 50 },
+        })
+      ).toBe(false)
     })
 
     test('converts string values to numbers', () => {
@@ -134,25 +133,16 @@ describe('Percentage', () => {
 
   describe('value', () => {
     test('returns object notation', () => {
-      const expr = new Percentage(
-        new Constant(25),
-        new Constant(50)
-      )
+      const expr = new Percentage(new Constant(25), new Constant(50))
       expect(expr.value()).toEqual({
-        Percentage: [25, 50]
+        Percentage: [25, 50],
       })
     })
 
     test('preserves nested expression structure', () => {
-      const expr = new Percentage(
-        new Property('current'),
-        new Constant(100)
-      )
+      const expr = new Percentage(new Property('current'), new Constant(100))
       expect(expr.value()).toEqual({
-        Percentage: [
-          { Property: 'current' },
-          100
-        ]
+        Percentage: [{ Property: 'current' }, 100],
       })
     })
   })

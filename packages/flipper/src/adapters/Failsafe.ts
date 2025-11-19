@@ -279,6 +279,6 @@ export default class Failsafe implements IAdapter {
       return false
     }
 
-    return this.errors.some((errorType) => error instanceof errorType)
+    return this.errors.some(errorType => error instanceof errorType)
   }
 }

@@ -13,7 +13,11 @@ describe('PercentageOfTimeType', () => {
   })
 
   test('throws exception if percentage is out of bounds', () => {
-    expect(() => PercentageOfTimeType.wrap(-1)).toThrow('value must be a positive number less than or equal to 100, but was -1')
-    expect(() => PercentageOfTimeType.wrap(101)).toThrow('value must be a positive number less than or equal to 100, but was 101')
+    expect(() => PercentageOfTimeType.wrap(-1)).toThrow(
+      'value must be a positive number less than or equal to 100, but was -1'
+    )
+    expect(() => PercentageOfTimeType.wrap(101)).toThrow(
+      'value must be a positive number less than or equal to 100, but was 101'
+    )
   })
 })

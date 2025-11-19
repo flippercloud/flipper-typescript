@@ -6,17 +6,14 @@ import { buildExpression } from './index'
 describe('LessThan', () => {
   describe('constructor', () => {
     test('accepts two expression arguments', () => {
-      const expr = new LessThan(
-        new Constant(5),
-        new Constant(10)
-      )
+      const expr = new LessThan(new Constant(5), new Constant(10))
       const context = { feature_name: 'test', properties: {} }
       expect(expr.evaluate(context)).toBe(true)
     })
 
     test('accepts expression objects via buildExpression', () => {
       const expr = buildExpression({
-        LessThan: [{ Constant: 5 }, { Constant: 10 }]
+        LessThan: [{ Constant: 5 }, { Constant: 10 }],
       }) as LessThan
       const context = { feature_name: 'test', properties: {} }
       expect(expr.evaluate(context)).toBe(true)
@@ -61,31 +58,29 @@ describe('LessThan', () => {
     })
 
     test('works with property expressions', () => {
-      const expr = new LessThan(
-        new Property('account_age_days'),
-        new Constant(30)
-      )
+      const expr = new LessThan(new Property('account_age_days'), new Constant(30))
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { account_age_days: 15 }
-      })).toBe(true)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { account_age_days: 15 },
+        })
+      ).toBe(true)
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { account_age_days: 45 }
-      })).toBe(false)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { account_age_days: 45 },
+        })
+      ).toBe(false)
     })
   })
 
   describe('value', () => {
     test('returns object notation', () => {
-      const expr = new LessThan(
-        new Constant(5),
-        new Constant(10)
-      )
+      const expr = new LessThan(new Constant(5), new Constant(10))
       expect(expr.value()).toEqual({
-        LessThan: [5, 10]
+        LessThan: [5, 10],
       })
     })
   })

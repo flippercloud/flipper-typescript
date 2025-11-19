@@ -71,7 +71,7 @@ export default class ActorLimit extends Wrapper {
    * @throws {ActorLimitExceededError} If enabling an actor would exceed the limit
    */
   override async enable(feature: Feature, gate: IGate, thing: IType): Promise<boolean> {
-    if (gate instanceof ActorGate && await this.isOverLimit(feature)) {
+    if (gate instanceof ActorGate && (await this.isOverLimit(feature))) {
       throw new ActorLimitExceededError(feature.name, this.limit)
     }
     return await super.enable(feature, gate, thing)

@@ -20,7 +20,9 @@ class BooleanType implements IType {
    * @throws Error if the value is not a boolean
    */
   public static wrap(thing: unknown): BooleanType {
-    if (thing instanceof BooleanType) { return thing }
+    if (thing instanceof BooleanType) {
+      return thing
+    }
     if (typeof thing === 'boolean') {
       return new BooleanType(thing)
     }

@@ -23,7 +23,10 @@ describe('Export/Import System', () => {
       expect(exportObj.contents).toBeTruthy()
 
       // Parse contents
-      const data = JSON.parse(exportObj.contents) as { version: number; features: Record<string, unknown> }
+      const data = JSON.parse(exportObj.contents) as {
+        version: number
+        features: Record<string, unknown>
+      }
       expect(data.version).toBe(1)
       expect(data.features).toBeDefined()
       expect(data.features.search).toBeDefined()
@@ -123,7 +126,7 @@ describe('Export/Import System', () => {
       await source.enable('boolean-test')
       await source.enableActor('actor-test', { flipperId: 'User;1' })
       await source.enableActor('actor-test', { flipperId: 'User;2' })
-      source.register('admins', (actor) => actor.isAdmin === true)
+      source.register('admins', actor => actor.isAdmin === true)
       await source.enableGroup('group-test', 'admins')
       await source.enablePercentageOfActors('percentage-actors-test', 50)
       await source.enablePercentageOfTime('percentage-time-test', 25)
@@ -135,8 +138,10 @@ describe('Export/Import System', () => {
       expect(await dest.isFeatureEnabled('boolean-test')).toBe(true)
       expect(await dest.isFeatureEnabled('actor-test', { flipperId: 'User;1' })).toBe(true)
       expect(await dest.isFeatureEnabled('actor-test', { flipperId: 'User;2' })).toBe(true)
-      dest.register('admins', (actor) => actor.isAdmin === true)
-      expect(await dest.isFeatureEnabled('group-test', { flipperId: 'User;1', isAdmin: true })).toBe(true)
+      dest.register('admins', actor => actor.isAdmin === true)
+      expect(
+        await dest.isFeatureEnabled('group-test', { flipperId: 'User;1', isAdmin: true })
+      ).toBe(true)
       // Note: Percentage gates can't be easily tested for exact values without checking internals
     })
   })

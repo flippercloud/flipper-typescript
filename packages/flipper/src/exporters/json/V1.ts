@@ -44,13 +44,13 @@ class V1 {
     const features = await adapter.getAll()
 
     // Convert Sets to Arrays for JSON serialization
-    Object.keys(features).forEach((featureKey) => {
+    Object.keys(features).forEach(featureKey => {
       const gates = features[featureKey]
       if (!gates) {
         return
       }
 
-      Object.keys(gates).forEach((gateKey) => {
+      Object.keys(gates).forEach(gateKey => {
         const value = gates[gateKey]
         if (value instanceof Set) {
           gates[gateKey] = Array.from(value)

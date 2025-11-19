@@ -14,7 +14,7 @@ describe('Random', () => {
 
     test('accepts expression object via buildExpression', () => {
       const expr = buildExpression({
-        Random: { Constant: 100 }
+        Random: { Constant: 100 },
       }) as Random
       const context = { feature_name: 'test', properties: {} }
       expect(typeof expr.evaluate(context)).toBe('number')
@@ -72,7 +72,7 @@ describe('Random', () => {
 
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: { max: 50 }
+        properties: { max: 50 },
       })
 
       expect(result).toBeGreaterThanOrEqual(0)
@@ -154,14 +154,14 @@ describe('Random', () => {
     test('returns object notation', () => {
       const expr = new Random(new Constant(100))
       expect(expr.value()).toEqual({
-        Random: 100
+        Random: 100,
       })
     })
 
     test('preserves nested expression structure', () => {
       const expr = new Random(new Property('max'))
       expect(expr.value()).toEqual({
-        Random: { Property: 'max' }
+        Random: { Property: 'max' },
       })
     })
   })

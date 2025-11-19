@@ -50,7 +50,7 @@ const expressions = {
   Property,
   Random,
   String: StringExpression,
-  Time
+  Time,
 }
 
 // Register expressions with the build function
@@ -88,11 +88,11 @@ export {
   Time,
 
   // Registry for advanced usage
-  expressions
+  expressions,
 }
 
 // Default export for convenience
 export default {
   build: buildExpression,
-  expressions
+  expressions,
 }

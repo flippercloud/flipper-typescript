@@ -127,7 +127,8 @@ describe('Instrumented', () => {
 
       // Should have 2 events: add and enable
       expect(instrumenter.count()).toBeGreaterThan(1)
-      const enableEvents = instrumenter.eventsByName(Instrumented.INSTRUMENTATION_NAME)
+      const enableEvents = instrumenter
+        .eventsByName(Instrumented.INSTRUMENTATION_NAME)
         .filter(e => e.payload.operation === 'enable')
       expect(enableEvents.length).toBe(1)
       expect(enableEvents[0]!.payload.feature_name).toBe('search')
@@ -144,7 +145,8 @@ describe('Instrumented', () => {
 
       // Should have 2 events: add and disable
       expect(instrumenter.count()).toBeGreaterThan(1)
-      const disableEvents = instrumenter.eventsByName(Instrumented.INSTRUMENTATION_NAME)
+      const disableEvents = instrumenter
+        .eventsByName(Instrumented.INSTRUMENTATION_NAME)
         .filter(e => e.payload.operation === 'disable')
       expect(disableEvents.length).toBe(1)
       expect(disableEvents[0]!.payload.feature_name).toBe('search')

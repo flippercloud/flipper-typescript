@@ -123,21 +123,13 @@ describe('ActorLimit', () => {
       // Should be able to add 100 actors
       for (let i = 0; i < 100; i++) {
         await expect(
-          defaultLimitAdapter.enable(
-            feature,
-            actorGate,
-            new ActorType({ flipperId: `user-${i}` })
-          )
+          defaultLimitAdapter.enable(feature, actorGate, new ActorType({ flipperId: `user-${i}` }))
         ).resolves.not.toThrow()
       }
 
       // 101st should throw
       await expect(
-        defaultLimitAdapter.enable(
-          feature,
-          actorGate,
-          new ActorType({ flipperId: 'user-100' })
-        )
+        defaultLimitAdapter.enable(feature, actorGate, new ActorType({ flipperId: 'user-100' }))
       ).rejects.toThrow(ActorLimitExceededError)
     })
   })
@@ -150,21 +142,13 @@ describe('ActorLimit', () => {
       // Should be able to add 5 actors
       for (let i = 0; i < 5; i++) {
         await expect(
-          customLimitAdapter.enable(
-            feature,
-            actorGate,
-            new ActorType({ flipperId: `user-${i}` })
-          )
+          customLimitAdapter.enable(feature, actorGate, new ActorType({ flipperId: `user-${i}` }))
         ).resolves.not.toThrow()
       }
 
       // 6th should throw
       await expect(
-        customLimitAdapter.enable(
-          feature,
-          actorGate,
-          new ActorType({ flipperId: 'user-5' })
-        )
+        customLimitAdapter.enable(feature, actorGate, new ActorType({ flipperId: 'user-5' }))
       ).rejects.toThrow(ActorLimitExceededError)
     })
   })
@@ -200,9 +184,9 @@ describe('ActorLimit', () => {
       await dsl.enableActor('limited_feature', { flipperId: 'user-3' })
 
       // Next one should throw
-      await expect(
-        dsl.enableActor('limited_feature', { flipperId: 'user-4' })
-      ).rejects.toThrow(ActorLimitExceededError)
+      await expect(dsl.enableActor('limited_feature', { flipperId: 'user-4' })).rejects.toThrow(
+        ActorLimitExceededError
+      )
     })
 
     it('allows other enable methods through Dsl', async () => {

@@ -58,26 +58,22 @@ class Synchronizer {
    * @throws {Error} If an error occurs and raise=true
    */
   public async call(): Promise<boolean> {
-    return await this.instrumenter.instrument(
-      'synchronizer_call.flipper',
-      {},
-      async () => {
-        try {
-          await this.sync()
-          return true
-        } catch (error) {
-          await this.instrumenter.instrument(
-            'synchronizer_exception.flipper',
-            { exception: error },
-            () => undefined
-          )
-          if (this.raise) {
-            throw error
-          }
-          return false
+    return await this.instrumenter.instrument('synchronizer_call.flipper', {}, async () => {
+      try {
+        await this.sync()
+        return true
+      } catch (error) {
+        await this.instrumenter.instrument(
+          'synchronizer_exception.flipper',
+          { exception: error },
+          () => undefined
+        )
+        if (this.raise) {
+          throw error
         }
+        return false
       }
-    )
+    })
   }
 
   /**
@@ -107,7 +103,7 @@ class Synchronizer {
 
     // Add features that are missing in local and present in remote
     const featuresToAdd = Object.keys(remoteGetAll).filter(
-      (key) => !Object.prototype.hasOwnProperty.call(localGetAll, key)
+      key => !Object.prototype.hasOwnProperty.call(localGetAll, key)
     )
     for (const key of featuresToAdd) {
       await new Feature(key, this.local, this.groups).add()
@@ -115,7 +111,7 @@ class Synchronizer {
 
     // Remove features that are present in local and missing in remote
     const featuresToRemove = Object.keys(localGetAll).filter(
-      (key) => !Object.prototype.hasOwnProperty.call(remoteGetAll, key)
+      key => !Object.prototype.hasOwnProperty.call(remoteGetAll, key)
     )
     for (const key of featuresToRemove) {
       await new Feature(key, this.local, this.groups).remove()

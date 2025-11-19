@@ -13,7 +13,7 @@ describe('String', () => {
 
     test('accepts expression object via buildExpression', () => {
       const expr = buildExpression({
-        String: { Constant: 42 }
+        String: { Constant: 42 },
       }) as StringExpression
       const context = { feature_name: 'test', properties: {} }
       expect(expr.evaluate(context)).toBe('42')
@@ -84,20 +84,26 @@ describe('String', () => {
     test('works with property expressions', () => {
       const expr = new StringExpression(new Property('plan'))
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { plan: 'enterprise' }
-      })).toBe('enterprise')
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { plan: 'enterprise' },
+        })
+      ).toBe('enterprise')
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { plan: 123 }
-      })).toBe('123')
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { plan: 123 },
+        })
+      ).toBe('123')
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { plan: true }
-      })).toBe('true')
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { plan: true },
+        })
+      ).toBe('true')
     })
 
     test('converts arrays to empty string', () => {
@@ -117,14 +123,14 @@ describe('String', () => {
     test('returns object notation', () => {
       const expr = new StringExpression(new Constant(42))
       expect(expr.value()).toEqual({
-        String: 42
+        String: 42,
       })
     })
 
     test('preserves nested expression structure', () => {
       const expr = new StringExpression(new Property('name'))
       expect(expr.value()).toEqual({
-        String: { Property: 'name' }
+        String: { Property: 'name' },
       })
     })
   })

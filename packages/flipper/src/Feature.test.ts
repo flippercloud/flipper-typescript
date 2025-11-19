@@ -275,7 +275,9 @@ describe('Feature', () => {
         await feature.enableGroup('admins')
         await feature.enableGroup('early_access')
         await feature.enableGroup('beta_testers')
-        expect(await feature.groupsValue()).toEqual(new Set(['admins', 'early_access', 'beta_testers']))
+        expect(await feature.groupsValue()).toEqual(
+          new Set(['admins', 'early_access', 'beta_testers'])
+        )
       })
 
       test('reflects removal of groups', async () => {
@@ -765,7 +767,7 @@ describe('Feature', () => {
           name: 'debug-feature',
           state: 'on',
           enabledGates: ['boolean'],
-          adapter: 'memory'
+          adapter: 'memory',
         })
       })
 
@@ -773,7 +775,12 @@ describe('Feature', () => {
         const testFeature = new Feature('json-feature', adapter, {})
         await testFeature.enable()
         const json = JSON.stringify(await testFeature.toJSON())
-        const parsed = JSON.parse(json) as { name: string; state: string; enabledGates: string[]; adapter: string }
+        const parsed = JSON.parse(json) as {
+          name: string
+          state: string
+          enabledGates: string[]
+          adapter: string
+        }
         expect(parsed.name).toBe('json-feature')
         expect(parsed.state).toBe('on')
       })
@@ -784,7 +791,9 @@ describe('Feature', () => {
         const testFeature = new Feature('inspect-feature', adapter, {})
         await testFeature.enable()
         const inspectSymbol = Symbol.for('nodejs.util.inspect.custom')
-        const result = await (testFeature as unknown as Record<symbol, () => Promise<string>>)[inspectSymbol]!()
+        const result = await (testFeature as unknown as Record<symbol, () => Promise<string>>)[
+          inspectSymbol
+        ]!()
         expect(result).toBe('Feature(inspect-feature) { state: on, gates: [boolean] }')
       })
 
@@ -793,7 +802,9 @@ describe('Feature', () => {
         await testFeature.enableActor(makeActor(1))
         await testFeature.enableGroup('admins')
         const inspectSymbol = Symbol.for('nodejs.util.inspect.custom')
-        const result = await (testFeature as unknown as Record<symbol, () => Promise<string>>)[inspectSymbol]!()
+        const result = await (testFeature as unknown as Record<symbol, () => Promise<string>>)[
+          inspectSymbol
+        ]!()
         expect(result).toBe('Feature(multi-gate) { state: conditional, gates: [actor, group] }')
       })
     })

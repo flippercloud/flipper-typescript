@@ -13,7 +13,7 @@ describe('Number', () => {
 
     test('accepts expression object via buildExpression', () => {
       const expr = buildExpression({
-        Number: { Constant: '42' }
+        Number: { Constant: '42' },
       }) as NumberExpression
       const context = { feature_name: 'test', properties: {} }
       expect(expr.evaluate(context)).toBe(42)
@@ -96,20 +96,26 @@ describe('Number', () => {
     test('works with property expressions', () => {
       const expr = new NumberExpression(new Property('age'))
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { age: '30' }
-      })).toBe(30)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { age: '30' },
+        })
+      ).toBe(30)
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { age: 30 }
-      })).toBe(30)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { age: 30 },
+        })
+      ).toBe(30)
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { age: true }
-      })).toBe(1)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { age: true },
+        })
+      ).toBe(1)
     })
 
     test('handles scientific notation', () => {
@@ -141,14 +147,14 @@ describe('Number', () => {
     test('returns object notation', () => {
       const expr = new NumberExpression(new Constant('42'))
       expect(expr.value()).toEqual({
-        Number: '42'
+        Number: '42',
       })
     })
 
     test('preserves nested expression structure', () => {
       const expr = new NumberExpression(new Property('age'))
       expect(expr.value()).toEqual({
-        Number: { Property: 'age' }
+        Number: { Property: 'age' },
       })
     })
   })

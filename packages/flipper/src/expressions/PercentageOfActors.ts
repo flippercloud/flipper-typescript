@@ -23,7 +23,8 @@ class PercentageOfActors {
 
   evaluate(context: EvaluationContext): boolean {
     const textValue = this.args[0]?.evaluate(context) ?? ''
-    const text = typeof textValue === 'string' || typeof textValue === 'number' ? String(textValue) : ''
+    const text =
+      typeof textValue === 'string' || typeof textValue === 'number' ? String(textValue) : ''
     const percentage = Number(this.args[1]?.evaluate(context) ?? 0)
 
     if (!text || percentage === 0) {
@@ -36,7 +37,7 @@ class PercentageOfActors {
     const scaledPercentage = percentage * PercentageOfActors.SCALING_FACTOR
     const scaledThreshold = 100 * PercentageOfActors.SCALING_FACTOR
 
-    return (hash % scaledThreshold) < scaledPercentage
+    return hash % scaledThreshold < scaledPercentage
   }
 
   value(): unknown {

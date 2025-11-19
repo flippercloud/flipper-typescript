@@ -9,10 +9,14 @@ describe('MemoryInstrumenter', () => {
 
   describe('instrument', () => {
     it('executes the function and records the event', () => {
-      const result = instrumenter.instrument('test.operation', { feature_name: 'test' }, (payload) => {
-        payload.result = 'done'
-        return 'result'
-      })
+      const result = instrumenter.instrument(
+        'test.operation',
+        { feature_name: 'test' },
+        payload => {
+          payload.result = 'done'
+          return 'result'
+        }
+      )
 
       expect(result).toBe('result')
       expect(instrumenter.events.length).toBe(1)
@@ -27,7 +31,7 @@ describe('MemoryInstrumenter', () => {
 
     it('passes payload to the function', async () => {
       const payload = { feature_name: 'test_feature', operation: 'enable' }
-      await instrumenter.instrument('test', payload, (p) => {
+      await instrumenter.instrument('test', payload, p => {
         expect(p.feature_name).toBe('test_feature')
         expect(p.operation).toBe('enable')
       })
@@ -35,7 +39,7 @@ describe('MemoryInstrumenter', () => {
 
     it('copies payload to prevent external modifications', async () => {
       const payload: { feature_name: string; result?: unknown } = { feature_name: 'test' }
-      await instrumenter.instrument('test', payload, (p) => {
+      await instrumenter.instrument('test', payload, p => {
         p.result = 'modified'
       })
 

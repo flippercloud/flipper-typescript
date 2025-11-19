@@ -222,7 +222,9 @@ class Dsl {
     let feature = this.memoizedFeatures[featureName]
 
     if (feature === undefined) {
-      feature = new Feature(featureName, this.adapter, this.groups, { instrumenter: this.instrumenter })
+      feature = new Feature(featureName, this.adapter, this.groups, {
+        instrumenter: this.instrumenter,
+      })
       this.memoizedFeatures[featureName] = feature
     }
 

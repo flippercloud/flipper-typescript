@@ -20,7 +20,9 @@ class ActorType implements IType {
    * @throws Error if the value is not a valid actor
    */
   public static wrap(thing: unknown): ActorType {
-    if (thing instanceof ActorType) { return thing }
+    if (thing instanceof ActorType) {
+      return thing
+    }
     if (typeof thing === 'object' && thing !== null && 'flipperId' in thing) {
       return new ActorType(thing as IActor)
     }

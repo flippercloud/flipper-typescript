@@ -6,17 +6,14 @@ import { buildExpression } from './index'
 describe('GreaterThanOrEqualTo', () => {
   describe('constructor', () => {
     test('accepts two expression arguments', () => {
-      const expr = new GreaterThanOrEqualTo(
-        new Constant(10),
-        new Constant(5)
-      )
+      const expr = new GreaterThanOrEqualTo(new Constant(10), new Constant(5))
       const context = { feature_name: 'test', properties: {} }
       expect(expr.evaluate(context)).toBe(true)
     })
 
     test('accepts expression objects via buildExpression', () => {
       const expr = buildExpression({
-        GreaterThanOrEqualTo: [{ Constant: 10 }, { Constant: 10 }]
+        GreaterThanOrEqualTo: [{ Constant: 10 }, { Constant: 10 }],
       }) as GreaterThanOrEqualTo
       const context = { feature_name: 'test', properties: {} }
       expect(expr.evaluate(context)).toBe(true)
@@ -61,36 +58,36 @@ describe('GreaterThanOrEqualTo', () => {
     })
 
     test('works with property expressions', () => {
-      const expr = new GreaterThanOrEqualTo(
-        new Property('account_age_days'),
-        new Constant(30)
-      )
+      const expr = new GreaterThanOrEqualTo(new Property('account_age_days'), new Constant(30))
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { account_age_days: 30 }
-      })).toBe(true)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { account_age_days: 30 },
+        })
+      ).toBe(true)
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { account_age_days: 45 }
-      })).toBe(true)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { account_age_days: 45 },
+        })
+      ).toBe(true)
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { account_age_days: 15 }
-      })).toBe(false)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { account_age_days: 15 },
+        })
+      ).toBe(false)
     })
   })
 
   describe('value', () => {
     test('returns object notation', () => {
-      const expr = new GreaterThanOrEqualTo(
-        new Constant(10),
-        new Constant(5)
-      )
+      const expr = new GreaterThanOrEqualTo(new Constant(10), new Constant(5))
       expect(expr.value()).toEqual({
-        GreaterThanOrEqualTo: [10, 5]
+        GreaterThanOrEqualTo: [10, 5],
       })
     })
   })

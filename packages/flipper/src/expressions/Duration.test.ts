@@ -6,17 +6,14 @@ import { buildExpression } from './index'
 describe('Duration', () => {
   describe('constructor', () => {
     test('accepts two expression arguments', () => {
-      const expr = new Duration(
-        new Constant(5),
-        new Constant('minutes')
-      )
+      const expr = new Duration(new Constant(5), new Constant('minutes'))
       const context = { feature_name: 'test', properties: {} }
       expect(expr.evaluate(context)).toBe(300)
     })
 
     test('accepts expression objects via buildExpression', () => {
       const expr = buildExpression({
-        Duration: [{ Constant: 5 }, { Constant: 'minutes' }]
+        Duration: [{ Constant: 5 }, { Constant: 'minutes' }],
       }) as Duration
       const context = { feature_name: 'test', properties: {} }
       expect(expr.evaluate(context)).toBe(300)
@@ -137,28 +134,22 @@ describe('Duration', () => {
     })
 
     test('works with property expressions', () => {
-      const expr = new Duration(
-        new Property('duration'),
-        new Constant('minutes')
-      )
+      const expr = new Duration(new Property('duration'), new Constant('minutes'))
 
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: { duration: 30 }
+        properties: { duration: 30 },
       })
 
       expect(result).toBe(1800)
     })
 
     test('works with property for unit', () => {
-      const expr = new Duration(
-        new Constant(5),
-        new Property('time_unit')
-      )
+      const expr = new Duration(new Constant(5), new Property('time_unit'))
 
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: { time_unit: 'hours' }
+        properties: { time_unit: 'hours' },
       })
 
       expect(result).toBe(18000)
@@ -201,7 +192,7 @@ describe('Duration', () => {
         { scalar: 1, unit: 'week', expected: 604800 },
         { scalar: 24, unit: 'hour', expected: 86400 },
         { scalar: 60, unit: 'minute', expected: 3600 },
-        { scalar: 48, unit: 'hour', expected: 172800 }
+        { scalar: 48, unit: 'hour', expected: 172800 },
       ]
 
       const context = { feature_name: 'test', properties: {} }
@@ -215,25 +206,16 @@ describe('Duration', () => {
 
   describe('value', () => {
     test('returns object notation', () => {
-      const expr = new Duration(
-        new Constant(5),
-        new Constant('minutes')
-      )
+      const expr = new Duration(new Constant(5), new Constant('minutes'))
       expect(expr.value()).toEqual({
-        Duration: [5, 'minutes']
+        Duration: [5, 'minutes'],
       })
     })
 
     test('preserves nested expression structure', () => {
-      const expr = new Duration(
-        new Property('duration'),
-        new Constant('hours')
-      )
+      const expr = new Duration(new Property('duration'), new Constant('hours'))
       expect(expr.value()).toEqual({
-        Duration: [
-          { Property: 'duration' },
-          'hours'
-        ]
+        Duration: [{ Property: 'duration' }, 'hours'],
       })
     })
   })

@@ -18,8 +18,8 @@ describe('Flipper', () => {
     test('returns array of registered group names', () => {
       const adapter = new MemoryAdapter()
       const flipper = new Flipper(adapter)
-      flipper.register('admins', (actor) => actor.flipperId === 'admin')
-      flipper.register('beta-users', (actor) => actor.flipperId === 'beta')
+      flipper.register('admins', actor => actor.flipperId === 'admin')
+      flipper.register('beta-users', actor => actor.flipperId === 'beta')
 
       const names = flipper.groupNames()
       expect(names).toHaveLength(2)
@@ -38,7 +38,7 @@ describe('Flipper', () => {
     test('returns true when group exists', () => {
       const adapter = new MemoryAdapter()
       const flipper = new Flipper(adapter)
-      flipper.register('admins', (actor) => actor.flipperId === 'admin')
+      flipper.register('admins', actor => actor.flipperId === 'admin')
       expect(flipper.groupExists('admins')).toBe(true)
     })
   })
@@ -47,8 +47,8 @@ describe('Flipper', () => {
     test('clears all registered groups', () => {
       const adapter = new MemoryAdapter()
       const flipper = new Flipper(adapter)
-      flipper.register('admins', (actor) => actor.flipperId === 'admin')
-      flipper.register('beta-users', (actor) => actor.flipperId === 'beta')
+      flipper.register('admins', actor => actor.flipperId === 'admin')
+      flipper.register('beta-users', actor => actor.flipperId === 'beta')
 
       expect(flipper.groupNames()).toHaveLength(2)
 

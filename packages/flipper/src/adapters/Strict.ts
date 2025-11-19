@@ -10,9 +10,7 @@ export class FeatureNotFoundError extends Error {
    * @param name - The name of the feature that was not found
    */
   constructor(name: string) {
-    super(
-      `Could not find feature "${name}". Call \`flipper.add("${name}")\` to create it.`
-    )
+    super(`Could not find feature "${name}". Call \`flipper.add("${name}")\` to create it.`)
     this.name = 'FeatureNotFoundError'
   }
 }
@@ -26,12 +24,7 @@ export class FeatureNotFoundError extends Error {
  * - `'noop'` or `false`: Do nothing
  * - Function: Call the function with the feature
  */
-export type StrictHandler =
-  | boolean
-  | 'raise'
-  | 'warn'
-  | 'noop'
-  | ((feature: Feature) => void)
+export type StrictHandler = boolean | 'raise' | 'warn' | 'noop' | ((feature: Feature) => void)
 
 /**
  * Adapter wrapper that ensures features exist before operations.
@@ -106,7 +99,7 @@ export default class Strict extends Wrapper {
    */
   private async assertFeatureExists(feature: Feature): Promise<void> {
     const features = await this.adapter.features()
-    const exists = features.some((f) => f.key === feature.key)
+    const exists = features.some(f => f.key === feature.key)
 
     if (exists) {
       return

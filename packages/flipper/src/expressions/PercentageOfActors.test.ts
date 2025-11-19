@@ -6,10 +6,7 @@ import { buildExpression } from './index'
 describe('PercentageOfActors', () => {
   describe('constructor', () => {
     test('accepts two expression arguments', () => {
-      const expr = new PercentageOfActors(
-        new Constant('user-123'),
-        new Constant(25)
-      )
+      const expr = new PercentageOfActors(new Constant('user-123'), new Constant(25))
       const context = { feature_name: 'test', properties: {} }
       // Just verify it can evaluate without error
       expect(typeof expr.evaluate(context)).toBe('boolean')
@@ -17,7 +14,7 @@ describe('PercentageOfActors', () => {
 
     test('accepts expression objects via buildExpression', () => {
       const expr = buildExpression({
-        PercentageOfActors: [{ Constant: 'user-123' }, { Constant: 25 }]
+        PercentageOfActors: [{ Constant: 'user-123' }, { Constant: 25 }],
       }) as PercentageOfActors
       const context = { feature_name: 'test', properties: {} }
       expect(typeof expr.evaluate(context)).toBe('boolean')
@@ -26,47 +23,32 @@ describe('PercentageOfActors', () => {
 
   describe('evaluate', () => {
     test('returns boolean', () => {
-      const expr = new PercentageOfActors(
-        new Constant('user-123'),
-        new Constant(25)
-      )
+      const expr = new PercentageOfActors(new Constant('user-123'), new Constant(25))
       const context = { feature_name: 'test', properties: {} }
       const result = expr.evaluate(context)
       expect(typeof result).toBe('boolean')
     })
 
     test('returns false for 0 percentage', () => {
-      const expr = new PercentageOfActors(
-        new Constant('user-123'),
-        new Constant(0)
-      )
+      const expr = new PercentageOfActors(new Constant('user-123'), new Constant(0))
       const context = { feature_name: 'test', properties: {} }
       expect(expr.evaluate(context)).toBe(false)
     })
 
     test('returns true for 100 percentage', () => {
-      const expr = new PercentageOfActors(
-        new Constant('user-123'),
-        new Constant(100)
-      )
+      const expr = new PercentageOfActors(new Constant('user-123'), new Constant(100))
       const context = { feature_name: 'test', properties: {} }
       expect(expr.evaluate(context)).toBe(true)
     })
 
     test('returns false for empty flipper_id', () => {
-      const expr = new PercentageOfActors(
-        new Constant(''),
-        new Constant(50)
-      )
+      const expr = new PercentageOfActors(new Constant(''), new Constant(50))
       const context = { feature_name: 'test', properties: {} }
       expect(expr.evaluate(context)).toBe(false)
     })
 
     test('returns consistent result for same flipper_id', () => {
-      const expr = new PercentageOfActors(
-        new Constant('user-123'),
-        new Constant(25)
-      )
+      const expr = new PercentageOfActors(new Constant('user-123'), new Constant(25))
       const context = { feature_name: 'test', properties: {} }
 
       const result1 = expr.evaluate(context)
@@ -84,10 +66,7 @@ describe('PercentageOfActors', () => {
       // Test multiple IDs and expect some variation
       const results: boolean[] = []
       for (let i = 1; i <= 100; i++) {
-        const expr = new PercentageOfActors(
-          new Constant(`user-${i}`),
-          new Constant(percentage)
-        )
+        const expr = new PercentageOfActors(new Constant(`user-${i}`), new Constant(percentage))
         results.push(expr.evaluate(context))
       }
 
@@ -100,24 +79,18 @@ describe('PercentageOfActors', () => {
     })
 
     test('works with property expressions', () => {
-      const expr = new PercentageOfActors(
-        new Property('flipper_id'),
-        new Constant(50)
-      )
+      const expr = new PercentageOfActors(new Property('flipper_id'), new Constant(50))
 
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: { flipper_id: 'user-123' }
+        properties: { flipper_id: 'user-123' },
       })
 
       expect(typeof result).toBe('boolean')
     })
 
     test('uses feature name in hash calculation', () => {
-      const expr = new PercentageOfActors(
-        new Constant('user-123'),
-        new Constant(25)
-      )
+      const expr = new PercentageOfActors(new Constant('user-123'), new Constant(25))
 
       const result1 = expr.evaluate({ feature_name: 'feature1', properties: {} })
       const result2 = expr.evaluate({ feature_name: 'feature2', properties: {} })
@@ -129,10 +102,7 @@ describe('PercentageOfActors', () => {
     })
 
     test('handles numeric flipper_id', () => {
-      const expr = new PercentageOfActors(
-        new Constant(123),
-        new Constant(50)
-      )
+      const expr = new PercentageOfActors(new Constant(123), new Constant(50))
       const context = { feature_name: 'test', properties: {} }
       expect(typeof expr.evaluate(context)).toBe('boolean')
     })
@@ -145,7 +115,7 @@ describe('PercentageOfActors', () => {
 
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: { rollout_percentage: 25 }
+        properties: { rollout_percentage: 25 },
       })
 
       expect(typeof result).toBe('boolean')
@@ -178,8 +148,8 @@ describe('PercentageOfActors', () => {
       expect(countAt25).toBeGreaterThan(testSize * 0.15)
       expect(countAt25).toBeLessThan(testSize * 0.35)
 
-      expect(countAt50).toBeGreaterThan(testSize * 0.40)
-      expect(countAt50).toBeLessThan(testSize * 0.60)
+      expect(countAt50).toBeGreaterThan(testSize * 0.4)
+      expect(countAt50).toBeLessThan(testSize * 0.6)
 
       expect(countAt75).toBeGreaterThan(testSize * 0.65)
       expect(countAt75).toBeLessThan(testSize * 0.85)
@@ -188,25 +158,16 @@ describe('PercentageOfActors', () => {
 
   describe('value', () => {
     test('returns object notation', () => {
-      const expr = new PercentageOfActors(
-        new Constant('user-123'),
-        new Constant(25)
-      )
+      const expr = new PercentageOfActors(new Constant('user-123'), new Constant(25))
       expect(expr.value()).toEqual({
-        PercentageOfActors: ['user-123', 25]
+        PercentageOfActors: ['user-123', 25],
       })
     })
 
     test('preserves nested expression structure', () => {
-      const expr = new PercentageOfActors(
-        new Property('flipper_id'),
-        new Constant(50)
-      )
+      const expr = new PercentageOfActors(new Property('flipper_id'), new Constant(50))
       expect(expr.value()).toEqual({
-        PercentageOfActors: [
-          { Property: 'flipper_id' },
-          50
-        ]
+        PercentageOfActors: [{ Property: 'flipper_id' }, 50],
       })
     })
   })

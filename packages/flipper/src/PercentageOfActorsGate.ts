@@ -67,10 +67,18 @@ class PercentageOfActorsGate implements IGate {
    */
   public isOpen(context: FeatureCheckContext): boolean {
     let usable = false
-    if (typeof(context.thing) === 'undefined') { return false }
-    if (!usable && context.thing instanceof ActorType) { usable = true }
-    if (!usable && instanceOfActor(context.thing)) { usable = true }
-    if (!usable) { return false }
+    if (typeof context.thing === 'undefined') {
+      return false
+    }
+    if (!usable && context.thing instanceof ActorType) {
+      usable = true
+    }
+    if (!usable && instanceOfActor(context.thing)) {
+      usable = true
+    }
+    if (!usable) {
+      return false
+    }
 
     const actorType = ActorType.wrap(context.thing)
     const percentage = context.percentageOfActorsValue
@@ -84,7 +92,9 @@ class PercentageOfActorsGate implements IGate {
    * @returns True if the value is a PercentageOfActorsType
    */
   public protectsThing(thing: unknown): boolean {
-    if (thing instanceof PercentageOfActorsType) { return true }
+    if (thing instanceof PercentageOfActorsType) {
+      return true
+    }
     return false
   }
 

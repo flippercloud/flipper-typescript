@@ -72,7 +72,7 @@ export default class OperationLogger extends Wrapper {
    * @returns Array of matching operations
    */
   type(type: string): Operation[] {
-    return this.operations.filter((op) => op.type === type)
+    return this.operations.filter(op => op.type === type)
   }
 
   /**
@@ -82,7 +82,7 @@ export default class OperationLogger extends Wrapper {
    */
   last(type: string): Operation | undefined {
     const ops = this.operations.slice().reverse()
-    return ops.find((op) => op.type === type)
+    return ops.find(op => op.type === type)
   }
 
   /**

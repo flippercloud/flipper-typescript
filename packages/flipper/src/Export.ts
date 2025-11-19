@@ -15,7 +15,7 @@ class ExportAdapter implements IAdapter {
 
   async features(): Promise<Feature[]> {
     return await Promise.resolve(
-      Object.keys(this.featuresData).map((key) => new Feature(key, this, {}))
+      Object.keys(this.featuresData).map(key => new Feature(key, this, {}))
     )
   }
 
@@ -37,9 +37,7 @@ class ExportAdapter implements IAdapter {
 
   async getMulti(features: Feature[]): Promise<Record<string, Record<string, unknown>>> {
     return await Promise.resolve(
-      Object.fromEntries(
-        features.map((f) => [f.key, this.featuresData[f.key] ?? {}])
-      )
+      Object.fromEntries(features.map(f => [f.key, this.featuresData[f.key] ?? {}]))
     )
   }
 

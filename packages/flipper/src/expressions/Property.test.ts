@@ -18,7 +18,7 @@ describe('Property', () => {
 
     test('accepts expression object via buildExpression', () => {
       const expr = buildExpression({
-        Property: { Constant: 'plan' }
+        Property: { Constant: 'plan' },
       }) as Property
       const context = { feature_name: 'test', properties: { plan: 'enterprise' } }
       expect(expr.evaluate(context)).toBe('enterprise')
@@ -30,7 +30,7 @@ describe('Property', () => {
       const expr = new Property(new Constant('name'))
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: { name: 'Alice' }
+        properties: { name: 'Alice' },
       })
       expect(result).toBe('Alice')
     })
@@ -39,7 +39,7 @@ describe('Property', () => {
       const expr = new Property(new Constant('age'))
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: { age: 30 }
+        properties: { age: 30 },
       })
       expect(result).toBe(30)
     })
@@ -48,7 +48,7 @@ describe('Property', () => {
       const expr = new Property(new Constant('admin'))
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: { admin: true }
+        properties: { admin: true },
       })
       expect(result).toBe(true)
     })
@@ -57,7 +57,7 @@ describe('Property', () => {
       const expr = new Property(new Constant('tags'))
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: { tags: ['tag1', 'tag2', 'tag3'] }
+        properties: { tags: ['tag1', 'tag2', 'tag3'] },
       })
       expect(result).toEqual(['tag1', 'tag2', 'tag3'])
     })
@@ -66,7 +66,7 @@ describe('Property', () => {
       const expr = new Property(new Constant('metadata'))
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: { metadata: { key: 'value' } }
+        properties: { metadata: { key: 'value' } },
       })
       expect(result).toEqual({ key: 'value' })
     })
@@ -75,7 +75,7 @@ describe('Property', () => {
       const expr = new Property(new Constant('missing'))
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: {}
+        properties: {},
       })
       expect(result).toBeUndefined()
     })
@@ -84,7 +84,7 @@ describe('Property', () => {
       const expr = new Property(new Constant('other'))
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: { name: 'Alice' }
+        properties: { name: 'Alice' },
       })
       expect(result).toBeUndefined()
     })
@@ -93,7 +93,7 @@ describe('Property', () => {
       const expr = new Property(new Constant('account_age_days'))
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: { account_age_days: 45 }
+        properties: { account_age_days: 45 },
       })
       expect(result).toBe(45)
     })
@@ -102,7 +102,7 @@ describe('Property', () => {
       const expr = new Property(new Constant('accountAgeDays'))
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: { accountAgeDays: 45 }
+        properties: { accountAgeDays: 45 },
       })
       expect(result).toBe(45)
     })
@@ -111,7 +111,7 @@ describe('Property', () => {
       const expr = new Property(new Constant('account-age'))
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: { 'account-age': 45 }
+        properties: { 'account-age': 45 },
       })
       expect(result).toBe(45)
     })
@@ -120,7 +120,7 @@ describe('Property', () => {
       const expr = new Property(new Constant(123))
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: { '123': 'numeric key' }
+        properties: { '123': 'numeric key' },
       })
       expect(result).toBe('numeric key')
     })
@@ -129,7 +129,7 @@ describe('Property', () => {
       const expr = new Property(new Constant('value'))
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: { value: null }
+        properties: { value: null },
       })
       expect(result).toBeNull()
     })
@@ -138,7 +138,7 @@ describe('Property', () => {
       const expr = new Property(new Constant('count'))
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: { count: 0 }
+        properties: { count: 0 },
       })
       expect(result).toBe(0)
     })
@@ -147,7 +147,7 @@ describe('Property', () => {
       const expr = new Property(new Constant('active'))
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: { active: false }
+        properties: { active: false },
       })
       expect(result).toBe(false)
     })
@@ -156,7 +156,7 @@ describe('Property', () => {
       const expr = new Property(new Constant('name'))
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: { name: '' }
+        properties: { name: '' },
       })
       expect(result).toBe('')
     })
@@ -165,7 +165,7 @@ describe('Property', () => {
       const expr = new Property(new Constant(''))
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: { '': 'empty key value' }
+        properties: { '': 'empty key value' },
       })
       expect(result).toBe('empty key value')
     })
@@ -178,8 +178,8 @@ describe('Property', () => {
         feature_name: 'test',
         properties: {
           key_name: 'actual_key',
-          actual_key: 'nested value'
-        }
+          actual_key: 'nested value',
+        },
       })
 
       expect(result).toBe('nested value')
@@ -189,7 +189,7 @@ describe('Property', () => {
       const expr = new Property(new Constant('feature_name'))
       const result = expr.evaluate({
         feature_name: 'my_feature',
-        properties: {}
+        properties: {},
       })
       // Should not access feature_name from context, only from properties
       expect(result).toBeUndefined()
@@ -199,13 +199,18 @@ describe('Property', () => {
       const expr = new Property(new Constant('feature_name'))
       const result = expr.evaluate({
         feature_name: 'my_feature',
-        properties: { feature_name: 'copied_feature_name' }
+        properties: { feature_name: 'copied_feature_name' },
       })
       expect(result).toBe('copied_feature_name')
     })
 
     test('handles special characters in property names', () => {
-      const specialNames = ['prop.with.dots', 'prop[with]brackets', 'prop:with:colons', 'prop with spaces']
+      const specialNames = [
+        'prop.with.dots',
+        'prop[with]brackets',
+        'prop:with:colons',
+        'prop with spaces',
+      ]
 
       const properties: Record<string, string> = {}
       specialNames.forEach(name => {
@@ -216,7 +221,7 @@ describe('Property', () => {
         const expr = new Property(new Constant(name))
         const result = expr.evaluate({
           feature_name: 'test',
-          properties
+          properties,
         })
         expect(result).toBe(`value for ${name}`)
       })
@@ -226,7 +231,7 @@ describe('Property', () => {
       const expr = new Property(new Constant('😀'))
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: { '😀': 'emoji value' }
+        properties: { '😀': 'emoji value' },
       })
       expect(result).toBe('emoji value')
     })
@@ -239,14 +244,14 @@ describe('Property', () => {
           user: {
             name: 'Alice',
             age: 30,
-            roles: ['admin', 'user']
-          }
-        }
+            roles: ['admin', 'user'],
+          },
+        },
       })
       expect(result).toEqual({
         name: 'Alice',
         age: 30,
-        roles: ['admin', 'user']
+        roles: ['admin', 'user'],
       })
     })
 
@@ -254,7 +259,7 @@ describe('Property', () => {
       const expr = new Property(new Constant(true))
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: { 'true': 'boolean key' }
+        properties: { true: 'boolean key' },
       })
       // Boolean true doesn't convert to 'true' with typeof check in Property.ts
       // It will be an empty string, so property won't be found
@@ -265,7 +270,7 @@ describe('Property', () => {
       const expr = new Property(new Constant(null))
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: {}
+        properties: {},
       })
       // null converts to empty string
       expect(result).toBeUndefined()
@@ -275,7 +280,7 @@ describe('Property', () => {
       const expr = new Property(new Constant(undefined))
       const result = expr.evaluate({
         feature_name: 'test',
-        properties: {}
+        properties: {},
       })
       // undefined converts to empty string
       expect(result).toBeUndefined()
@@ -286,21 +291,21 @@ describe('Property', () => {
     test('returns object notation with string', () => {
       const expr = new Property(new Constant('plan'))
       expect(expr.value()).toEqual({
-        Property: 'plan'
+        Property: 'plan',
       })
     })
 
     test('returns object notation with nested expression', () => {
       const expr = new Property(new Property('key'))
       expect(expr.value()).toEqual({
-        Property: { Property: 'key' }
+        Property: { Property: 'key' },
       })
     })
 
     test('returns object notation with number', () => {
       const expr = new Property(new Constant(123))
       expect(expr.value()).toEqual({
-        Property: 123
+        Property: 123,
       })
     })
   })

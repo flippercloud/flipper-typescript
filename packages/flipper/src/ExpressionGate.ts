@@ -83,21 +83,29 @@ class ExpressionGate implements IGate {
       const expression = buildExpression(expressionValue)
 
       // If we have an actor, evaluate with their properties
-      if (context.thing && typeof context.thing === 'object' && 'flipperProperties' in context.thing) {
+      if (
+        context.thing &&
+        typeof context.thing === 'object' &&
+        'flipperProperties' in context.thing
+      ) {
         const actor = context.thing as { flipperProperties?: Record<string, unknown> }
         const properties = actor.flipperProperties ?? {}
 
-        return Boolean(expression.evaluate({
-          feature_name: context.featureName,
-          properties
-        }))
+        return Boolean(
+          expression.evaluate({
+            feature_name: context.featureName,
+            properties,
+          })
+        )
       }
 
       // No actor - evaluate constant expressions
-      return Boolean(expression.evaluate({
-        feature_name: context.featureName,
-        properties: {}
-      }))
+      return Boolean(
+        expression.evaluate({
+          feature_name: context.featureName,
+          properties: {},
+        })
+      )
     } catch {
       // TODO: Check strict configuration
       // For now, return false on error (lenient mode)
