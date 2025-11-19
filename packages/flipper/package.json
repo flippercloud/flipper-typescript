@@ -20,9 +20,9 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "NODE_OPTIONS='--localstorage-file=/tmp/jest.db' node --experimental-vm-modules ../../node_modules/jest/bin/jest.js",
-    "test:watch": "NODE_OPTIONS='--localstorage-file=/tmp/jest.db' node --experimental-vm-modules ../../node_modules/jest/bin/jest.js --watch",
-    "test:coverage": "NODE_OPTIONS='--localstorage-file=/tmp/jest.db' node --experimental-vm-modules ../../node_modules/jest/bin/jest.js --coverage",
+    "test": "NODE_OPTIONS='--localstorage-file=/tmp/jest.db' node --experimental-vm-modules --no-warnings=ExperimentalWarning ../../node_modules/jest/bin/jest.js",
+    "test:watch": "NODE_OPTIONS='--localstorage-file=/tmp/jest.db' node --experimental-vm-modules --no-warnings=ExperimentalWarning ../../node_modules/jest/bin/jest.js --watch",
+    "test:coverage": "NODE_OPTIONS='--localstorage-file=/tmp/jest.db' node --experimental-vm-modules --no-warnings=ExperimentalWarning ../../node_modules/jest/bin/jest.js --coverage",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",

@@ -10,8 +10,8 @@
   ],
   "scripts": {
     "build": "bun --workspaces run build",
-    "test": "bun --workspaces run test",
-    "test:coverage": "bun --workspaces run test:coverage",
+    "test": "sh -c 'cd packages/flipper && bun run test && cd ../flipper-sequelize && bun run test'",
+    "test:coverage": "sh -c 'cd packages/flipper && bun run test:coverage && cd ../flipper-sequelize && bun run test:coverage'",
     "lint": "bun --workspaces run lint",
     "lint:fix": "bun --workspaces run lint:fix",
     "type-check": "bun --workspaces run type-check",
