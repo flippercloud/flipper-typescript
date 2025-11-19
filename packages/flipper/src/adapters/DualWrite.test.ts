@@ -4,7 +4,7 @@ import Feature from '../Feature'
 import Dsl from '../Dsl'
 import BooleanGate from '../BooleanGate'
 import BooleanType from '../BooleanType'
-import { jest } from '@jest/globals'
+import { jest, describe, it, beforeEach, expect } from '@jest/globals'
 
 describe('DualWrite', () => {
   let local: MemoryAdapter

@@ -52,11 +52,14 @@ describe('MemoryInstrumenter', () => {
     it('records exception information when function throws', async () => {
       const error = new Error('test error')
 
-      await expect(async () => {
+      try {
         await instrumenter.instrument('test', { feature_name: 'test' }, () => {
           throw error
         })
-      }).rejects.toThrow('test error')
+        fail('Expected error to be thrown')
+      } catch (e) {
+        expect(e).toBe(error)
+      }
 
       expect(instrumenter.events.length).toBe(1)
       expect(instrumenter.events[0]!.name).toBe('test')
