@@ -21,7 +21,7 @@ Control your software &mdash; don't let it control you.
 Install the package:
 
 ```bash
-npm install @flippercloud/flipper
+bun add @flippercloud/flipper
 ```
 
 ## Getting Started
@@ -66,7 +66,7 @@ For development setup and scripts, see the [Quick Reference](docs/QUICK_REFERENC
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Run the tests (`npm test`)
+3. Run the tests (`bun test`)
 4. Commit your changes (`git commit -am 'Added some feature'`)
 5. Push to the branch (`git push origin my-new-feature`)
 6. Create new Pull Request

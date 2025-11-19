@@ -6,57 +6,57 @@
 
 ```bash
 # Install all dependencies
-npm install
+bun install
 
 # Build all packages
-npm run build
+bun run build
 
 # Test all packages
-npm test
+bun test
 
 # Test with coverage
-npm run test:coverage
+bun run test:coverage
 
 # Lint all packages
-npm run lint
+bun run lint
 
 # Fix linting issues
-npm run lint:fix
+bun run lint:fix
 
 # Type check all packages
-npm run type-check
+bun run type-check
 
 # Format all code
-npm run format
+bun run format
 
 # Clean all build artifacts
-npm run clean
+bun run clean
 ```
 
 ### Working with Specific Packages
 
 ```bash
 # Build a specific package
-npm run build -w @flippercloud/flipper
+bun run build -w @flippercloud/flipper
 
 # Test a specific package
-npm run test -w @flippercloud/flipper
+bun run test -w @flippercloud/flipper
 
 # Watch tests in a package
-npm run test:watch -w @flippercloud/flipper
+bun run test:watch -w @flippercloud/flipper
 
 # Lint a specific package
-npm run lint -w @flippercloud/flipper
+bun run lint -w @flippercloud/flipper
 ```
 
 ### Package Management
 
 ```bash
 # Add a dependency to a specific package
-npm install <package> -w @flippercloud/flipper
+bun install <package> -w @flippercloud/flipper
 
 # Add a dev dependency to a specific package
-npm install -D <package> -w @flippercloud/flipper
+bun install -D <package> -w @flippercloud/flipper
 
 # Add a workspace dependency (use another package in the monorepo)
 # In the package.json, add:
@@ -93,7 +93,7 @@ flipper-typescript/
 
 ## Key Features
 
-✅ **npm workspaces** - Native monorepo support
+✅ **bun workspaces** - Native monorepo support
 ✅ **Shared configuration** - Base configs extended by packages
 ✅ **Scoped packages** - Professional namespace
 ✅ **Independent versioning** - Each package versions separately
@@ -108,49 +108,49 @@ Quick version:
 1. Create `packages/your-package/`
 2. Copy structure from `packages/flipper/`
 3. Update package.json with new name
-4. Run `npm install` from root
+4. Run `bun install` from root
 
 ## Publishing Packages
 
 ```bash
 # From within a package directory
 cd packages/your-package
-npm publish
+bun publish
 ```
 
-Each package publishes independently to npm.
+Each package publishes independently to bun.
 
 ## Useful Package Manager Features
 
 ```bash
 # List all workspaces
-npm ls --workspaces
+bun ls --workspaces
 
 # Run a command in all workspaces
-npm run <script> --workspaces
+bun run <script> --workspaces
 
 # Run only if the script exists
-npm run <script> --workspaces --if-present
+bun run <script> --workspaces --if-present
 ```
 
 ## Troubleshooting
 
 ### "Module not found" errors
 ```bash
-npm install  # Re-install from root
+bun install  # Re-install from root
 ```
 
 ### Build issues
 ```bash
-npm run clean  # Clean all build artifacts
-npm run build  # Rebuild everything
+bun run clean  # Clean all build artifacts
+bun run build  # Rebuild everything
 ```
 
 ### Test issues
 ```bash
 # Make sure you built first
-npm run build
-npm test
+bun run build
+bun test
 ```
 
 ## Related Documentation

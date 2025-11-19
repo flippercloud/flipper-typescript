@@ -38,15 +38,15 @@ Create `packages/your-package-name/package.json`:
   "scripts": {
     "build": "tsc",
     "test": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js",
-    "test:watch": "npm test -- --watch",
-    "test:coverage": "npm test -- --coverage",
+    "test:watch": "bun test -- --watch",
+    "test:coverage": "bun test -- --coverage",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.{ts,tsx,json,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,json,md}\"",
     "clean": "node -e \"try { require('fs').rmSync('dist', {recursive:true, force:true}); require('fs').rmSync('coverage', {recursive:true, force:true}); } catch(e) {}\"",
-    "prepublishOnly": "npm run clean && npm run build && npm test"
+    "prepublishOnly": "bun run clean && bun run build && bun test"
   },
   "dependencies": {
     "@flippercloud/flipper": "workspace:*"
@@ -132,14 +132,14 @@ Create your source files in `packages/your-package-name/src/`:
 From the repository root:
 
 ```bash
-npm install
+bun install
 ```
 
 ### 9. Build and Test
 
 ```bash
-npm run build -w @flippercloud/your-package-name
-npm run test -w @flippercloud/your-package-name
+bun run build -w @flippercloud/your-package-name
+bun run test -w @flippercloud/your-package-name
 ```
 
 ## Example Package Structure

@@ -1,22 +1,22 @@
 # AGENTS.md
 
-Flipper TypeScript is a monorepo using npm workspaces. This document contains build steps, test commands, and conventions for coding agents working on this project.
+Flipper TypeScript is a monorepo using Bun workspaces. This document contains build steps, test commands, and conventions for coding agents working on this project.
 
 ## Setup commands
 
-- Install dependencies: `npm install`
-- Build all packages: `npm run build`
-- Build specific package: `npm run build -w @flippercloud/flipper`
+- Install dependencies: `bun install`
+- Build all packages: `bun run build`
+- Build specific package: `bun run build --filter @flippercloud/flipper`
 - Run dev server: N/A (library project)
-- Run tests: `npm test`
-- Run tests for specific package: `npm run test -w @flippercloud/flipper`
-- Watch tests: `npm run test:watch -w @flippercloud/flipper`
-- Test with coverage: `npm run test:coverage`
-- Type check: `npm run type-check`
-- Lint code: `npm run lint`
-- Fix linting: `npm run lint:fix`
-- Format code: `npm run format`
-- Clean build artifacts: `npm run clean`
+- Run tests: `bun test`
+- Run tests for specific package: `bun run test --filter @flippercloud/flipper`
+- Watch tests: `bun run test:watch --filter @flippercloud/flipper`
+- Test with coverage: `bun run test:coverage`
+- Type check: `bun run type-check`
+- Lint code: `bun run lint`
+- Fix linting: `bun run lint:fix`
+- Format code: `bun run format`
+- Clean build artifacts: `bun run clean`
 
 ## Project structure
 
@@ -49,23 +49,23 @@ flipper-typescript/
 
 ## Testing instructions
 
-- Run all tests: `npm test`
-- Run tests for a specific package: `npm run test -w @flippercloud/flipper`
-- Watch tests: `npm run test:watch -w @flippercloud/flipper`
-- Run tests with coverage: `npm run test:coverage`
-- Run specific test: `npm run test -w @flippercloud/flipper -- --testNamePattern="test name"`
-- Always run the full test suite before committing: `npm test`
+- Run all tests: `bun test`
+- Run tests for a specific package: `bun run test --filter @flippercloud/flipper`
+- Watch tests: `bun run test:watch --filter @flippercloud/flipper`
+- Run tests with coverage: `bun run test:coverage`
+- Run specific test: `bun run test --filter @flippercloud/flipper -- --testNamePattern="test name"`
+- Always run the full test suite before committing: `bun test`
 - Write tests in `__tests__/` directories alongside source code
 - Aim for good test coverage for new functionality
 - Use Jest for testing (configured in `jest.config.ts`)
 
 ## Linting and type checking
 
-- Lint all packages: `npm run lint`
-- Lint specific package: `npm run lint -w @flippercloud/flipper`
-- Fix linting issues: `npm run lint:fix`
-- Type check all: `npm run type-check`
-- Format code: `npm run format`
+- Lint all packages: `bun run lint`
+- Lint specific package: `bun run lint --filter @flippercloud/flipper`
+- Fix linting issues: `bun run lint:fix`
+- Type check all: `bun run type-check`
+- Format code: `bun run format`
 - All code must pass linting before commit
 
 ## Key concepts for agents
@@ -86,11 +86,11 @@ See [README.md](./README.md) and [docs/QUICK_REFERENCE.md](./docs/QUICK_REFERENC
 
 ## Monorepo conventions
 
-- **Workspaces**: This monorepo uses npm workspaces (`-w` flag to run in specific packages)
+- **Workspaces**: This monorepo uses Bun workspaces (`--filter` flag to run in specific packages)
 - **Package naming**: All packages use `@flippercloud/` scope (e.g., `@flippercloud/flipper`)
 - **Internal dependencies**: Use `workspace:*` protocol for cross-package dependencies (e.g., in an adapter package: `"@flippercloud/flipper": "workspace:*"`)
   - During development: imports use the local version automatically via symlinks
-  - When published: npm converts `workspace:*` to the actual published version (e.g., `^1.0.0`)
+  - When published: bun converts `workspace:*` to the actual published version (e.g., `^1.0.0`)
 - **Configuration**: Base configs in root; packages extend them
 - **Independent versioning**: Each package versions separately
 
@@ -101,8 +101,8 @@ When adding a new package (e.g., adapters, exporters):
 1. See [docs/ADDING_PACKAGES.md](./docs/ADDING_PACKAGES.md) for the complete template and structure
 2. Use the template in that file as your starting point
 3. For adapter packages that depend on flipper, use `"@flippercloud/flipper": "workspace:*"` in dependencies
-4. After creating the package structure, run `npm install` from the root to register the workspace
-5. Verify with `npm ls --workspaces` to see all packages
+4. After creating the package structure, run `bun install` from the root to register the workspace
+- Verify with `bun ls --workspaces` to see all packages
 
 ## PR instructions
 
@@ -117,5 +117,5 @@ When adding a new package (e.g., adapters, exporters):
   Describe the implementation approach and any key changes
   ```
 - Reference the related issue in the PR body
-- Always run `npm test` and `npm run lint` before committing
+- Always run `bun test` and `bun run lint` before committing
 - Ensure all CI checks pass
