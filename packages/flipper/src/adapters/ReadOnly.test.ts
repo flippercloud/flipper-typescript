@@ -32,20 +32,23 @@ describe('ReadOnly', () => {
 
   describe('read operations', () => {
     it('allows features()', async () => {
-      await expect(readOnly.features()).resolves.not.toThrow()
-      expect(await readOnly.features()).toEqual([feature])
+      const result = await readOnly.features()
+      expect(result).toEqual([feature])
     })
 
     it('allows get()', async () => {
-      await expect(readOnly.get(feature)).resolves.not.toThrow()
+      const result = await readOnly.get(feature)
+      expect(result).toBeDefined()
     })
 
     it('allows getMulti()', async () => {
-      await expect(readOnly.getMulti([feature])).resolves.not.toThrow()
+      const result = await readOnly.getMulti([feature])
+      expect(result).toBeDefined()
     })
 
     it('allows getAll()', async () => {
-      await expect(readOnly.getAll()).resolves.not.toThrow()
+      const result = await readOnly.getAll()
+      expect(result).toBeDefined()
     })
   })
 
@@ -96,7 +99,8 @@ describe('ReadOnly', () => {
 
     it('allows checking if feature is enabled', async () => {
       const dsl = new Dsl(readOnly)
-      await expect(dsl.isFeatureEnabled('test_feature')).resolves.not.toThrow()
+      const result = await dsl.isFeatureEnabled('test_feature')
+      expect(typeof result).toBe('boolean')
     })
   })
 })

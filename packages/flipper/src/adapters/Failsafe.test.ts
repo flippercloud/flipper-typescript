@@ -4,7 +4,7 @@ import Feature from '../Feature'
 import Dsl from '../Dsl'
 import BooleanGate from '../BooleanGate'
 import BooleanType from '../BooleanType'
-import { jest } from '@jest/globals'
+import { jest, describe, it, beforeEach, expect } from '@jest/globals'
 
 class CustomError extends Error {
   constructor(message: string) {
@@ -363,9 +363,13 @@ describe('Failsafe', () => {
       expect(await dsl.isFeatureEnabled('feature1')).toBe(false)
       expect(await dsl.isFeatureEnabled('feature2')).toBe(false)
 
-      // Write operations fail gracefully
-      await expect(dsl.enable('feature1')).resolves.not.toThrow()
-      await expect(dsl.disable('feature1')).resolves.not.toThrow()
+      // Write operations fail gracefully - DSL methods don't throw
+      const result1 = await dsl.enable('feature1')
+      expect(result1).toBe(true) // DSL.enable always returns true, it doesn't propagate adapter failures
+
+      // But the underlying adapter call returned false due to failsafe catching the error
+      const adapterResult = await failsafe.enable(feature, gate, thing)
+      expect(adapterResult).toBe(false)
     })
   })
 

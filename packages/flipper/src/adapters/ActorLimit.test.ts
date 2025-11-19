@@ -33,17 +33,14 @@ describe('ActorLimit', () => {
     it('allows enabling actors below limit', async () => {
       await actorLimit.add(feature)
 
-      await expect(
-        actorLimit.enable(feature, actorGate, new ActorType({ flipperId: 'user-1' }))
-      ).resolves.not.toThrow()
+      const result1 = await actorLimit.enable(feature, actorGate, new ActorType({ flipperId: 'user-1' }))
+      expect(result1).toBe(true)
 
-      await expect(
-        actorLimit.enable(feature, actorGate, new ActorType({ flipperId: 'user-2' }))
-      ).resolves.not.toThrow()
+      const result2 = await actorLimit.enable(feature, actorGate, new ActorType({ flipperId: 'user-2' }))
+      expect(result2).toBe(true)
 
-      await expect(
-        actorLimit.enable(feature, actorGate, new ActorType({ flipperId: 'user-3' }))
-      ).resolves.not.toThrow()
+      const result3 = await actorLimit.enable(feature, actorGate, new ActorType({ flipperId: 'user-3' }))
+      expect(result3).toBe(true)
     })
 
     it('throws when enabling actor at limit', async () => {
@@ -76,15 +73,12 @@ describe('ActorLimit', () => {
     it('allows enabling same actor multiple times', async () => {
       await actorLimit.add(feature)
 
-      await expect(
-        actorLimit.enable(feature, actorGate, new ActorType({ flipperId: 'user-1' }))
-      ).resolves.not.toThrow()
-      await expect(
-        actorLimit.enable(feature, actorGate, new ActorType({ flipperId: 'user-1' }))
-      ).resolves.not.toThrow()
-      await expect(
-        actorLimit.enable(feature, actorGate, new ActorType({ flipperId: 'user-1' }))
-      ).resolves.not.toThrow()
+      const result1 = await actorLimit.enable(feature, actorGate, new ActorType({ flipperId: 'user-1' }))
+      expect(result1).toBe(true)
+      const result2 = await actorLimit.enable(feature, actorGate, new ActorType({ flipperId: 'user-1' }))
+      expect(result2).toBe(true)
+      const result3 = await actorLimit.enable(feature, actorGate, new ActorType({ flipperId: 'user-1' }))
+      expect(result3).toBe(true)
     })
 
     it('allows boolean gate regardless of actor count', async () => {
@@ -96,9 +90,8 @@ describe('ActorLimit', () => {
       await actorLimit.enable(feature, actorGate, new ActorType({ flipperId: 'user-3' }))
 
       // Boolean gate should still work
-      await expect(
-        actorLimit.enable(feature, booleanGate, new BooleanType(true))
-      ).resolves.not.toThrow()
+      const result = await actorLimit.enable(feature, booleanGate, new BooleanType(true))
+      expect(result).toBe(true)
     })
 
     it('allows other gates regardless of actor count', async () => {
@@ -110,8 +103,10 @@ describe('ActorLimit', () => {
       await actorLimit.enable(feature, actorGate, new ActorType({ flipperId: 'user-3' }))
 
       // Other operations should still work
-      await expect(actorLimit.features()).resolves.not.toThrow()
-      await expect(actorLimit.get(feature)).resolves.not.toThrow()
+      const features = await actorLimit.features()
+      expect(features).toBeDefined()
+      const state = await actorLimit.get(feature)
+      expect(state).toBeDefined()
     })
   })
 
@@ -122,9 +117,8 @@ describe('ActorLimit', () => {
 
       // Should be able to add 100 actors
       for (let i = 0; i < 100; i++) {
-        await expect(
-          defaultLimitAdapter.enable(feature, actorGate, new ActorType({ flipperId: `user-${i}` }))
-        ).resolves.not.toThrow()
+        const result = await defaultLimitAdapter.enable(feature, actorGate, new ActorType({ flipperId: `user-${i}` }))
+        expect(result).toBe(true)
       }
 
       // 101st should throw
@@ -141,9 +135,8 @@ describe('ActorLimit', () => {
 
       // Should be able to add 5 actors
       for (let i = 0; i < 5; i++) {
-        await expect(
-          customLimitAdapter.enable(feature, actorGate, new ActorType({ flipperId: `user-${i}` }))
-        ).resolves.not.toThrow()
+        const result = await customLimitAdapter.enable(feature, actorGate, new ActorType({ flipperId: `user-${i}` }))
+        expect(result).toBe(true)
       }
 
       // 6th should throw
@@ -166,9 +159,8 @@ describe('ActorLimit', () => {
       await actorLimit.disable(feature, actorGate, new ActorType({ flipperId: 'user-2' }))
 
       // Now we can add another
-      await expect(
-        actorLimit.enable(feature, actorGate, new ActorType({ flipperId: 'user-4' }))
-      ).resolves.not.toThrow()
+      const result = await actorLimit.enable(feature, actorGate, new ActorType({ flipperId: 'user-4' }))
+      expect(result).toBe(true)
     })
   })
 
@@ -200,8 +192,10 @@ describe('ActorLimit', () => {
       await dsl.enableActor('limited_feature', { flipperId: 'user-3' })
 
       // These should all still work
-      await expect(dsl.enable('limited_feature')).resolves.not.toThrow()
-      await expect(dsl.enablePercentageOfActors('limited_feature', 25)).resolves.not.toThrow()
+      const result1 = await dsl.enable('limited_feature')
+      expect(result1).toBeDefined()
+      const result2 = await dsl.enablePercentageOfActors('limited_feature', 25)
+      expect(result2).toBeDefined()
     })
   })
 

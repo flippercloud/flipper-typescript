@@ -2,7 +2,7 @@ import Strict, { FeatureNotFoundError } from './Strict'
 import MemoryAdapter from '../MemoryAdapter'
 import Feature from '../Feature'
 import Dsl from '../Dsl'
-import { jest } from '@jest/globals'
+import { jest, describe, it, beforeEach, expect } from '@jest/globals'
 
 describe('Strict', () => {
   let adapter: MemoryAdapter
@@ -35,13 +35,17 @@ describe('Strict', () => {
     it('allows operations on existing features', async () => {
       await adapter.add(feature)
 
-      await expect(strict.get(feature)).resolves.not.toThrow()
-      await expect(strict.getMulti([feature])).resolves.not.toThrow()
+      const result1 = await strict.get(feature)
+      expect(result1).toBeDefined()
+      const result2 = await strict.getMulti([feature])
+      expect(result2).toBeDefined()
     })
 
     it('does not throw for other operations', async () => {
-      await expect(strict.add(feature)).resolves.not.toThrow()
-      await expect(strict.features()).resolves.not.toThrow()
+      const result1 = await strict.add(feature)
+      expect(result1).toBeDefined()
+      const result2 = await strict.features()
+      expect(result2).toBeDefined()
     })
   })
 
@@ -55,7 +59,8 @@ describe('Strict', () => {
         // no-op
       })
 
-      await expect(strict.get(feature)).resolves.not.toThrow()
+      const result = await strict.get(feature)
+      expect(result).toBeDefined()
       expect(warnSpy).toHaveBeenCalledWith(
         expect.stringContaining('Could not find feature "test_feature"')
       )
@@ -68,13 +73,15 @@ describe('Strict', () => {
     it('does nothing on missing feature', async () => {
       strict = new Strict(adapter, 'noop')
 
-      await expect(strict.get(feature)).resolves.not.toThrow()
+      const result = await strict.get(feature)
+      expect(result).toBeDefined()
     })
 
     it('accepts false as noop', async () => {
       strict = new Strict(adapter, false)
 
-      await expect(strict.get(feature)).resolves.not.toThrow()
+      const result = await strict.get(feature)
+      expect(result).toBeDefined()
     })
   })
 
@@ -135,7 +142,8 @@ describe('Strict', () => {
       const dsl = new Dsl(strict)
 
       await dsl.add('test_feature')
-      await expect(dsl.isFeatureEnabled('test_feature')).resolves.not.toThrow()
+      const result = await dsl.isFeatureEnabled('test_feature')
+      expect(typeof result).toBe('boolean')
     })
   })
 })
