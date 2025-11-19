@@ -63,9 +63,12 @@ class GateValues {
     this.groups = Typecast.toSet(values.groups)
     this.percentageOfActors = Typecast.toNumber(values.percentageOfActors)
     this.percentageOfTime = Typecast.toNumber(values.percentageOfTime)
-    this.expression = values.expression && typeof values.expression === 'object' && !Array.isArray(values.expression)
-      ? values.expression as Record<string, unknown>
-      : null
+    this.expression =
+      values.expression &&
+      typeof values.expression === 'object' &&
+      !Array.isArray(values.expression)
+        ? (values.expression as Record<string, unknown>)
+        : null
   }
 }
 

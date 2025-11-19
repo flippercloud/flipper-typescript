@@ -67,9 +67,15 @@ class BooleanGate implements IGate {
    * @returns True if the value is a BooleanType or boolean
    */
   public protectsThing(thing: unknown): boolean {
-    if (thing instanceof BooleanType) { return true }
-    if (thing === true) { return true }
-    if (thing === false) { return true }
+    if (thing instanceof BooleanType) {
+      return true
+    }
+    if (thing === true) {
+      return true
+    }
+    if (thing === false) {
+      return true
+    }
     return false
   }
 

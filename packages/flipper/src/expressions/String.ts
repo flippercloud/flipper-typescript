@@ -18,7 +18,9 @@ class StringExpression {
 
   evaluate(context: EvaluationContext): string {
     const value = this.args[0]?.evaluate(context) ?? ''
-    return typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' ? String(value) : ''
+    return typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
+      ? String(value)
+      : ''
   }
 
   value(): unknown {

@@ -113,5 +113,9 @@ export interface IInstrumenter {
    * @param fn - The function to execute and instrument
    * @returns The result of the function
    */
-  instrument<T>(name: string, payload: InstrumentationPayload, fn: (payload: InstrumentationPayload) => T | Promise<T>): T | Promise<T>
+  instrument<T>(
+    name: string,
+    payload: InstrumentationPayload,
+    fn: (payload: InstrumentationPayload) => T | Promise<T>
+  ): T | Promise<T>
 }

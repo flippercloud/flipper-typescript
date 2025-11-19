@@ -36,13 +36,7 @@ export default class ReadOnly extends Wrapper {
   /**
    * Set of method names that are considered write operations.
    */
-  private static readonly WRITE_METHODS = new Set([
-    'add',
-    'remove',
-    'clear',
-    'enable',
-    'disable',
-  ])
+  private static readonly WRITE_METHODS = new Set(['add', 'remove', 'clear', 'enable', 'disable'])
 
   /**
    * Always returns true for read-only adapters.

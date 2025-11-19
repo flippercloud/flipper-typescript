@@ -22,7 +22,9 @@ class PercentageOfActorsType implements IType {
    * @throws Error if the value is not a valid percentage
    */
   public static wrap(thing: unknown): PercentageOfActorsType {
-    if (thing instanceof PercentageOfActorsType) { return thing }
+    if (thing instanceof PercentageOfActorsType) {
+      return thing
+    }
     if (typeof thing === 'number') {
       return new PercentageOfActorsType(thing)
     }

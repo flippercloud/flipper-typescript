@@ -67,15 +67,11 @@ describe('ReadOnly', () => {
     })
 
     it('prevents enable()', async () => {
-      await expect(readOnly.enable(feature, gate, thing)).rejects.toThrow(
-        WriteAttemptedError
-      )
+      await expect(readOnly.enable(feature, gate, thing)).rejects.toThrow(WriteAttemptedError)
     })
 
     it('prevents disable()', async () => {
-      await expect(readOnly.disable(feature, gate, thing)).rejects.toThrow(
-        WriteAttemptedError
-      )
+      await expect(readOnly.disable(feature, gate, thing)).rejects.toThrow(WriteAttemptedError)
     })
   })
 

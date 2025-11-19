@@ -6,17 +6,14 @@ import { buildExpression } from './index'
 describe('NotEqual', () => {
   describe('constructor', () => {
     test('accepts two expression arguments', () => {
-      const expr = new NotEqual(
-        new Constant(5),
-        new Constant(10)
-      )
+      const expr = new NotEqual(new Constant(5), new Constant(10))
       const context = { feature_name: 'test', properties: {} }
       expect(expr.evaluate(context)).toBe(true)
     })
 
     test('accepts expression objects via buildExpression', () => {
       const expr = buildExpression({
-        NotEqual: [{ Constant: 5 }, { Constant: 10 }]
+        NotEqual: [{ Constant: 5 }, { Constant: 10 }],
       }) as NotEqual
       const context = { feature_name: 'test', properties: {} }
       expect(expr.evaluate(context)).toBe(true)
@@ -67,20 +64,21 @@ describe('NotEqual', () => {
     })
 
     test('works with property expressions', () => {
-      const expr = new NotEqual(
-        new Property('plan'),
-        new Constant('enterprise')
-      )
+      const expr = new NotEqual(new Property('plan'), new Constant('enterprise'))
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { plan: 'basic' }
-      })).toBe(true)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { plan: 'basic' },
+        })
+      ).toBe(true)
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { plan: 'enterprise' }
-      })).toBe(false)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { plan: 'enterprise' },
+        })
+      ).toBe(false)
     })
 
     test('returns true when comparing different types', () => {
@@ -92,12 +90,9 @@ describe('NotEqual', () => {
 
   describe('value', () => {
     test('returns object notation', () => {
-      const expr = new NotEqual(
-        new Constant(5),
-        new Constant(10)
-      )
+      const expr = new NotEqual(new Constant(5), new Constant(10))
       expect(expr.value()).toEqual({
-        NotEqual: [5, 10]
+        NotEqual: [5, 10],
       })
     })
   })

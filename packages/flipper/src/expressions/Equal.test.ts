@@ -6,17 +6,14 @@ import { buildExpression } from './index'
 describe('Equal', () => {
   describe('constructor', () => {
     test('accepts two expression arguments', () => {
-      const expr = new Equal(
-        new Constant(5),
-        new Constant(5)
-      )
+      const expr = new Equal(new Constant(5), new Constant(5))
       const context = { feature_name: 'test', properties: {} }
       expect(expr.evaluate(context)).toBe(true)
     })
 
     test('accepts expression objects via buildExpression', () => {
       const expr = buildExpression({
-        Equal: [{ Constant: 5 }, { Constant: 5 }]
+        Equal: [{ Constant: 5 }, { Constant: 5 }],
       }) as Equal
       const context = { feature_name: 'test', properties: {} }
       expect(expr.evaluate(context)).toBe(true)
@@ -73,37 +70,39 @@ describe('Equal', () => {
     })
 
     test('works with property expressions', () => {
-      const expr = new Equal(
-        new Property('plan'),
-        new Constant('enterprise')
-      )
+      const expr = new Equal(new Property('plan'), new Constant('enterprise'))
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { plan: 'enterprise' }
-      })).toBe(true)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { plan: 'enterprise' },
+        })
+      ).toBe(true)
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { plan: 'basic' }
-      })).toBe(false)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { plan: 'basic' },
+        })
+      ).toBe(false)
     })
 
     test('compares two properties', () => {
-      const expr = new Equal(
-        new Property('value1'),
-        new Property('value2')
-      )
+      const expr = new Equal(new Property('value1'), new Property('value2'))
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { value1: 'same', value2: 'same' }
-      })).toBe(true)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { value1: 'same', value2: 'same' },
+        })
+      ).toBe(true)
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { value1: 'different', value2: 'values' }
-      })).toBe(false)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { value1: 'different', value2: 'values' },
+        })
+      ).toBe(false)
     })
 
     test('returns false when comparing different types', () => {
@@ -121,25 +120,16 @@ describe('Equal', () => {
 
   describe('value', () => {
     test('returns object notation', () => {
-      const expr = new Equal(
-        new Constant(5),
-        new Constant(10)
-      )
+      const expr = new Equal(new Constant(5), new Constant(10))
       expect(expr.value()).toEqual({
-        Equal: [5, 10]
+        Equal: [5, 10],
       })
     })
 
     test('preserves nested expression structure', () => {
-      const expr = new Equal(
-        new Property('plan'),
-        new Constant('enterprise')
-      )
+      const expr = new Equal(new Property('plan'), new Constant('enterprise'))
       expect(expr.value()).toEqual({
-        Equal: [
-          { Property: 'plan' },
-          'enterprise'
-        ]
+        Equal: [{ Property: 'plan' }, 'enterprise'],
       })
     })
   })

@@ -74,12 +74,12 @@ describe('Now', () => {
 
       const result1 = expr.evaluate({
         feature_name: 'test',
-        properties: { timestamp: 123456 }
+        properties: { timestamp: 123456 },
       })
 
       const result2 = expr.evaluate({
         feature_name: 'test',
-        properties: {}
+        properties: {},
       })
 
       // Should return similar values regardless of properties
@@ -91,7 +91,7 @@ describe('Now', () => {
     test('returns object notation with empty array', () => {
       const expr = new Now()
       expect(expr.value()).toEqual({
-        Now: []
+        Now: [],
       })
     })
   })

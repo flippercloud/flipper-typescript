@@ -6,17 +6,14 @@ import { buildExpression } from './index'
 describe('LessThanOrEqualTo', () => {
   describe('constructor', () => {
     test('accepts two expression arguments', () => {
-      const expr = new LessThanOrEqualTo(
-        new Constant(5),
-        new Constant(10)
-      )
+      const expr = new LessThanOrEqualTo(new Constant(5), new Constant(10))
       const context = { feature_name: 'test', properties: {} }
       expect(expr.evaluate(context)).toBe(true)
     })
 
     test('accepts expression objects via buildExpression', () => {
       const expr = buildExpression({
-        LessThanOrEqualTo: [{ Constant: 5 }, { Constant: 5 }]
+        LessThanOrEqualTo: [{ Constant: 5 }, { Constant: 5 }],
       }) as LessThanOrEqualTo
       const context = { feature_name: 'test', properties: {} }
       expect(expr.evaluate(context)).toBe(true)
@@ -61,36 +58,36 @@ describe('LessThanOrEqualTo', () => {
     })
 
     test('works with property expressions', () => {
-      const expr = new LessThanOrEqualTo(
-        new Property('account_age_days'),
-        new Constant(30)
-      )
+      const expr = new LessThanOrEqualTo(new Property('account_age_days'), new Constant(30))
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { account_age_days: 30 }
-      })).toBe(true)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { account_age_days: 30 },
+        })
+      ).toBe(true)
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { account_age_days: 15 }
-      })).toBe(true)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { account_age_days: 15 },
+        })
+      ).toBe(true)
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { account_age_days: 45 }
-      })).toBe(false)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { account_age_days: 45 },
+        })
+      ).toBe(false)
     })
   })
 
   describe('value', () => {
     test('returns object notation', () => {
-      const expr = new LessThanOrEqualTo(
-        new Constant(5),
-        new Constant(10)
-      )
+      const expr = new LessThanOrEqualTo(new Constant(5), new Constant(10))
       expect(expr.value()).toEqual({
-        LessThanOrEqualTo: [5, 10]
+        LessThanOrEqualTo: [5, 10],
       })
     })
   })

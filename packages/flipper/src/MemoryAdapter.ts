@@ -69,7 +69,7 @@ class MemoryAdapter implements IAdapter {
    */
   async features(): Promise<Feature[]> {
     return await Promise.resolve(
-      Object.keys(this.features_store).map((key) => {
+      Object.keys(this.features_store).map(key => {
         return new Feature(key, this, {})
       })
     )
@@ -326,7 +326,7 @@ class MemoryAdapter implements IAdapter {
    * @returns The stored value
    */
   private write(key: string, value: string) {
-    return this.sourceStore[key] = value
+    return (this.sourceStore[key] = value)
   }
 
   /**

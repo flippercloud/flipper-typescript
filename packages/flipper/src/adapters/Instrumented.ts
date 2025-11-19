@@ -52,11 +52,11 @@ export default class Instrumented extends Wrapper {
         operation: method,
         adapter_name: this.adapter.name,
       },
-      (payload) => {
+      payload => {
         const result = fn()
         // Handle both sync and async results
         if (result instanceof Promise) {
-          return result.then((r) => {
+          return result.then(r => {
             payload.result = r
             return r
           })
@@ -64,7 +64,7 @@ export default class Instrumented extends Wrapper {
           payload.result = result
           return result
         }
-      },
+      }
     )
   }
 
@@ -105,12 +105,12 @@ export default class Instrumented extends Wrapper {
       {
         operation: 'getMulti',
         adapter_name: this.adapter.name,
-        feature_names: features.map((f) => f.name),
+        feature_names: features.map(f => f.name),
       },
-      async (payload) => {
+      async payload => {
         payload.result = await this.adapter.getMulti(features)
         return payload.result as Record<string, Record<string, unknown>>
-      },
+      }
     )
     return await result
   }
@@ -127,10 +127,10 @@ export default class Instrumented extends Wrapper {
         feature_name: feature.name,
         gate_name: gate.key,
       },
-      async (payload) => {
+      async payload => {
         payload.result = await this.adapter.enable(feature, gate, thing)
         return payload.result as boolean
-      },
+      }
     )
     return await result
   }
@@ -147,10 +147,10 @@ export default class Instrumented extends Wrapper {
         feature_name: feature.name,
         gate_name: gate.key,
       },
-      async (payload) => {
+      async payload => {
         payload.result = await this.adapter.disable(feature, gate, thing)
         return payload.result as boolean
-      },
+      }
     )
     return await result
   }
@@ -158,7 +158,11 @@ export default class Instrumented extends Wrapper {
   /**
    * Helper method to instrument operations that take a single feature.
    */
-  private async instrumentWithFeature<T>(operation: string, feature: Feature, fn: () => Promise<T>): Promise<T> {
+  private async instrumentWithFeature<T>(
+    operation: string,
+    feature: Feature,
+    fn: () => Promise<T>
+  ): Promise<T> {
     const result = this.instrumenter.instrument<Promise<T>>(
       Instrumented.INSTRUMENTATION_NAME,
       {
@@ -166,10 +170,10 @@ export default class Instrumented extends Wrapper {
         adapter_name: this.adapter.name,
         feature_name: feature.name,
       },
-      async (payload) => {
+      async payload => {
         payload.result = await fn()
         return payload.result as T
-      },
+      }
     )
     return await result
   }

@@ -183,7 +183,7 @@ export default class Memoizable implements IAdapter {
     }
 
     // Find features not in cache
-    const uncachedFeatures = features.filter((feature) => {
+    const uncachedFeatures = features.filter(feature => {
       const key = this.keyFor(feature.key)
       return !(key in this.cache)
     })

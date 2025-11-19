@@ -6,17 +6,14 @@ import { buildExpression } from './index'
 describe('GreaterThan', () => {
   describe('constructor', () => {
     test('accepts two expression arguments', () => {
-      const expr = new GreaterThan(
-        new Constant(10),
-        new Constant(5)
-      )
+      const expr = new GreaterThan(new Constant(10), new Constant(5))
       const context = { feature_name: 'test', properties: {} }
       expect(expr.evaluate(context)).toBe(true)
     })
 
     test('accepts expression objects via buildExpression', () => {
       const expr = buildExpression({
-        GreaterThan: [{ Constant: 10 }, { Constant: 5 }]
+        GreaterThan: [{ Constant: 10 }, { Constant: 5 }],
       }) as GreaterThan
       const context = { feature_name: 'test', properties: {} }
       expect(expr.evaluate(context)).toBe(true)
@@ -67,61 +64,54 @@ describe('GreaterThan', () => {
     })
 
     test('works with property expressions', () => {
-      const expr = new GreaterThan(
-        new Property('account_age_days'),
-        new Constant(30)
-      )
+      const expr = new GreaterThan(new Property('account_age_days'), new Constant(30))
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { account_age_days: 45 }
-      })).toBe(true)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { account_age_days: 45 },
+        })
+      ).toBe(true)
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { account_age_days: 15 }
-      })).toBe(false)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { account_age_days: 15 },
+        })
+      ).toBe(false)
     })
 
     test('compares two properties', () => {
-      const expr = new GreaterThan(
-        new Property('value1'),
-        new Property('value2')
-      )
+      const expr = new GreaterThan(new Property('value1'), new Property('value2'))
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { value1: 100, value2: 50 }
-      })).toBe(true)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { value1: 100, value2: 50 },
+        })
+      ).toBe(true)
 
-      expect(expr.evaluate({
-        feature_name: 'test',
-        properties: { value1: 50, value2: 100 }
-      })).toBe(false)
+      expect(
+        expr.evaluate({
+          feature_name: 'test',
+          properties: { value1: 50, value2: 100 },
+        })
+      ).toBe(false)
     })
   })
 
   describe('value', () => {
     test('returns object notation', () => {
-      const expr = new GreaterThan(
-        new Constant(10),
-        new Constant(5)
-      )
+      const expr = new GreaterThan(new Constant(10), new Constant(5))
       expect(expr.value()).toEqual({
-        GreaterThan: [10, 5]
+        GreaterThan: [10, 5],
       })
     })
 
     test('preserves nested expression structure', () => {
-      const expr = new GreaterThan(
-        new Property('age'),
-        new Constant(18)
-      )
+      const expr = new GreaterThan(new Property('age'), new Constant(18))
       expect(expr.value()).toEqual({
-        GreaterThan: [
-          { Property: 'age' },
-          18
-        ]
+        GreaterThan: [{ Property: 'age' }, 18],
       })
     })
   })

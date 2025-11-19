@@ -29,7 +29,13 @@ export function setRegistry(reg: Record<string, new (...args: unknown[]) => Expr
  */
 export function buildExpression(object: unknown): ExpressionLike {
   // Return existing expression or constant as-is
-  if (object && typeof object === 'object' && 'evaluate' in object && 'value' in object && 'equals' in object) {
+  if (
+    object &&
+    typeof object === 'object' &&
+    'evaluate' in object &&
+    'value' in object &&
+    'equals' in object
+  ) {
     return object as ExpressionLike
   }
 

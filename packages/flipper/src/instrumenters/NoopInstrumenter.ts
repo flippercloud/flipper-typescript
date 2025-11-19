@@ -23,7 +23,11 @@ class NoopInstrumenter implements IInstrumenter {
    * @param fn - The function to execute
    * @returns The result of the function
    */
-  instrument<T>(_name: string, payload: InstrumentationPayload, fn: (payload: InstrumentationPayload) => T | Promise<T>): T | Promise<T> {
+  instrument<T>(
+    _name: string,
+    payload: InstrumentationPayload,
+    fn: (payload: InstrumentationPayload) => T | Promise<T>
+  ): T | Promise<T> {
     return fn(payload)
   }
 }

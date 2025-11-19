@@ -22,7 +22,9 @@ class PercentageOfTimeType implements IType {
    * @throws Error if the value is not a valid percentage
    */
   public static wrap(thing: unknown): PercentageOfTimeType {
-    if (thing instanceof PercentageOfTimeType) { return thing }
+    if (thing instanceof PercentageOfTimeType) {
+      return thing
+    }
     if (typeof thing === 'number') {
       return new PercentageOfTimeType(thing)
     }

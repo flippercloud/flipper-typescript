@@ -18,8 +18,8 @@ class Duration {
     hour: 3600,
     day: 86400,
     week: 604800,
-    month: 2629746,  // 1/12 of a gregorian year
-    year: 31556952   // length of a gregorian year (365.2425 days)
+    month: 2629746, // 1/12 of a gregorian year
+    year: 31556952, // length of a gregorian year (365.2425 days)
   }
 
   constructor(...args: unknown[]) {
@@ -29,7 +29,9 @@ class Duration {
   evaluate(context: EvaluationContext): number {
     const scalar = Number(this.args[0]?.evaluate(context) ?? 0)
     const unitValue = this.args[1]?.evaluate(context) ?? 'second'
-    let unit = (typeof unitValue === 'string' || typeof unitValue === 'number' ? String(unitValue) : 'second').toLowerCase()
+    let unit = (
+      typeof unitValue === 'string' || typeof unitValue === 'number' ? String(unitValue) : 'second'
+    ).toLowerCase()
 
     // Remove trailing 's' if present
     if (unit.endsWith('s')) {
@@ -38,7 +40,9 @@ class Duration {
 
     const secondsPerUnit = Duration.SECONDS_PER[unit]
     if (!secondsPerUnit) {
-      throw new Error(`Duration unit ${unit} must be one of: ${Object.keys(Duration.SECONDS_PER).join(', ')}`)
+      throw new Error(
+        `Duration unit ${unit} must be one of: ${Object.keys(Duration.SECONDS_PER).join(', ')}`
+      )
     }
 
     if (typeof scalar !== 'number' || Number.isNaN(scalar)) {

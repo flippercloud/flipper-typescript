@@ -26,7 +26,9 @@ class GroupType implements IType {
    * @throws Error if the value is not a valid group
    */
   public static wrap(thing: unknown): GroupType {
-    if (thing instanceof GroupType) { return thing }
+    if (thing instanceof GroupType) {
+      return thing
+    }
     if (typeof thing === 'string') {
       return new GroupType(thing)
     }

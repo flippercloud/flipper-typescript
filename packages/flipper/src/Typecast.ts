@@ -52,7 +52,9 @@ class Typecast {
    * @returns Numeric value, or 0 if value cannot be converted
    */
   public static toNumber(value: unknown): number {
-    if (typeof value === 'number') { return value }
+    if (typeof value === 'number') {
+      return value
+    }
     if (typeof value === 'string') {
       const parsed = parseInt(value, 10)
       return isNaN(parsed) ? 0 : parsed
@@ -80,7 +82,7 @@ class Typecast {
       return normalized
     }
 
-    Object.keys(source).forEach((featureKey) => {
+    Object.keys(source).forEach(featureKey => {
       normalized[featureKey] = {}
       const gates = source[featureKey]
 
@@ -88,7 +90,7 @@ class Typecast {
         return
       }
 
-      Object.keys(gates).forEach((gateKey) => {
+      Object.keys(gates).forEach(gateKey => {
         const value = gates[gateKey]
 
         let normalizedValue: unknown

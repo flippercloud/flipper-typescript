@@ -79,12 +79,14 @@ class GroupGate implements IGate {
    * @returns True if the actor belongs to any enabled group
    */
   public isOpen(context: FeatureCheckContext): boolean {
-    if (context.thing === 'undefined') { return false }
+    if (context.thing === 'undefined') {
+      return false
+    }
 
     const groupNames = Array.from(context.groupsValue)
     let groupMatch = false
 
-    groupNames.some((groupName) => {
+    groupNames.some(groupName => {
       const groupType = this.groups[groupName]
 
       if (groupType && context.thing instanceof ActorType) {
@@ -103,8 +105,12 @@ class GroupGate implements IGate {
    * @returns True if the value is a GroupType or string
    */
   public protectsThing(thing: unknown): boolean {
-    if (thing instanceof GroupType) { return true }
-    if (typeof(thing) === 'string') { return true }
+    if (thing instanceof GroupType) {
+      return true
+    }
+    if (typeof thing === 'string') {
+      return true
+    }
     return false
   }
 

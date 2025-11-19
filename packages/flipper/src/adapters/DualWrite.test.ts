@@ -172,8 +172,8 @@ describe('DualWrite', () => {
       await dsl.enable('new_feature')
 
       // Verify both have it
-      expect((await local.features()).some((f) => f.name === 'new_feature')).toBe(true)
-      expect((await remote.features()).some((f) => f.name === 'new_feature')).toBe(true)
+      expect((await local.features()).some(f => f.name === 'new_feature')).toBe(true)
+      expect((await remote.features()).some(f => f.name === 'new_feature')).toBe(true)
 
       // But reads come from local
       const localResult = await local.get(feature)
