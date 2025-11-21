@@ -19,7 +19,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc-esm-fix --target dist --ext .js",
     "test": "NODE_OPTIONS='--localstorage-file=/tmp/jest.db' node --experimental-vm-modules --no-warnings=ExperimentalWarning ../../node_modules/jest/bin/jest.js",
     "test:watch": "NODE_OPTIONS='--localstorage-file=/tmp/jest.db' node --experimental-vm-modules --no-warnings=ExperimentalWarning ../../node_modules/jest/bin/jest.js --watch",
     "test:coverage": "NODE_OPTIONS='--localstorage-file=/tmp/jest.db' node --experimental-vm-modules --no-warnings=ExperimentalWarning ../../node_modules/jest/bin/jest.js --coverage",
@@ -39,7 +39,8 @@
   },
   "devDependencies": {
     "sequelize": "^6.35.2",
-    "sqlite3": "^5.1.6"
+    "sqlite3": "^5.1.6",
+    "tsc-esm-fix": "^2.20.26"
   },
   "engines": {
     "node": ">=18.0.0"
