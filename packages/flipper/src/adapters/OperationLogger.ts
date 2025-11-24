@@ -17,26 +17,26 @@ export interface Operation {
  * Never use in production - for testing only.
  *
  * @example
- * const adapter = new MemoryAdapter();
- * const logger = new OperationLogger(adapter);
+ * const adapter = new MemoryAdapter()
+ * const logger = new OperationLogger(adapter)
  *
- * await logger.add(feature);
- * await logger.enable(feature, gate, thing);
+ * await logger.add(feature)
+ * await logger.enable(feature, gate, thing)
  *
  * // Check operations
- * logger.count(); // 2
- * logger.count('add'); // 1
- * logger.count('enable'); // 1
+ * logger.count() // 2
+ * logger.count('add') // 1
+ * logger.count('enable') // 1
  *
  * // Get operations of a type
- * logger.type('enable'); // [{ type: 'enable', args: [...] }]
+ * logger.type('enable') // [{ type: 'enable', args: [...] }]
  *
  * // Get last operation of a type
- * logger.last('enable'); // { type: 'enable', args: [...] }
+ * logger.last('enable') // { type: 'enable', args: [...] }
  *
  * // Reset log
- * logger.reset();
- * logger.count(); // 0
+ * logger.reset()
+ * logger.count() // 0
  */
 export default class OperationLogger extends Wrapper {
   /**

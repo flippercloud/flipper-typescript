@@ -6,17 +6,17 @@
  *
  * @example
  * // Convert various truthy values to boolean
- * Typecast.toBoolean(true); // true
- * Typecast.toBoolean('true'); // true
- * Typecast.toBoolean(1); // true
- * Typecast.toBoolean(false); // false
+ * Typecast.toBoolean(true) // true
+ * Typecast.toBoolean('true') // true
+ * Typecast.toBoolean(1) // true
+ * Typecast.toBoolean(false) // false
  *
  * // Convert arrays to Sets
- * Typecast.toSet(['a', 'b']); // Set(['a', 'b'])
+ * Typecast.toSet(['a', 'b']) // Set(['a', 'b'])
  *
  * // Convert strings to numbers
- * Typecast.toNumber('42'); // 42
- * Typecast.toNumber('invalid'); // 0
+ * Typecast.toNumber('42') // 42
+ * Typecast.toNumber('invalid') // 0
  */
 class Typecast {
   /**

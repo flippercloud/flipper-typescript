@@ -33,23 +33,23 @@ export type StrictHandler = boolean | 'raise' | 'warn' | 'noop' | ((feature: Fea
  * before being added to the adapter.
  *
  * @example
- * const adapter = new MemoryAdapter();
- * const strictAdapter = new Strict(adapter); // throws by default
+ * const adapter = new MemoryAdapter()
+ * const strictAdapter = new Strict(adapter) // throws by default
  *
  * // This will throw FeatureNotFoundError
- * await strictAdapter.get(feature);
+ * await strictAdapter.get(feature)
  *
  * // Add the feature first
- * await strictAdapter.add(feature);
- * await strictAdapter.get(feature); // now works
+ * await strictAdapter.add(feature)
+ * await strictAdapter.get(feature) // now works
  *
  * // Use 'warn' mode to log instead of throwing
- * const warnAdapter = new Strict(adapter, 'warn');
+ * const warnAdapter = new Strict(adapter, 'warn')
  *
  * // Use custom handler
  * const customAdapter = new Strict(adapter, (feature) => {
- *   console.log(`Feature ${feature.name} not found`);
- * });
+ *   console.log(`Feature ${feature.name} not found`)
+ * })
  */
 export default class Strict extends Wrapper {
   /**

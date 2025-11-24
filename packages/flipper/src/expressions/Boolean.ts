@@ -5,8 +5,8 @@ import { buildExpression } from './build'
  * Converts argument to boolean.
  *
  * @example
- * const expr = Expression.build({ Boolean: 'truthy' });
- * expr.evaluate({ properties: {} }); // => true
+ * const expr = Expression.build({ Boolean: 'truthy' })
+ * expr.evaluate({ properties: {} }) // => true
  */
 class BooleanExpression {
   readonly name = 'Boolean'

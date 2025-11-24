@@ -10,13 +10,13 @@ import { GroupCallback, IType } from './interfaces'
  *
  * @example
  * // Define group callback
- * const isAdmin = (actor) => actor.role === 'admin';
- * const adminGroup = new GroupType('admins', isAdmin);
+ * const isAdmin = (actor) => actor.role === 'admin'
+ * const adminGroup = new GroupType('admins', isAdmin)
  *
  * // Check membership
- * const user = { flipperId: 'user-1', role: 'admin' };
- * const actorType = ActorType.wrap(user);
- * adminGroup.isMatch(actorType, context); // true
+ * const user = { flipperId: 'user-1', role: 'admin' }
+ * const actorType = ActorType.wrap(user)
+ * adminGroup.isMatch(actorType, context) // true
  */
 class GroupType implements IType {
   /**

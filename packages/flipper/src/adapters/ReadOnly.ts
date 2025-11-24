@@ -21,16 +21,16 @@ export class WriteAttemptedError extends Error {
  * or when you want to ensure certain code paths cannot change feature states.
  *
  * @example
- * const memoryAdapter = new MemoryAdapter();
- * const readOnlyAdapter = new ReadOnly(memoryAdapter);
+ * const memoryAdapter = new MemoryAdapter()
+ * const readOnlyAdapter = new ReadOnly(memoryAdapter)
  *
  * // Reads work fine
- * await readOnlyAdapter.features();
- * await readOnlyAdapter.get(feature);
+ * await readOnlyAdapter.features()
+ * await readOnlyAdapter.get(feature)
  *
  * // Writes throw errors
- * await readOnlyAdapter.add(feature); // throws WriteAttemptedError
- * await readOnlyAdapter.enable(feature, gate, thing); // throws WriteAttemptedError
+ * await readOnlyAdapter.add(feature) // throws WriteAttemptedError
+ * await readOnlyAdapter.enable(feature, gate, thing) // throws WriteAttemptedError
  */
 export default class ReadOnly extends Wrapper {
   /**

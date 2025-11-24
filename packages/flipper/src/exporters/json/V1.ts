@@ -9,9 +9,9 @@ import Typecast from '../../Typecast'
  * Compatible with Ruby Flipper's JSON V1 export format.
  *
  * @example
- * const adapter = new MemoryAdapter();
- * const exporter = new V1();
- * const exportObj = exporter.call(adapter);
+ * const adapter = new MemoryAdapter()
+ * const exporter = new V1()
+ * const exportObj = exporter.call(adapter)
  *
  * // Export structure:
  * // {

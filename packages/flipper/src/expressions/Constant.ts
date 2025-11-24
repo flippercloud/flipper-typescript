@@ -6,8 +6,8 @@ import type { EvaluationContext } from './types'
  * Wraps primitive values (strings, numbers, booleans, null) as expressions.
  *
  * @example
- * const str = new Constant('hello');
- * str.evaluate({ properties: {} }); // => 'hello'
+ * const str = new Constant('hello')
+ * str.evaluate({ properties: {} }) // => 'hello'
  */
 class Constant {
   private constantValue: unknown

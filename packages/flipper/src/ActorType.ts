@@ -7,10 +7,10 @@ import { IActor, IType } from './interfaces'
  * This type is used by ActorGate to determine feature enablement.
  *
  * @example
- * const user = { flipperId: 'user-123', name: 'Alice' };
- * const actorType = ActorType.wrap(user);
+ * const user = { flipperId: 'user-123', name: 'Alice' }
+ * const actorType = ActorType.wrap(user)
  *
- * console.log(actorType.value); // 'user-123'
+ * console.log(actorType.value) // 'user-123'
  */
 class ActorType implements IType {
   /**

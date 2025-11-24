@@ -11,10 +11,10 @@ import { buildExpression } from './build'
  *     { Property: 'admin' },
  *     { Property: 'beta_user' }
  *   ]
- * });
+ * })
  * expr.evaluate({
  *   properties: { admin: false, beta_user: true }
- * }); // => true
+ * }) // => true
  */
 class Any {
   readonly name = 'Any'

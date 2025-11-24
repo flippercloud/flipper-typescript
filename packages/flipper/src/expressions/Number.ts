@@ -5,8 +5,8 @@ import { buildExpression } from './build'
  * Converts argument to number.
  *
  * @example
- * const expr = Expression.build({ Number: '42' });
- * expr.evaluate({ properties: {} }); // => 42
+ * const expr = Expression.build({ Number: '42' })
+ * expr.evaluate({ properties: {} }) // => 42
  */
 class NumberExpression {
   readonly name = 'Number'

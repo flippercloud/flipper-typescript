@@ -31,20 +31,20 @@ export class ActorLimitExceededError extends Error {
  * are not affected by this limit.
  *
  * @example
- * const adapter = new ActorLimit(new MemoryAdapter(), 100);
+ * const adapter = new ActorLimit(new MemoryAdapter(), 100)
  *
  * // Enable for up to 100 actors
  * for (let i = 0; i < 100; i++) {
- *   await feature.enableActor({ flipperId: `user-${i}` }); // OK
+ *   await feature.enableActor({ flipperId: `user-${i}` }) // OK
  * }
  *
  * // 101st actor throws error
- * await feature.enableActor({ flipperId: 'user-100' });
+ * await feature.enableActor({ flipperId: 'user-100' })
  * // => ActorLimitExceededError: Actor limit of 100 exceeded
  *
  * // Other gates still work
- * await feature.enable(); // OK - boolean gate
- * await feature.enablePercentageOfActors(25); // OK - percentage gate
+ * await feature.enable() // OK - boolean gate
+ * await feature.enablePercentageOfActors(25) // OK - percentage gate
  */
 export default class ActorLimit extends Wrapper {
   /**

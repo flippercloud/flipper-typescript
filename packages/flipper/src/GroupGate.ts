@@ -12,18 +12,18 @@ import { IGate, IType } from './interfaces'
  *
  * @example
  * // Register groups
- * flipper.register('admins', (actor) => actor.role === 'admin');
- * flipper.register('beta_users', (actor) => actor.betaOptIn === true);
+ * flipper.register('admins', (actor) => actor.role === 'admin')
+ * flipper.register('beta_users', (actor) => actor.betaOptIn === true)
  *
  * // Enable feature for group
- * await flipper.enableGroup('admin-panel', 'admins');
+ * await flipper.enableGroup('admin-panel', 'admins')
  *
  * // Check if enabled for actor
- * const admin = { flipperId: '1', role: 'admin' };
- * await flipper.isFeatureEnabled('admin-panel', admin); // true
+ * const admin = { flipperId: '1', role: 'admin' }
+ * await flipper.isFeatureEnabled('admin-panel', admin) // true
  *
- * const user = { flipperId: '2', role: 'user' };
- * await flipper.isFeatureEnabled('admin-panel', user); // false
+ * const user = { flipperId: '2', role: 'user' }
+ * await flipper.isFeatureEnabled('admin-panel', user) // false
  */
 class GroupGate implements IGate {
   /**

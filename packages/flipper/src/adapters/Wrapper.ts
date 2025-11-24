@@ -13,10 +13,10 @@ import type Dsl from '../Dsl'
  * @example
  * class MyWrapper extends Wrapper {
  *   protected wrap<T>(method: string, fn: () => T): T {
- *     console.log(`Calling ${method}`);
- *     const result = fn();
- *     console.log(`Result: ${result}`);
- *     return result;
+ *     console.log(`Calling ${method}`)
+ *     const result = fn()
+ *     console.log(`Result: ${result}`)
+ *     return result
  *   }
  * }
  */

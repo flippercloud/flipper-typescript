@@ -1,16 +1,17 @@
 {
   "name": "@flippercloud/flipper",
   "description": "Flipper feature flags for TypeScript/JavaScript",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "author": "Jonathan Hoyt",
   "license": "MIT",
-  "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "types": "./dist/esm/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
     }
   },
   "files": [
@@ -19,7 +20,9 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "bun run build:esm && bun run build:cjs",
+    "build:esm": "tsc --module esnext --outDir dist/esm && tsc-esm-fix --target dist/esm --ext .js",
+    "build:cjs": "tsc --module commonjs --moduleResolution node --outDir dist/cjs",
     "test": "NODE_OPTIONS='--localstorage-file=/tmp/jest.db' node --experimental-vm-modules --no-warnings=ExperimentalWarning ../../node_modules/jest/bin/jest.js",
     "test:watch": "NODE_OPTIONS='--localstorage-file=/tmp/jest.db' node --experimental-vm-modules --no-warnings=ExperimentalWarning ../../node_modules/jest/bin/jest.js --watch",
     "test:coverage": "NODE_OPTIONS='--localstorage-file=/tmp/jest.db' node --experimental-vm-modules --no-warnings=ExperimentalWarning ../../node_modules/jest/bin/jest.js --coverage",
@@ -35,7 +38,8 @@
     "crc": "^4.3.2"
   },
   "devDependencies": {
-    "@types/crc": "^3.8.3"
+    "@types/crc": "^3.8.3",
+    "tsc-esm-fix": "^2.20.26"
   },
   "engines": {
     "node": ">=18.0.0",

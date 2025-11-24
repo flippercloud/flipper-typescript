@@ -6,12 +6,14 @@
  *
  * @example
  * // In your migration file (migrations/xxx-create-flipper-tables.js):
- * import { createFlipperMigration } from '@flippercloud/flipper-sequelize';
+ * import { createFlipperMigration } from '@flippercloud/flipper-sequelize'
  *
- * const migration = createFlipperMigration();
- * export const up = migration.up;
- * export const down = migration.down;
+ * const migration = createFlipperMigration()
+ * export const up = migration.up
+ * export const down = migration.down
  */
+
+import type { QueryInterface } from 'sequelize'
 
 export interface MigrationOptions {
   featureTableName?: string
@@ -29,7 +31,9 @@ export function createFlipperMigration(options: MigrationOptions = {}) {
   const gateTableName = options.gateTableName ?? 'flipper_gates'
 
   return {
-    async up(queryInterface: any, Sequelize: any) {
+    // Sequelize migrations have untyped Sequelize parameter by design
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async up(queryInterface: QueryInterface, Sequelize: any) {
       // Create features table
       await queryInterface.createTable(featureTableName, {
         id: {
@@ -105,7 +109,7 @@ export function createFlipperMigration(options: MigrationOptions = {}) {
       })
     },
 
-    async down(queryInterface: any) {
+    async down(queryInterface: QueryInterface) {
       await queryInterface.dropTable(gateTableName)
       await queryInterface.dropTable(featureTableName)
     },

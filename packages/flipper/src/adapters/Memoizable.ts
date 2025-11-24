@@ -16,27 +16,27 @@ interface Cache {
  * Call `memoize = true` to enable caching, `memoize = false` to disable and clear.
  *
  * @example
- * const adapter = new MemoryAdapter();
- * const memoizer = new Memoizable(adapter);
+ * const adapter = new MemoryAdapter()
+ * const memoizer = new Memoizable(adapter)
  *
  * // Enable memoization
- * memoizer.memoize = true;
+ * memoizer.memoize = true
  *
  * // First call hits the adapter
- * await memoizer.get(feature);
+ * await memoizer.get(feature)
  *
  * // Second call uses cache
- * await memoizer.get(feature); // cached!
+ * await memoizer.get(feature) // cached!
  *
  * // Disable memoization and clear cache
- * memoizer.memoize = false;
+ * memoizer.memoize = false
  *
  * // Request-scoped usage (e.g., Express middleware)
  * app.use((req, res, next) => {
- *   req.flipperMemoizer = new Memoizable(adapter);
- *   req.flipperMemoizer.memoize = true;
- *   next();
- * });
+ *   req.flipperMemoizer = new Memoizable(adapter)
+ *   req.flipperMemoizer.memoize = true
+ *   next()
+ * })
  */
 export default class Memoizable implements IAdapter {
   /**

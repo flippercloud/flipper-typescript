@@ -8,9 +8,9 @@ import GateValues from './GateValues'
  * actor/thing being checked.
  *
  * @example
- * const values = new GateValues(rawValues);
- * const actor = { flipperId: 'user-123' };
- * const context = new FeatureCheckContext('new-ui', values, actor);
+ * const values = new GateValues(rawValues)
+ * const actor = { flipperId: 'user-123' }
+ * const context = new FeatureCheckContext('new-ui', values, actor)
  *
  * // Gates use context to make decisions
  * if (actorGate.isOpen(context)) {

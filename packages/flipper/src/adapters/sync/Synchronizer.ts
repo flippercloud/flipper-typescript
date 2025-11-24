@@ -19,8 +19,8 @@ import NoopInstrumenter from '../../instrumenters/NoopInstrumenter'
  *   localAdapter,
  *   remoteAdapter,
  *   { raise: true }
- * );
- * synchronizer.call();
+ * )
+ * synchronizer.call()
  */
 class Synchronizer {
   private readonly local: IAdapter

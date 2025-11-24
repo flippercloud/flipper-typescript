@@ -24,14 +24,14 @@ interface IFeatureGates {
  * Ideal for testing, development, and single-process applications.
  *
  * @example
- * const adapter = new MemoryAdapter();
- * const flipper = new Flipper(adapter);
+ * const adapter = new MemoryAdapter()
+ * const flipper = new Flipper(adapter)
  *
  * // Enable a feature
- * await flipper.enable('new-feature');
+ * await flipper.enable('new-feature')
  *
  * // Data is stored in memory
- * await flipper.isFeatureEnabled('new-feature'); // true
+ * await flipper.isFeatureEnabled('new-feature') // true
  *
  * // Data is lost on restart (not persisted)
  */

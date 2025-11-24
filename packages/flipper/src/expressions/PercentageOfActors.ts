@@ -9,7 +9,7 @@ import type { EvaluationContext, ExpressionLike } from './types'
  * @example
  * const expr = Expression.build({
  *   PercentageOfActors: [{ Property: 'flipper_id' }, 25]
- * });
+ * })
  * // Returns true for 25% of actors consistently
  */
 class PercentageOfActors {

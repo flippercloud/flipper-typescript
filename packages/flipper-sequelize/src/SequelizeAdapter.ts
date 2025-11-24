@@ -1,6 +1,7 @@
 import type { IAdapter, IGate, IType } from '@flippercloud/flipper'
 import { Exporter, Synchronizer } from '@flippercloud/flipper'
 import type { Feature as FeatureClass, Export, Dsl } from '@flippercloud/flipper'
+import type { ModelStatic } from 'sequelize'
 import type { FlipperFeatureModel, FlipperGateModel } from './Models'
 
 /**
@@ -10,11 +11,11 @@ export interface SequelizeAdapterOptions {
   /**
    * The Flipper Feature model instance
    */
-  Feature: typeof FlipperFeatureModel
+  Feature: ModelStatic<FlipperFeatureModel>
   /**
    * The Flipper Gate model instance
    */
-  Gate: typeof FlipperGateModel
+  Gate: ModelStatic<FlipperGateModel>
   /**
    * Whether the adapter is read-only (default: false)
    */
@@ -27,18 +28,18 @@ export interface SequelizeAdapterOptions {
  * Supports any database backend that Sequelize supports (MySQL, PostgreSQL, SQLite, etc.).
  *
  * @example
- * import { Sequelize } from 'sequelize';
- * import Flipper from '@flippercloud/flipper';
- * import { SequelizeAdapter, createFlipperModels } from '@flippercloud/flipper-sequelize';
+ * import { Sequelize } from 'sequelize'
+ * import Flipper from '@flippercloud/flipper'
+ * import { SequelizeAdapter, createFlipperModels } from '@flippercloud/flipper-sequelize'
  *
- * const sequelize = new Sequelize('mysql://user:pass@localhost/db');
- * const { Feature, Gate } = createFlipperModels(sequelize);
+ * const sequelize = new Sequelize('mysql://user:pass@localhost/db')
+ * const { Feature, Gate } = createFlipperModels(sequelize)
  *
- * const adapter = new SequelizeAdapter({ Feature, Gate });
- * const flipper = new Flipper(adapter);
+ * const adapter = new SequelizeAdapter({ Feature, Gate })
+ * const flipper = new Flipper(adapter)
  *
  * // Use flipper
- * await flipper.enable('new-feature');
+ * await flipper.enable('new-feature')
  */
 class SequelizeAdapter implements IAdapter {
   /**
@@ -49,12 +50,12 @@ class SequelizeAdapter implements IAdapter {
   /**
    * The Feature model
    */
-  private Feature: any
+  private Feature: ModelStatic<FlipperFeatureModel>
 
   /**
    * The Gate model
    */
-  private Gate: any
+  private Gate: ModelStatic<FlipperGateModel>
 
   /**
    * Whether the adapter is read-only
@@ -75,8 +76,8 @@ class SequelizeAdapter implements IAdapter {
     const features = await this.Feature.findAll({ raw: true })
     // We need to import Feature dynamically to avoid circular dependencies
     const module = await import('@flippercloud/flipper')
-    const Feature = (module as any).Feature
-    return features.map((f: any) => new (Feature as any)(f.key, this, {}))
+    const Feature = module.Feature
+    return features.map(f => new Feature(f.key, this, {}))
   }
 
   /**
@@ -92,9 +93,13 @@ class SequelizeAdapter implements IAdapter {
     try {
       await this.Feature.create({ key: feature.key })
       return true
-    } catch (error: any) {
+    } catch (error) {
       // Check if it's a unique constraint error
-      if (error.name === 'SequelizeUniqueConstraintError') {
+      if (
+        error instanceof Error &&
+        'name' in error &&
+        error.name === 'SequelizeUniqueConstraintError'
+      ) {
         return false
       }
       throw error
@@ -350,7 +355,6 @@ class SequelizeAdapter implements IAdapter {
    * @returns True if successful
    */
   private async addToSet(featureId: number, gateKey: string, value: string): Promise<boolean> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     const gateRecord = await this.Gate.findOne({
       where: { feature_id: featureId, key: gateKey },
     })
@@ -359,9 +363,8 @@ class SequelizeAdapter implements IAdapter {
 
     if (gateRecord) {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        const parsed = JSON.parse(gateRecord.value)
-        currentSet = new Set(Array.isArray(parsed) ? parsed : [])
+        const parsed = JSON.parse(gateRecord.value) as unknown
+        currentSet = new Set(Array.isArray(parsed) ? (parsed as string[]) : [])
       } catch {
         currentSet = new Set()
       }
@@ -372,10 +375,8 @@ class SequelizeAdapter implements IAdapter {
     const serializedValue = JSON.stringify(Array.from(currentSet))
 
     if (gateRecord) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       await gateRecord.update({ value: serializedValue })
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       await this.Gate.create({
         feature_id: featureId,
         key: gateKey,
@@ -395,7 +396,6 @@ class SequelizeAdapter implements IAdapter {
    * @returns True if successful
    */
   private async removeFromSet(featureId: number, gateKey: string, value: string): Promise<boolean> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     const gateRecord = await this.Gate.findOne({
       where: { feature_id: featureId, key: gateKey },
     })
@@ -405,17 +405,14 @@ class SequelizeAdapter implements IAdapter {
     }
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      const parsed = JSON.parse(gateRecord.value)
-      const currentSet = new Set(Array.isArray(parsed) ? parsed : [])
+      const parsed = JSON.parse(gateRecord.value) as unknown
+      const currentSet = new Set(Array.isArray(parsed) ? (parsed as string[]) : [])
       currentSet.delete(value)
 
       if (currentSet.size === 0) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         await gateRecord.destroy()
       } else {
         const serializedValue = JSON.stringify(Array.from(currentSet))
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         await gateRecord.update({ value: serializedValue })
       }
 
@@ -456,7 +453,7 @@ class SequelizeAdapter implements IAdapter {
    */
   private parseGateValue(value: string): unknown {
     try {
-      const parsed = JSON.parse(value)
+      const parsed = JSON.parse(value) as unknown
       // Check if it's a set (array)
       if (Array.isArray(parsed)) {
         return new Set(parsed)

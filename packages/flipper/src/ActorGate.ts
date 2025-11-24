@@ -9,14 +9,14 @@ import { IGate, IType } from './interfaces'
  * Actors must have a `flipperId` property that uniquely identifies them.
  *
  * @example
- * const feature = flipper.feature('beta-features');
+ * const feature = flipper.feature('beta-features')
  *
  * // Enable for specific user
- * await feature.enableActor({ flipperId: 'user-123' });
+ * await feature.enableActor({ flipperId: 'user-123' })
  *
  * // Check if enabled for user
- * await feature.isEnabled({ flipperId: 'user-123' }); // true
- * await feature.isEnabled({ flipperId: 'user-456' }); // false
+ * await feature.isEnabled({ flipperId: 'user-123' }) // true
+ * await feature.isEnabled({ flipperId: 'user-456' }) // false
  */
 class ActorGate implements IGate {
   /**
