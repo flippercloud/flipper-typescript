@@ -6,10 +6,10 @@ import Comparable from './Comparable'
  * @example
  * const expr = Expression.build({
  *   Equal: [{ Property: 'plan' }, 'enterprise']
- * });
+ * })
  * expr.evaluate({
  *   properties: { plan: 'enterprise' }
- * }); // => true
+ * }) // => true
  */
 class Equal extends Comparable {
   protected operator = '=='

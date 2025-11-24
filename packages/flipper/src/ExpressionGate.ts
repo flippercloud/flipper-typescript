@@ -11,10 +11,10 @@ import { IGate, IType } from './interfaces'
  * to be evaluated.
  *
  * @example
- * const feature = flipper.feature('beta-features');
+ * const feature = flipper.feature('beta-features')
  *
  * // Enable for admins
- * await feature.enableExpression({ Property: 'admin' });
+ * await feature.enableExpression({ Property: 'admin' })
  *
  * // Enable for enterprise plans OR admins
  * await feature.enableExpression({
@@ -22,14 +22,14 @@ import { IGate, IType } from './interfaces'
  *     { Property: 'admin' },
  *     { Equal: [{ Property: 'plan' }, 'enterprise'] }
  *   ]
- * });
+ * })
  *
  * // Check if enabled
  * const user = {
  *   flipperId: 'user-123',
  *   flipperProperties: { admin: false, plan: 'enterprise' }
- * };
- * await feature.isEnabled(user); // true
+ * }
+ * await feature.isEnabled(user) // true
  */
 class ExpressionGate implements IGate {
   /**

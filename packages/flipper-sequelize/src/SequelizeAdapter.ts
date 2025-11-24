@@ -28,18 +28,18 @@ export interface SequelizeAdapterOptions {
  * Supports any database backend that Sequelize supports (MySQL, PostgreSQL, SQLite, etc.).
  *
  * @example
- * import { Sequelize } from 'sequelize';
- * import Flipper from '@flippercloud/flipper';
- * import { SequelizeAdapter, createFlipperModels } from '@flippercloud/flipper-sequelize';
+ * import { Sequelize } from 'sequelize'
+ * import Flipper from '@flippercloud/flipper'
+ * import { SequelizeAdapter, createFlipperModels } from '@flippercloud/flipper-sequelize'
  *
- * const sequelize = new Sequelize('mysql://user:pass@localhost/db');
- * const { Feature, Gate } = createFlipperModels(sequelize);
+ * const sequelize = new Sequelize('mysql://user:pass@localhost/db')
+ * const { Feature, Gate } = createFlipperModels(sequelize)
  *
- * const adapter = new SequelizeAdapter({ Feature, Gate });
- * const flipper = new Flipper(adapter);
+ * const adapter = new SequelizeAdapter({ Feature, Gate })
+ * const flipper = new Flipper(adapter)
  *
  * // Use flipper
- * await flipper.enable('new-feature');
+ * await flipper.enable('new-feature')
  */
 class SequelizeAdapter implements IAdapter {
   /**

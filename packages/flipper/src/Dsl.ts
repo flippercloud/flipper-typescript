@@ -13,21 +13,21 @@ import type Export from './Export'
  * This class is the foundation of the Flipper API, extended by the Flipper class.
  *
  * @example
- * const adapter = new MemoryAdapter();
- * const dsl = new Dsl(adapter);
+ * const adapter = new MemoryAdapter()
+ * const dsl = new Dsl(adapter)
  *
  * // Register a group
- * dsl.register('admins', (actor) => actor.isAdmin === true);
+ * dsl.register('admins', (actor) => actor.isAdmin === true)
  *
  * // Enable feature for a group
- * await dsl.enableGroup('admin-panel', 'admins');
+ * await dsl.enableGroup('admin-panel', 'admins')
  *
  * // Check if enabled for an actor
- * const user = { flipperId: 'user-123', isAdmin: true };
- * await dsl.isFeatureEnabled('admin-panel', user); // true
+ * const user = { flipperId: 'user-123', isAdmin: true }
+ * await dsl.isFeatureEnabled('admin-panel', user) // true
  *
  * // Preload features for efficiency
- * await dsl.preloadAll();
+ * await dsl.preloadAll()
  */
 class Dsl {
   /**
@@ -266,8 +266,8 @@ class Dsl {
    * @param callback - Function that returns true if actor is in the group
    *
    * @example
-   * flipper.register('admins', (actor) => actor.role === 'admin');
-   * await flipper.enableGroup('admin-features', 'admins');
+   * flipper.register('admins', (actor) => actor.role === 'admin')
+   * await flipper.enableGroup('admin-features', 'admins')
    */
   public register(groupName: string, callback: GroupCallback): void {
     this.groups[groupName] = new GroupType(groupName, callback)
@@ -299,11 +299,11 @@ class Dsl {
    *
    * @example
    * // Export to JSON
-   * const exportObj = await flipper.export({ format: 'json', version: 1 });
-   * const jsonString = exportObj.contents;
+   * const exportObj = await flipper.export({ format: 'json', version: 1 })
+   * const jsonString = exportObj.contents
    *
    * // Save to file
-   * fs.writeFileSync('backup.json', jsonString);
+   * fs.writeFileSync('backup.json', jsonString)
    */
   async export(options?: { format?: string; version?: number }): Promise<Export> {
     return await this.adapter.export(options)
@@ -320,16 +320,16 @@ class Dsl {
    *
    * @example
    * // Import from another Flipper instance
-   * const source = new Flipper(sourceAdapter);
-   * await destination.import(source);
+   * const source = new Flipper(sourceAdapter)
+   * await destination.import(source)
    *
    * // Import from an export
-   * const contents = fs.readFileSync('backup.json', 'utf-8');
-   * const exportObj = new JsonExport({ contents });
-   * await flipper.import(exportObj);
+   * const contents = fs.readFileSync('backup.json', 'utf-8')
+   * const exportObj = new JsonExport({ contents })
+   * await flipper.import(exportObj)
    *
    * // Import from another adapter
-   * await flipper.import(sourceAdapter);
+   * await flipper.import(sourceAdapter)
    */
   async import(source: IAdapter | Export | Dsl): Promise<boolean> {
     return await this.adapter.import(source)

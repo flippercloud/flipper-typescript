@@ -74,13 +74,13 @@ class ExportAdapter implements IAdapter {
  *
  * @example
  * // Export from source
- * const sourceExport = await sourceFlipper.export();
+ * const sourceExport = await sourceFlipper.export()
  *
  * // Transfer the export
- * const jsonString = sourceExport.contents;
+ * const jsonString = sourceExport.contents
  *
  * // Import to destination
- * await destinationFlipper.import(sourceExport);
+ * await destinationFlipper.import(sourceExport)
  */
 abstract class Export {
   /**

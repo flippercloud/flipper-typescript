@@ -5,10 +5,10 @@ import { buildExpression } from './build'
  * Accesses a property from the actor's flipper_properties.
  *
  * @example
- * const expr = Expression.build({ Property: 'plan' });
+ * const expr = Expression.build({ Property: 'plan' })
  * expr.evaluate({
  *   properties: { plan: 'enterprise' }
- * }); // => 'enterprise'
+ * }) // => 'enterprise'
  */
 class Property {
   readonly name = 'Property'

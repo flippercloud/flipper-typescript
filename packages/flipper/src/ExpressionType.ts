@@ -7,10 +7,10 @@ import { buildExpression, type ExpressionLike } from './expressions'
  * Wraps expression objects for use with the ExpressionGate.
  *
  * @example
- * const expr = { Property: 'admin' };
- * const exprType = ExpressionType.wrap(expr);
+ * const expr = { Property: 'admin' }
+ * const exprType = ExpressionType.wrap(expr)
  *
- * console.log(exprType.value); // JSON string of expression
+ * console.log(exprType.value) // JSON string of expression
  */
 class ExpressionType implements IType {
   /**

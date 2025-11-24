@@ -23,25 +23,25 @@ import { type ExpressionLike } from './expressions'
  * group, percentage of actors, percentage of time).
  *
  * @example
- * const adapter = new MemoryAdapter();
- * const groups = {};
- * const feature = new Feature('new-ui', adapter, groups);
+ * const adapter = new MemoryAdapter()
+ * const groups = {}
+ * const feature = new Feature('new-ui', adapter, groups)
  *
  * // Enable for everyone
- * await feature.enable();
+ * await feature.enable()
  *
  * // Enable for specific actor
- * await feature.enableActor({ flipperId: 'user-123' });
+ * await feature.enableActor({ flipperId: 'user-123' })
  *
  * // Enable with expression
- * await feature.enableExpression({ Property: 'admin' });
+ * await feature.enableExpression({ Property: 'admin' })
  *
  * // Check if enabled
- * await feature.isEnabled(); // true
- * await feature.isEnabled({ flipperId: 'user-123' }); // true
+ * await feature.isEnabled() // true
+ * await feature.isEnabled({ flipperId: 'user-123' }) // true
  *
  * // Check state
- * await feature.state(); // 'on' | 'off' | 'conditional'
+ * await feature.state() // 'on' | 'off' | 'conditional'
  */
 class Feature {
   /**
@@ -180,7 +180,7 @@ class Feature {
    * @returns True if successful
    * @example
    * // Enable for admins
-   * await feature.enableExpression({ Property: 'admin' });
+   * await feature.enableExpression({ Property: 'admin' })
    *
    * // Enable for admins OR enterprise users
    * await feature.enableExpression({
@@ -188,7 +188,7 @@ class Feature {
    *     { Property: 'admin' },
    *     { Equal: [{ Property: 'plan' }, 'enterprise'] }
    *   ]
-   * });
+   * })
    */
   public enableExpression(expression: Record<string, unknown> | ExpressionLike) {
     const expressionType = ExpressionType.wrap(expression)

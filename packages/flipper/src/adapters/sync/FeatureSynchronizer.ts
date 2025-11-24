@@ -12,8 +12,8 @@ import type GateValues from '../../GateValues'
  *   feature,
  *   localGateValues,
  *   remoteGateValues
- * );
- * synchronizer.call();
+ * )
+ * synchronizer.call()
  */
 class FeatureSynchronizer {
   private readonly feature: Feature

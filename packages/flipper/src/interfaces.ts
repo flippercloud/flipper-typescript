@@ -97,10 +97,10 @@ export interface InstrumentationPayload {
  * @example
  * class CustomInstrumenter implements IInstrumenter {
  *   instrument<T>(name: string, payload: InstrumentationPayload, fn: (payload: InstrumentationPayload) => T): T {
- *     console.log('Starting:', name, payload);
- *     const result = fn(payload);
- *     console.log('Finished:', name, 'result:', result);
- *     return result;
+ *     console.log('Starting:', name, payload)
+ *     const result = fn(payload)
+ *     console.log('Finished:', name, 'result:', result)
+ *     return result
  *   }
  * }
  */

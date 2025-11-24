@@ -15,12 +15,12 @@ import Typecast from './Typecast'
  *   percentageOfActors: 25,
  *   percentageOfTime: 10,
  *   expression: { Property: 'admin' }
- * };
+ * }
  *
- * const gateValues = new GateValues(rawValues);
- * console.log(gateValues.boolean); // true
- * console.log(gateValues.actors); // Set(['user-1', 'user-2'])
- * console.log(gateValues.expression); // { Property: 'admin' }
+ * const gateValues = new GateValues(rawValues)
+ * console.log(gateValues.boolean) // true
+ * console.log(gateValues.actors) // Set(['user-1', 'user-2'])
+ * console.log(gateValues.expression) // { Property: 'admin' }
  */
 class GateValues {
   /**

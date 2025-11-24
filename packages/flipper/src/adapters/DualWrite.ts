@@ -11,15 +11,15 @@ import Dsl from '../Dsl'
  * All reads come from the local adapter only.
  *
  * @example
- * const local = new MemoryAdapter();
- * const remote = new RedisAdapter();
- * const dualWrite = new DualWrite(local, remote);
+ * const local = new MemoryAdapter()
+ * const remote = new RedisAdapter()
+ * const dualWrite = new DualWrite(local, remote)
  *
  * // Writes go to both (remote first, then local)
- * await dualWrite.enable(feature, gate, thing);
+ * await dualWrite.enable(feature, gate, thing)
  *
  * // Reads come from local only
- * await dualWrite.get(feature);
+ * await dualWrite.get(feature)
  *
  * // Migration pattern: gradually shift reads to remote
  * // Step 1: DualWrite(old, new) - write to both, read from old

@@ -5,8 +5,8 @@ import { buildExpression } from './build'
  * Returns the current Unix timestamp in seconds.
  *
  * @example
- * const expr = Expression.build({ Now: [] });
- * expr.evaluate({ properties: {} }); // => 1699459200
+ * const expr = Expression.build({ Now: [] })
+ * expr.evaluate({ properties: {} }) // => 1699459200
  */
 class Now {
   readonly name = 'Now'

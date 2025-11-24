@@ -18,8 +18,8 @@ export interface IExporter {
  * Factory for building exporters based on format and version.
  *
  * @example
- * const exporter = Exporter.build({ format: 'json', version: 1 });
- * const exportObj = await exporter.call(adapter);
+ * const exporter = Exporter.build({ format: 'json', version: 1 })
+ * const exportObj = await exporter.call(adapter)
  */
 class Exporter {
   /**

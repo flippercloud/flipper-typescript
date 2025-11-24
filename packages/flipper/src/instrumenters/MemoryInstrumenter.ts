@@ -27,21 +27,21 @@ export interface InstrumentationEvent {
  * captures all Flipper operations and allows you to inspect them.
  *
  * @example
- * const instrumenter = new MemoryInstrumenter();
- * const dsl = new Dsl(adapter, { instrumenter });
+ * const instrumenter = new MemoryInstrumenter()
+ * const dsl = new Dsl(adapter, { instrumenter })
  *
- * await dsl.enable('my-feature');
+ * await dsl.enable('my-feature')
  *
  * // Check what operations occurred
- * console.log(instrumenter.events); // Array of events
- * console.log(instrumenter.count()); // Total event count
- * console.log(instrumenter.count('feature_operation.flipper')); // Count by name
+ * console.log(instrumenter.events) // Array of events
+ * console.log(instrumenter.count()) // Total event count
+ * console.log(instrumenter.count('feature_operation.flipper')) // Count by name
  *
  * // Get specific events
- * const events = instrumenter.eventsByName('feature_operation.flipper');
+ * const events = instrumenter.eventsByName('feature_operation.flipper')
  *
  * // Reset for next test
- * instrumenter.reset();
+ * instrumenter.reset()
  */
 class MemoryInstrumenter implements IInstrumenter {
   /**

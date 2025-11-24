@@ -6,11 +6,11 @@
  *
  * @example
  * // In your migration file (migrations/xxx-create-flipper-tables.js):
- * import { createFlipperMigration } from '@flippercloud/flipper-sequelize';
+ * import { createFlipperMigration } from '@flippercloud/flipper-sequelize'
  *
- * const migration = createFlipperMigration();
- * export const up = migration.up;
- * export const down = migration.down;
+ * const migration = createFlipperMigration()
+ * export const up = migration.up
+ * export const down = migration.down
  */
 
 import type { QueryInterface } from 'sequelize'

@@ -1,6 +1,6 @@
-const eslint = require('@eslint/js');
-const tseslint = require('typescript-eslint');
-const path = require('path');
+const eslint = require('@eslint/js')
+const tseslint = require('typescript-eslint')
+const path = require('path')
 
 module.exports = tseslint.config(
   eslint.configs.recommended,

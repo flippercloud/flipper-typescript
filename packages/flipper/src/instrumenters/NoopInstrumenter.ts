@@ -8,10 +8,10 @@ import { IInstrumenter, InstrumentationPayload } from '../interfaces'
  * any instrumentation overhead.
  *
  * @example
- * const instrumenter = new NoopInstrumenter();
+ * const instrumenter = new NoopInstrumenter()
  * const result = instrumenter.instrument('operation', {}, (payload) => {
- *   return 'result';
- * });
+ *   return 'result'
+ * })
  * // result === 'result'
  */
 class NoopInstrumenter implements IInstrumenter {

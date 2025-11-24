@@ -7,7 +7,7 @@ import { buildExpression } from './build'
  * @example
  * const expr = Expression.build({
  *   Percentage: [45, 50]
- * });
+ * })
  * expr.evaluate({ properties: {} }); // => true (45 < 50)
  */
 class Percentage {

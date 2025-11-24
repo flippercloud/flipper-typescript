@@ -14,7 +14,7 @@ Flipper gives you control over who has access to features in your app.
 - Performant in-memory adapter with support for custom storage adapters.
 - Adapter wrappers for memoization, read-only mode, strict mode, dual-write, and operation logging.
 
-Control your software &mdash; don't let it control you.
+Control your software — don't let it control you.
 
 ## Installation
 
@@ -29,16 +29,16 @@ bun add @flippercloud/flipper
 Use `flipper.isFeatureEnabled()` in your app to check if a feature is enabled.
 
 ```typescript
-import { Flipper, MemoryAdapter } from '@flippercloud/flipper';
+import { Flipper, MemoryAdapter } from '@flippercloud/flipper'
 
-const adapter = new MemoryAdapter();
-const flipper = new Flipper(adapter);
+const adapter = new MemoryAdapter()
+const flipper = new Flipper(adapter)
 
 // Check if search is enabled
 if (await flipper.isFeatureEnabled('search', currentUser)) {
-  console.log('Search away!');
+  console.log('Search away!')
 } else {
-  console.log('No search for you!');
+  console.log('No search for you!')
 }
 ```
 
@@ -46,16 +46,16 @@ All features are disabled by default, so you'll need to explicitly enable them.
 
 ```typescript
 // Enable a feature for everyone
-await flipper.enable('search');
+await flipper.enable('search')
 
 // Enable a feature for a specific actor
-await flipper.enableActor('search', currentUser);
+await flipper.enableActor('search', currentUser)
 
 // Enable a feature for a group of actors
-await flipper.enableGroup('search', 'admin');
+await flipper.enableGroup('search', 'admin')
 
 // Enable a feature for a percentage of actors
-await flipper.enablePercentageOfActors('search', 25);
+await flipper.enablePercentageOfActors('search', 25)
 ```
 
 Read more about [getting started with Flipper](docs/QUICK_REFERENCE.md) and see the [Quick Reference](docs/QUICK_REFERENCE.md) for the full API.

@@ -5,8 +5,8 @@ import { buildExpression } from './build'
  * Converts a duration into seconds.
  *
  * @example
- * const expr = Expression.build({ Duration: [5, 'minutes'] });
- * expr.evaluate({ properties: {} }); // => 300
+ * const expr = Expression.build({ Duration: [5, 'minutes'] })
+ * expr.evaluate({ properties: {} }) // => 300
  */
 class Duration {
   readonly name = 'Duration'

@@ -10,10 +10,10 @@ import Wrapper from './Wrapper'
  * allowing monitoring, logging, and performance tracking of adapter calls.
  *
  * @example
- * const memoryInstrumenter = new MemoryInstrumenter();
- * const adapter = new Instrumented(new Memory(), { instrumenter: memoryInstrumenter });
- * await adapter.features(); // Emits "adapter_operation.flipper" event
- * console.log(memoryInstrumenter.count()); // 1
+ * const memoryInstrumenter = new MemoryInstrumenter()
+ * const adapter = new Instrumented(new Memory(), { instrumenter: memoryInstrumenter })
+ * await adapter.features() // Emits "adapter_operation.flipper" event
+ * console.log(memoryInstrumenter.count()) // 1
  */
 export default class Instrumented extends Wrapper {
   /**

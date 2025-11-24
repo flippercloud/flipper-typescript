@@ -35,21 +35,21 @@ export interface FailoverOptions {
  * const adapter = new Failover(
  *   cacheAdapter,     // Fast but might fail
  *   databaseAdapter   // Slower but reliable
- * );
+ * )
  *
  * // Dual write mode: keep both adapters in sync
  * const adapter = new Failover(
  *   cacheAdapter,
  *   databaseAdapter,
  *   { dualWrite: true }
- * );
+ * )
  *
  * // Custom error handling
  * const adapter = new Failover(
  *   primaryAdapter,
  *   secondaryAdapter,
  *   { errors: [NetworkError, TimeoutError] }
- * );
+ * )
  */
 export default class Failover implements IAdapter {
   /**

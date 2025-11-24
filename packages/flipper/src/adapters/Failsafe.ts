@@ -37,16 +37,16 @@ export interface FailsafeOptions {
  * // Wrap external adapter with failsafe
  * const adapter = new Failsafe(
  *   new HttpAdapter('https://flipper.example.com')
- * );
+ * )
  *
  * // If HTTP adapter fails, features are disabled (fail closed)
- * const enabled = await flipper.isEnabled('new-feature'); // false, no error
+ * const enabled = await flipper.isEnabled('new-feature') // false, no error
  *
  * // Custom error handling
  * const adapter = new Failsafe(
  *   myAdapter,
  *   { errors: [NetworkError, TimeoutError] }
- * );
+ * )
  */
 export default class Failsafe implements IAdapter {
   /**

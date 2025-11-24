@@ -55,9 +55,9 @@ export interface FlipperModels {
  * @returns Object with Feature and Gate models
  *
  * @example
- * const sequelize = new Sequelize('mysql://user:pass@localhost/db');
- * const { Feature, Gate } = createFlipperModels(sequelize);
- * await Feature.sync(); // Create tables if they don't exist
+ * const sequelize = new Sequelize('mysql://user:pass@localhost/db')
+ * const { Feature, Gate } = createFlipperModels(sequelize)
+ * await Feature.sync() // Create tables if they don't exist
  */
 export function createFlipperModels(
   sequelize: Sequelize,

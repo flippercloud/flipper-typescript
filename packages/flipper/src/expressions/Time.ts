@@ -5,8 +5,8 @@ import { buildExpression } from './build'
  * Parses a time string into a Unix timestamp.
  *
  * @example
- * const expr = Expression.build({ Time: '2024-01-01T00:00:00Z' });
- * expr.evaluate({ properties: {} }); // => 1704067200
+ * const expr = Expression.build({ Time: '2024-01-01T00:00:00Z' })
+ * expr.evaluate({ properties: {} }) // => 1704067200
  */
 class Time {
   readonly name = 'Time'

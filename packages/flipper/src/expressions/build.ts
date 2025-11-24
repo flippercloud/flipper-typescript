@@ -21,11 +21,11 @@ export function setRegistry(reg: Record<string, new (...args: unknown[]) => Expr
  * @throws {Error} If object cannot be converted to an expression
  * @example
  * // From object
- * const expr1 = buildExpression({ Property: 'admin' });
+ * const expr1 = buildExpression({ Property: 'admin' })
  *
  * // From primitive (creates Constant)
- * const expr2 = buildExpression('hello');
- * const expr3 = buildExpression(42);
+ * const expr2 = buildExpression('hello')
+ * const expr3 = buildExpression(42)
  */
 export function buildExpression(object: unknown): ExpressionLike {
   // Return existing expression or constant as-is

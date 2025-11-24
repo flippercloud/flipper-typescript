@@ -5,8 +5,8 @@ import { buildExpression } from './build'
  * Converts argument to string.
  *
  * @example
- * const expr = Expression.build({ String: 42 });
- * expr.evaluate({ properties: {} }); // => '42'
+ * const expr = Expression.build({ String: 42 })
+ * expr.evaluate({ properties: {} }) // => '42'
  */
 class StringExpression {
   readonly name = 'String'

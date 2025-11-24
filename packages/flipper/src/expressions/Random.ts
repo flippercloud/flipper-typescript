@@ -5,8 +5,8 @@ import { buildExpression } from './build'
  * Generates a random number between 0 and max (exclusive).
  *
  * @example
- * const expr = Expression.build({ Random: 100 });
- * expr.evaluate({ properties: {} }); // => 0-99
+ * const expr = Expression.build({ Random: 100 })
+ * expr.evaluate({ properties: {} }) // => 0-99
  */
 class Random {
   readonly name = 'Random'

@@ -9,11 +9,11 @@ import { buildExpression, Constant, type ExpressionLike } from './expressions'
  * checking their state.
  *
  * @example
- * const adapter = new MemoryAdapter();
- * const flipper = new Flipper(adapter);
+ * const adapter = new MemoryAdapter()
+ * const flipper = new Flipper(adapter)
  *
  * // Enable a feature for everyone
- * await flipper.enable('new-ui');
+ * await flipper.enable('new-ui')
  *
  * // Check if feature is enabled
  * if (await flipper.isFeatureEnabled('new-ui')) {
@@ -21,10 +21,10 @@ import { buildExpression, Constant, type ExpressionLike } from './expressions'
  * }
  *
  * // Enable for specific actor
- * await flipper.enableActor('beta-features', { flipperId: 'user-123' });
+ * await flipper.enableActor('beta-features', { flipperId: 'user-123' })
  *
  * // Enable for percentage of users
- * await flipper.enablePercentageOfActors('gradual-rollout', 25);
+ * await flipper.enablePercentageOfActors('gradual-rollout', 25)
  */
 class Flipper extends Dsl {
   /**
@@ -32,9 +32,9 @@ class Flipper extends Dsl {
    * @returns Array of group names
    *
    * @example
-   * flipper.register('admins', (actor) => actor.isAdmin);
-   * flipper.register('beta-users', (actor) => actor.betaTester);
-   * flipper.groupNames(); // ['admins', 'beta-users']
+   * flipper.register('admins', (actor) => actor.isAdmin)
+   * flipper.register('beta-users', (actor) => actor.betaTester)
+   * flipper.groupNames() // ['admins', 'beta-users']
    */
   public groupNames(): string[] {
     return Object.keys(this.groups)
@@ -46,9 +46,9 @@ class Flipper extends Dsl {
    * @returns True if the group is registered
    *
    * @example
-   * flipper.register('admins', (actor) => actor.isAdmin);
-   * flipper.groupExists('admins'); // true
-   * flipper.groupExists('unknown'); // false
+   * flipper.register('admins', (actor) => actor.isAdmin)
+   * flipper.groupExists('admins') // true
+   * flipper.groupExists('unknown') // false
    */
   public groupExists(groupName: string): boolean {
     return groupName in this.groups
@@ -59,10 +59,10 @@ class Flipper extends Dsl {
    * @returns void
    *
    * @example
-   * flipper.register('admins', (actor) => actor.isAdmin);
-   * flipper.groupNames(); // ['admins']
-   * flipper.unregisterGroups();
-   * flipper.groupNames(); // []
+   * flipper.register('admins', (actor) => actor.isAdmin)
+   * flipper.groupNames() // ['admins']
+   * flipper.unregisterGroups()
+   * flipper.groupNames() // []
    */
   public unregisterGroups(): void {
     this.groups = {}
@@ -74,7 +74,7 @@ class Flipper extends Dsl {
    * @param object - Expression object or primitive value
    * @returns ExpressionLike instance
    * @example
-   * const expr = Flipper.build({ Property: 'admin' });
+   * const expr = Flipper.build({ Property: 'admin' })
    */
   public static build(object: unknown): ExpressionLike {
     return buildExpression(object)
@@ -86,8 +86,8 @@ class Flipper extends Dsl {
    * @param value - The constant value
    * @returns Constant expression
    * @example
-   * const expr = Flipper.constant('hello');
-   * expr.evaluate({ properties: {} }); // => 'hello'
+   * const expr = Flipper.constant('hello')
+   * expr.evaluate({ properties: {} }) // => 'hello'
    */
   public static constant(value: unknown): Constant {
     return new Constant(value)
@@ -99,8 +99,8 @@ class Flipper extends Dsl {
    * @param name - Property name to lookup
    * @returns Property expression
    * @example
-   * const expr = Flipper.property('admin');
-   * expr.evaluate({ properties: { admin: true } }); // => true
+   * const expr = Flipper.property('admin')
+   * expr.evaluate({ properties: { admin: true } }) // => true
    */
   public static property(name: string): ExpressionLike {
     return buildExpression({ Property: name })
@@ -115,7 +115,7 @@ class Flipper extends Dsl {
    * const expr = Flipper.any(
    *   Flipper.property('admin'),
    *   Flipper.property('beta_user')
-   * );
+   * )
    */
   public static any(...args: unknown[]): ExpressionLike {
     return buildExpression({ Any: args })
@@ -130,7 +130,7 @@ class Flipper extends Dsl {
    * const expr = Flipper.all(
    *   Flipper.property('admin'),
    *   Flipper.property('active')
-   * );
+   * )
    */
   public static all(...args: unknown[]): ExpressionLike {
     return buildExpression({ All: args })
@@ -142,8 +142,8 @@ class Flipper extends Dsl {
    * @param value - Value to convert to string
    * @returns String expression
    * @example
-   * const expr = Flipper.string(42);
-   * expr.evaluate({ properties: {} }); // => '42'
+   * const expr = Flipper.string(42)
+   * expr.evaluate({ properties: {} }) // => '42'
    */
   public static string(value: unknown): ExpressionLike {
     return buildExpression({ String: value })
@@ -155,8 +155,8 @@ class Flipper extends Dsl {
    * @param value - Value to convert to number
    * @returns Number expression
    * @example
-   * const expr = Flipper.number('42');
-   * expr.evaluate({ properties: {} }); // => 42
+   * const expr = Flipper.number('42')
+   * expr.evaluate({ properties: {} }) // => 42
    */
   public static number(value: unknown): ExpressionLike {
     return buildExpression({ Number: value })
@@ -168,8 +168,8 @@ class Flipper extends Dsl {
    * @param value - Value to convert to boolean
    * @returns Boolean expression
    * @example
-   * const expr = Flipper.boolean('truthy');
-   * expr.evaluate({ properties: {} }); // => true
+   * const expr = Flipper.boolean('truthy')
+   * expr.evaluate({ properties: {} }) // => true
    */
   public static boolean(value: unknown): ExpressionLike {
     return buildExpression({ Boolean: value })
@@ -181,8 +181,8 @@ class Flipper extends Dsl {
    * @param max - Maximum value (exclusive)
    * @returns Random expression
    * @example
-   * const expr = Flipper.random(100);
-   * expr.evaluate({ properties: {} }); // => 0-99
+   * const expr = Flipper.random(100)
+   * expr.evaluate({ properties: {} }) // => 0-99
    */
   public static random(max: number): ExpressionLike {
     return buildExpression({ Random: max })
@@ -193,8 +193,8 @@ class Flipper extends Dsl {
    *
    * @returns Now expression
    * @example
-   * const expr = Flipper.now();
-   * expr.evaluate({ properties: {} }); // => current Unix timestamp
+   * const expr = Flipper.now()
+   * expr.evaluate({ properties: {} }) // => current Unix timestamp
    */
   public static now(): ExpressionLike {
     return buildExpression({ Now: [] })
@@ -206,8 +206,8 @@ class Flipper extends Dsl {
    * @param timeString - ISO 8601 time string
    * @returns Time expression
    * @example
-   * const expr = Flipper.time('2024-01-01T00:00:00Z');
-   * expr.evaluate({ properties: {} }); // => Unix timestamp
+   * const expr = Flipper.time('2024-01-01T00:00:00Z')
+   * expr.evaluate({ properties: {} }) // => Unix timestamp
    */
   public static time(timeString: string): ExpressionLike {
     return buildExpression({ Time: timeString })
@@ -220,8 +220,8 @@ class Flipper extends Dsl {
    * @param unit - Unit of time (second, minute, hour, day, week, month, year)
    * @returns Duration expression
    * @example
-   * const expr = Flipper.duration(5, 'minutes');
-   * expr.evaluate({ properties: {} }); // => 300
+   * const expr = Flipper.duration(5, 'minutes')
+   * expr.evaluate({ properties: {} }) // => 300
    */
   public static duration(scalar: number, unit: string = 'second'): ExpressionLike {
     return buildExpression({ Duration: [scalar, unit] })
