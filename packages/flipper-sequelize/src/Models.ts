@@ -1,4 +1,4 @@
-import { DataTypes, Model, Sequelize } from 'sequelize'
+import { DataTypes, Model, Sequelize, ModelStatic } from 'sequelize'
 
 /**
  * Sequelize model for Flipper features.
@@ -9,6 +9,7 @@ export class FlipperFeatureModel extends Model {
   declare key: string
   declare createdAt: Date
   declare updatedAt: Date
+  declare gates?: FlipperGateModel[]
 }
 
 /**
@@ -22,6 +23,7 @@ export class FlipperGateModel extends Model {
   declare value: string
   declare createdAt: Date
   declare updatedAt: Date
+  declare feature?: FlipperFeatureModel
 }
 
 /**
@@ -32,6 +34,14 @@ export interface CreateFlipperModelsOptions {
   gateTableName?: string
   timestamps?: boolean
   underscored?: boolean
+}
+
+/**
+ * Return type for createFlipperModels
+ */
+export interface FlipperModels {
+  Feature: ModelStatic<FlipperFeatureModel>
+  Gate: ModelStatic<FlipperGateModel>
 }
 
 /**
@@ -52,10 +62,7 @@ export interface CreateFlipperModelsOptions {
 export function createFlipperModels(
   sequelize: Sequelize,
   options: CreateFlipperModelsOptions = {}
-): {
-  Feature: any
-  Gate: any
-} {
+): FlipperModels {
   const {
     featureTableName = 'flipper_features',
     gateTableName = 'flipper_gates',
@@ -63,7 +70,7 @@ export function createFlipperModels(
     underscored = true,
   } = options
 
-  const Feature = sequelize.define(
+  const Feature = sequelize.define<FlipperFeatureModel>(
     'FlipperFeature',
     {
       id: {
@@ -84,9 +91,9 @@ export function createFlipperModels(
       underscored,
       modelName: 'FlipperFeature',
     }
-  )
+  ) as ModelStatic<FlipperFeatureModel>
 
-  const Gate = sequelize.define(
+  const Gate = sequelize.define<FlipperGateModel>(
     'FlipperGate',
     {
       id: {
@@ -122,7 +129,7 @@ export function createFlipperModels(
         },
       ],
     }
-  )
+  ) as ModelStatic<FlipperGateModel>
 
   // Set up associations
   Feature.hasMany(Gate, {

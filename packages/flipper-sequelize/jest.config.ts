@@ -13,12 +13,19 @@ const config: Config = {
   transform: {
     '^.+\\.ts$': ['ts-jest', {
       useESM: true,
+      tsconfig: {
+        module: 'ESNext',
+        skipLibCheck: true,
+      },
     }],
   },
   extensionsToTreatAsEsm: ['.ts'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
+    '^@flippercloud/flipper$': '<rootDir>/../../packages/flipper/src/index.ts',
   },
+  testPathIgnorePatterns: ['/node_modules/', '/dist/'],
 }
 
 export default config
+
