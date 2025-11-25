@@ -58,11 +58,11 @@ await flipper.enableGroup('search', 'admin')
 await flipper.enablePercentageOfActors('search', 25)
 ```
 
-Read more about [getting started with Flipper](docs/QUICK_REFERENCE.md) and see the [Quick Reference](docs/QUICK_REFERENCE.md) for the full API.
+Read more in the [Getting Started guide](docs/guides/getting-started.md) and browse the [Workspace command reference](docs/reference/workspace-commands.md) for the full API surface.
 
 ## Contributing
 
-For development setup and scripts, see the [Quick Reference](docs/QUICK_REFERENCE.md).
+For development setup and scripts, see the [Workspace command reference](docs/reference/workspace-commands.md).
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
