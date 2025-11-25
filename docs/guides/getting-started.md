@@ -49,7 +49,7 @@ await flipper.enablePercentageOfActors('search', 25)
 - Redis adapter: distribute feature state across servers.
 - SQL adapters: manage state alongside relational data.
 
-See the adapter-specific guides once you are ready to move beyond in-memory storage.
+Browse the [adapter guides](../adapters/README.md) once you're ready to move beyond in-memory storage.
 
 ## 6. Explore More
 

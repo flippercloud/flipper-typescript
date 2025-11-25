@@ -6,6 +6,7 @@ Welcome to the home of the Flipper TypeScript documentation. These guides cover 
 
 - [Getting started guide](./guides/getting-started.md)
 - [Workspace command reference](./reference/workspace-commands.md)
+- [Adapter guides](./adapters/README.md)
 - [Create a new package](./how-to/create-package.md)
 - [Documentation upkeep checklist](./contributing/documentation.md)
 
