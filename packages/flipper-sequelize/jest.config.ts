@@ -16,6 +16,7 @@ const config: Config = {
       tsconfig: {
         module: 'ESNext',
         skipLibCheck: true,
+        rootDir: '../../',
       },
     }],
   },
@@ -28,4 +29,3 @@ const config: Config = {
 }
 
 export default config
-
