@@ -54,21 +54,16 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      feature_id: {
+      feature_key: {
         allowNull: false,
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'flipper_features',
-          key: 'id',
-        },
-        onDelete: 'CASCADE',
+        type: Sequelize.STRING,
       },
       key: {
         allowNull: false,
         type: Sequelize.STRING,
       },
       value: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.TEXT,
       },
       created_at: {
@@ -83,9 +78,9 @@ module.exports = {
       },
     })
 
-    await queryInterface.addIndex('flipper_gates', ['feature_id', 'key'], {
+    await queryInterface.addIndex('flipper_gates', ['feature_key', 'key', 'value'], {
       unique: true,
-      name: 'index_flipper_gates_on_feature_id_and_key',
+      name: 'index_flipper_gates_on_feature_key_and_key_and_value',
     })
   },
 
@@ -133,9 +128,10 @@ export const createFlipperModels = (sequelize) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      feature_id: {
-        type: DataTypes.INTEGER,
+      featureKey: {
+        type: DataTypes.STRING,
         allowNull: false,
+        field: 'feature_key',
       },
       key: {
         type: DataTypes.STRING,
@@ -143,18 +139,31 @@ export const createFlipperModels = (sequelize) => {
       },
       value: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
       },
     },
     {
       tableName: 'flipper_gates',
       timestamps: true,
       underscored: true,
+      indexes: [
+        {
+          unique: true,
+          fields: ['feature_key', 'key', 'value'],
+        },
+      ],
     }
   )
 
-  Feature.hasMany(Gate, { foreignKey: 'feature_id', as: 'gates' })
-  Gate.belongsTo(Feature, { foreignKey: 'feature_id' })
+  Feature.hasMany(Gate, {
+    foreignKey: { name: 'featureKey', field: 'feature_key' },
+    sourceKey: 'key',
+    as: 'gates',
+  })
+  Gate.belongsTo(Feature, {
+    foreignKey: { name: 'featureKey', field: 'feature_key' },
+    targetKey: 'key',
+  })
 
   return { Feature, Gate }
 }

@@ -139,15 +139,12 @@ class SequelizeAdapter implements IAdapter {
     }
 
     const gates = await this.Gate.findAll({
-      where: { feature_id: dbFeature.id },
+      where: { featureKey: feature.key },
+      attributes: ['key', 'value'],
       raw: true,
     })
 
-    const result: Record<string, unknown> = {}
-    for (const gate of gates) {
-      result[gate.key] = this.parseGateValue(gate.value)
-    }
-    return result
+    return this.resultForGates(feature, gates as Array<{ key: string | null; value: string | null }>)
   }
 
   /**
@@ -202,26 +199,22 @@ class SequelizeAdapter implements IAdapter {
       throw new Error(`Feature ${feature.key} not found`)
     }
 
-    const value = this.serializeGateValue(gate.dataType, thing.value)
-
-    // For set types, we need to handle differently
-    if (gate.dataType === 'set') {
-      return this.addToSet(dbFeature.id, gate.key, String(thing.value))
-    }
-
-    // For other types, upsert the gate
-    const [gateRecord] = await this.Gate.findOrCreate({
-      where: {
-        feature_id: dbFeature.id,
-        key: gate.key,
-      },
-      defaults: {
-        value,
-      },
-    })
-
-    if (gateRecord.value !== value) {
-      await gateRecord.update({ value })
+    switch (gate.dataType) {
+      case 'boolean':
+        await this.set(feature, gate, thing, { clear: true })
+        break
+      case 'number':
+        await this.set(feature, gate, thing)
+        break
+      case 'json':
+        await this.set(feature, gate, thing, { json: true })
+        break
+      case 'set':
+        await this.enableMulti(feature, gate, thing)
+        break
+      default:
+        await this.set(feature, gate, thing)
+        break
     }
 
     return true
@@ -249,18 +242,26 @@ class SequelizeAdapter implements IAdapter {
 
     // For set types, remove from set
     if (gate.dataType === 'set') {
-      return this.removeFromSet(dbFeature.id, gate.key, String(thing.value))
+      await this.deleteSetValue(feature, gate, String(thing.value))
+      return true
     }
 
     // For boolean and number types, delete the gate completely
-    const result = await this.Gate.destroy({
-      where: {
-        feature_id: dbFeature.id,
-        key: gate.key,
-      },
-    })
-
-    return result > 0
+    switch (gate.dataType) {
+      case 'boolean':
+        await this.clear(feature)
+        return true
+      case 'number':
+        await this.set(feature, gate, thing)
+        return true
+      case 'json':
+            await this.deleteGate(feature, gate)
+        return true
+      default: {
+            await this.deleteGate(feature, gate)
+        return true
+      }
+    }
   }
 
   /**
@@ -282,7 +283,7 @@ class SequelizeAdapter implements IAdapter {
     }
 
     await this.Gate.destroy({
-      where: { feature_id: dbFeature.id },
+      where: { featureKey: feature.key },
     })
 
     return true
@@ -348,78 +349,135 @@ class SequelizeAdapter implements IAdapter {
 
   /**
    * Add a value to a set gate.
-   * @private
-   * @param featureId - The feature ID
-   * @param gateKey - The gate key
-   * @param value - The value to add
-   * @returns True if successful
+   * Mirrors ActiveRecord adapter behavior by writing one row per value.
    */
-  private async addToSet(featureId: number, gateKey: string, value: string): Promise<boolean> {
-    const gateRecord = await this.Gate.findOne({
-      where: { feature_id: featureId, key: gateKey },
-    })
-
-    let currentSet = new Set<string>()
-
-    if (gateRecord) {
-      try {
-        const parsed = JSON.parse(gateRecord.value) as unknown
-        currentSet = new Set(Array.isArray(parsed) ? (parsed as string[]) : [])
-      } catch {
-        currentSet = new Set()
-      }
-    }
-
-    currentSet.add(value)
-
-    const serializedValue = JSON.stringify(Array.from(currentSet))
-
-    if (gateRecord) {
-      await gateRecord.update({ value: serializedValue })
-    } else {
+  private async enableMulti(feature: FeatureClass, gate: IGate, thing: IType): Promise<void> {
+    try {
       await this.Gate.create({
-        feature_id: featureId,
-        key: gateKey,
-        value: serializedValue,
+        featureKey: feature.key,
+        key: gate.key,
+        value: String(thing.value),
       })
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        'name' in error &&
+        error.name === 'SequelizeUniqueConstraintError'
+      ) {
+        return
+      }
+      throw error
     }
-
-    return true
   }
 
   /**
-   * Remove a value from a set gate.
-   * @private
-   * @param featureId - The feature ID
-   * @param gateKey - The gate key
-   * @param value - The value to remove
-   * @returns True if successful
+   * Create or replace a single gate value.
    */
-  private async removeFromSet(featureId: number, gateKey: string, value: string): Promise<boolean> {
-    const gateRecord = await this.Gate.findOne({
-      where: { feature_id: featureId, key: gateKey },
-    })
+  private async set(
+    feature: FeatureClass,
+    gate: IGate,
+    thing: IType,
+    options: { clear?: boolean; json?: boolean } = {}
+  ): Promise<void> {
+    const clearFeature = options.clear ?? false
+    const jsonFeature = options.json ?? false
 
-    if (!gateRecord) {
-      return false
+    if (clearFeature) {
+      await this.clear(feature)
     }
+
+    await this.deleteGate(feature, gate)
+
+    const value = this.serializeGateValue(jsonFeature ? 'json' : gate.dataType, thing.value)
 
     try {
-      const parsed = JSON.parse(gateRecord.value) as unknown
-      const currentSet = new Set(Array.isArray(parsed) ? (parsed as string[]) : [])
-      currentSet.delete(value)
+      await this.Gate.create({
+        featureKey: feature.key,
+        key: gate.key,
+        value,
+      })
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        'name' in error &&
+        error.name === 'SequelizeUniqueConstraintError'
+      ) {
+        return
+      }
+      throw error
+    }
+  }
 
-      if (currentSet.size === 0) {
-        await gateRecord.destroy()
-      } else {
-        const serializedValue = JSON.stringify(Array.from(currentSet))
-        await gateRecord.update({ value: serializedValue })
+  /**
+   * Delete all rows for a specific gate.
+   */
+  private async deleteGate(feature: FeatureClass, gate: IGate): Promise<void> {
+    await this.Gate.destroy({
+      where: {
+        featureKey: feature.key,
+        key: gate.key,
+      },
+    })
+  }
+
+  /**
+   * Remove single value from set gate.
+   */
+  private async deleteSetValue(feature: FeatureClass, gate: IGate, value: string): Promise<void> {
+    await this.Gate.destroy({
+      where: {
+        featureKey: feature.key,
+        key: gate.key,
+        value,
+      },
+    })
+  }
+
+  /**
+   * Convert database rows to Flipper gate structure.
+   */
+  private resultForGates(
+    feature: FeatureClass,
+    rows: Array<{ key: string | null; value: string | null }>
+  ): Record<string, unknown> {
+    const result: Record<string, unknown> = {}
+
+    const validRows = rows.filter(row => row.key !== null)
+
+    for (const gate of feature.gates) {
+      const gateKey = gate.key
+      const gateRows = validRows.filter(row => row.key === gateKey)
+
+      if (gateRows.length === 0) {
+        continue
       }
 
-      return true
-    } catch {
-      return false
+      switch (gate.dataType) {
+        case 'set': {
+          const values = gateRows
+            .map(row => row.value)
+            .filter((value): value is string => value !== null)
+          result[gateKey] = new Set(values)
+          break
+        }
+        case 'json': {
+          const value = gateRows[0]?.value
+          if (typeof value === 'string') {
+            result[gateKey] = this.parseGateValue(value)
+          }
+          break
+        }
+        default: {
+          const value = gateRows[0]?.value
+          if (typeof value === 'string') {
+            result[gateKey] = this.parseGateValue(value)
+          }
+          break
+        }
+      }
     }
+
+    return result
   }
 
   /**
@@ -435,11 +493,8 @@ class SequelizeAdapter implements IAdapter {
         return String(value === true)
       case 'number':
         return String(value)
-      case 'set':
-        // Sets should be handled separately via addToSet
-        return JSON.stringify([value])
       case 'json':
-        return String(value)
+        return typeof value === 'string' ? value : JSON.stringify(value)
       default:
         return String(value)
     }

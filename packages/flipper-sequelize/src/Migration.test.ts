@@ -94,13 +94,13 @@ describe('createFlipperModels', () => {
 
       const feature = await Feature.create({ key: 'test-feature' })
       const gate = await Gate.create({
-        feature_id: feature.id,
+        featureKey: feature.key,
         key: 'boolean',
         value: 'true',
       })
 
       expect(gate.id).toBeDefined()
-      expect(gate.feature_id).toBe(feature.id)
+      expect(gate.featureKey).toBe(feature.key)
       expect(gate.key).toBe('boolean')
       expect(gate.value).toBe('true')
     })
@@ -123,8 +123,8 @@ describe('createFlipperModels', () => {
       await sequelize.sync({ force: true })
 
       const feature = await Feature.create({ key: 'test-feature' })
-      await Gate.create({ feature_id: feature.id, key: 'boolean', value: 'true' })
-      await Gate.create({ feature_id: feature.id, key: 'actors', value: '["user-1"]' })
+      await Gate.create({ featureKey: feature.key, key: 'boolean', value: 'true' })
+      await Gate.create({ featureKey: feature.key, key: 'actors', value: 'user-1' })
 
       const featureWithGates = await Feature.findByPk(feature.id, { include: 'gates' })
 
@@ -138,7 +138,7 @@ describe('createFlipperModels', () => {
 
       const feature = await Feature.create({ key: 'test-feature' })
       const gate = await Gate.create({
-        feature_id: feature.id,
+        featureKey: feature.key,
         key: 'boolean',
         value: 'true',
       })
@@ -155,11 +155,11 @@ describe('createFlipperModels', () => {
       await sequelize.sync({ force: true })
 
       const feature = await Feature.create({ key: 'test-feature' })
-      await Gate.create({ feature_id: feature.id, key: 'boolean', value: 'true' })
+      await Gate.create({ featureKey: feature.key, key: 'boolean', value: 'true' })
 
       await Feature.destroy({ where: { id: feature.id } })
 
-      const gates = await Gate.findAll({ where: { feature_id: feature.id } })
+      const gates = await Gate.findAll({ where: { featureKey: feature.key } })
       expect(gates).toHaveLength(0)
     })
   })

@@ -67,22 +67,16 @@ export function createFlipperMigration(options: MigrationOptions = {}) {
           primaryKey: true,
           type: Sequelize.INTEGER,
         },
-        feature_id: {
+        feature_key: {
           allowNull: false,
-          type: Sequelize.INTEGER,
-          references: {
-            model: featureTableName,
-            key: 'id',
-          },
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE',
+          type: Sequelize.STRING,
         },
         key: {
           allowNull: false,
           type: Sequelize.STRING,
         },
         value: {
-          allowNull: false,
+          allowNull: true,
           type: Sequelize.TEXT,
         },
         created_at: {
@@ -98,14 +92,9 @@ export function createFlipperMigration(options: MigrationOptions = {}) {
       })
 
       // Add composite unique index
-      await queryInterface.addIndex(gateTableName, ['feature_id', 'key'], {
+      await queryInterface.addIndex(gateTableName, ['feature_key', 'key', 'value'], {
         unique: true,
-        name: `index_${gateTableName}_on_feature_id_and_key`,
-      })
-
-      // Add index on feature_id for faster queries
-      await queryInterface.addIndex(gateTableName, ['feature_id'], {
-        name: `index_${gateTableName}_on_feature_id`,
+        name: `index_${gateTableName}_on_feature_key_and_key_and_value`,
       })
     },
 

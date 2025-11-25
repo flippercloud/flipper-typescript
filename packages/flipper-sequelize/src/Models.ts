@@ -18,9 +18,9 @@ export class FlipperFeatureModel extends Model {
  */
 export class FlipperGateModel extends Model {
   declare id: number
-  declare feature_id: number
+  declare featureKey: string
   declare key: string
-  declare value: string
+  declare value: string | null
   declare createdAt: Date
   declare updatedAt: Date
   declare feature?: FlipperFeatureModel
@@ -102,9 +102,10 @@ export function createFlipperModels(
         autoIncrement: true,
         allowNull: false,
       },
-      feature_id: {
-        type: DataTypes.INTEGER,
+      featureKey: {
+        type: DataTypes.STRING(255),
         allowNull: false,
+        field: 'feature_key',
       },
       key: {
         type: DataTypes.STRING(255),
@@ -112,8 +113,7 @@ export function createFlipperModels(
       },
       value: {
         type: DataTypes.TEXT,
-        allowNull: false,
-        defaultValue: '',
+        allowNull: true,
       },
     },
     {
@@ -124,8 +124,8 @@ export function createFlipperModels(
       indexes: [
         {
           unique: true,
-          fields: ['feature_id', 'key'],
-          name: `index_${gateTableName}_on_feature_id_and_key`,
+          fields: ['feature_key', 'key', 'value'],
+          name: `index_${gateTableName}_on_feature_key_and_key_and_value`,
         },
       ],
     }
@@ -133,14 +133,22 @@ export function createFlipperModels(
 
   // Set up associations
   Feature.hasMany(Gate, {
-    foreignKey: 'feature_id',
+    foreignKey: {
+      name: 'featureKey',
+      field: 'feature_key',
+    },
+    sourceKey: 'key',
     as: 'gates',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
 
   Gate.belongsTo(Feature, {
-    foreignKey: 'feature_id',
+    foreignKey: {
+      name: 'featureKey',
+      field: 'feature_key',
+    },
+    targetKey: 'key',
     as: 'feature',
   })
 
