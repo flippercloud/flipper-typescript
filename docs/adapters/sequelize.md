@@ -5,14 +5,16 @@ The Sequelize adapter stores feature gate state in a SQL database via [Sequelize
 ## Installation
 
 ```bash
-# Add the adapter workspace to your project
-bun add @flippercloud/flipper-sequelize
+# Add the adapter and its peer dependency to your project
+bun add @flippercloud/flipper-sequelize sequelize
 
 # Or, inside the monorepo, ensure the workspace is linked:
 bun install
 ```
 
 > **Prerequisites:** Node.js ≥ 18, Bun ≥ 1.3.2, and a database supported by Sequelize (e.g., PostgreSQL, MySQL, SQLite).
+
+> **Note:** `sequelize` is a required peer dependency of this adapter. Install it alongside the adapter in your application.
 
 ## Database Setup
 
@@ -31,6 +33,44 @@ await sequelize.sync()
 ```
 
 > For production, run migrations ahead of time. The helpers expose the model definitions so you can integrate them into your own migration tooling.
+
+## Migrations (example)
+
+For production environments, we recommend managing schema via migrations. Below is a minimal migration example that creates the two tables used by the adapter:
+
+```typescript
+module.exports = {
+  async up(queryInterface, Sequelize) {
+    await queryInterface.createTable('flipper_features', {
+      id: { allowNull: false, autoIncrement: true, primaryKey: true, type: Sequelize.INTEGER },
+      key: { allowNull: false, type: Sequelize.STRING, unique: true },
+      created_at: { allowNull: false, type: Sequelize.DATE, defaultValue: Sequelize.fn('now') },
+      updated_at: { allowNull: false, type: Sequelize.DATE, defaultValue: Sequelize.fn('now') },
+    })
+
+    await queryInterface.createTable('flipper_gates', {
+      id: { allowNull: false, autoIncrement: true, primaryKey: true, type: Sequelize.INTEGER },
+      feature_key: { allowNull: false, type: Sequelize.STRING },
+      key: { allowNull: false, type: Sequelize.STRING },
+      value: { allowNull: true, type: Sequelize.TEXT },
+      created_at: { allowNull: false, type: Sequelize.DATE, defaultValue: Sequelize.fn('now') },
+      updated_at: { allowNull: false, type: Sequelize.DATE, defaultValue: Sequelize.fn('now') },
+    })
+
+    await queryInterface.addIndex('flipper_gates', ['feature_key', 'key', 'value'], {
+      unique: true,
+      name: 'index_flipper_gates_on_feature_key_and_key_and_value',
+    })
+  },
+
+  async down(queryInterface) {
+    await queryInterface.dropTable('flipper_gates')
+    await queryInterface.dropTable('flipper_features')
+  },
+}
+```
+
+If you prefer to avoid migrations in development or tests, you can rely on `sequelize.sync()` to create the tables at runtime, as shown above.
 
 ## Usage
 
@@ -58,6 +98,22 @@ await flipper.enable('search')
 const enabled = await flipper.isFeatureEnabled('search')
 ```
 
+## API surface
+
+The adapter implements the full Flipper adapter contract:
+
+- enable: Enable a feature for all users or specific criteria
+- disable: Disable a feature
+- get: Get the current state of a feature
+- getMulti: Get state for multiple features
+- getAll: Get state for all features
+- add: Add a new feature
+- remove: Remove a feature
+- clear: Clear all gates for a feature
+- features: List all features
+- export: Export features as JSON
+- import: Import features from another source
+
 ### Read-only Mode
 
 Pass `readOnly: true` when constructing the adapter to prevent mutating methods. This is useful for replicas or background workers:
@@ -84,6 +140,15 @@ await adapter.import(otherAdapter)
 
 When importing, the adapter creates missing features and gates automatically.
 
+## Supported databases
+
+Any database supported by Sequelize, including:
+
+- PostgreSQL
+- MySQL / MariaDB
+- SQLite
+- MSSQL
+
 ## Testing
 
 The `@flippercloud/flipper-sequelize` package includes a Jest suite that spins up an in-memory SQLite database. Run it whenever you change adapter behavior:
@@ -105,5 +170,5 @@ For CI environments that lack SQLite, point Sequelize to your preferred engine b
 ## Next Steps
 
 - Review the source code in `packages/flipper-sequelize/` for advanced options.
-- Combine Sequelize with the [Operation Logger](../guides/getting-started.md#6-explore-more) or other wrappers.
+- Pair Sequelize with the [Cache adapter](../adapters/cache.md) for read-heavy workloads.
 - Share feedback or improvements in `docs/adapters/sequelize.md` to keep this guide accurate.
