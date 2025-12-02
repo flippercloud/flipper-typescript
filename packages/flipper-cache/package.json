@@ -1,0 +1,43 @@
+{
+  "name": "@flippercloud/flipper-cache",
+  "version": "0.0.1",
+  "description": "Generic cache wrapper for Flipper TypeScript adapters (read-through/write-through).",
+  "author": "Jonathan Hoyt",
+  "license": "MIT",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/esm/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "bun run build:esm && bun run build:cjs",
+    "build:esm": "tsc --module esnext --outDir dist/esm && tsc-esm-fix --target dist/esm --ext .js",
+    "build:cjs": "tsc --module commonjs --moduleResolution node --outDir dist/cjs",
+    "test": "bun test src",
+    "test:watch": "bun test --watch src",
+    "test:coverage": "bun test --coverage src",
+    "lint": "eslint .",
+    "type-check": "tsc --noEmit",
+    "clean": "node -e \"try { require('fs').rmSync('dist', {recursive:true, force:true}); require('fs').rmSync('coverage', {recursive:true, force:true}); } catch(e) {}\"",
+    "prepublishOnly": "bun run clean && bun run build && bun test"
+  },
+  "dependencies": {
+    "@flippercloud/flipper": "workspace:*"
+  },
+  "devDependencies": {
+    "tsc-esm-fix": "^2.20.26"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
