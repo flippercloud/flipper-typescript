@@ -1,4 +1,3 @@
-import { jest, describe, it, beforeEach, afterEach, expect } from '@jest/globals'
 import RedisMock from 'ioredis-mock'
 import { Flipper, Feature, MemoryAdapter } from '@flippercloud/flipper'
 import RedisAdapter from './RedisAdapter'
