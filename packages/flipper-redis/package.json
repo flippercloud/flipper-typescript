@@ -1,0 +1,54 @@
+{
+  "name": "@flippercloud/flipper-redis",
+  "description": "Redis adapter for Flipper feature flags",
+  "version": "0.0.1",
+  "author": "Jonathan Hoyt",
+  "license": "MIT",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/esm/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "bun run build:esm && bun run build:cjs",
+    "build:esm": "tsc --module esnext --outDir dist/esm && tsc-esm-fix --target dist/esm --ext .js",
+    "build:cjs": "tsc --module commonjs --moduleResolution node --outDir dist/cjs",
+    "test": "NODE_OPTIONS='--localstorage-file=/tmp/jest.db' node --experimental-vm-modules --no-warnings=ExperimentalWarning ../../node_modules/jest/bin/jest.js",
+    "test:watch": "NODE_OPTIONS='--localstorage-file=/tmp/jest.db' node --experimental-vm-modules --no-warnings=ExperimentalWarning ../../node_modules/jest/bin/jest.js --watch",
+    "test:coverage": "NODE_OPTIONS='--localstorage-file=/tmp/jest.db' node --experimental-vm-modules --no-warnings=ExperimentalWarning ../../node_modules/jest/bin/jest.js --coverage",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write \"src/**/*.{ts,tsx,json,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,json,md}\"",
+    "clean": "node -e \"try { require('fs').rmSync('dist', {recursive:true, force:true}); require('fs').rmSync('coverage', {recursive:true, force:true}); } catch(e) {}\"",
+    "prepublishOnly": "bun run clean && bun run build && bun test"
+  },
+  "peerDependencies": {
+    "ioredis": "^5.0.0"
+  },
+  "dependencies": {
+    "@flippercloud/flipper": "workspace:*"
+  },
+  "devDependencies": {
+    "ioredis": "^5.4.1",
+    "ioredis-mock": "^8.9.0",
+    "tsc-esm-fix": "^2.20.26"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
