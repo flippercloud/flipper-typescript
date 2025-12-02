@@ -98,6 +98,20 @@ await flipper.enable('search')
 const enabled = await flipper.isFeatureEnabled('search')
 ```
 
+### Primary Reads (Replication Consistency)
+
+If your Sequelize setup uses read replicas, there can be a lag between writes (e.g. calling `enable`) and subsequent reads on a replica. To guarantee read-after-write consistency for Flipper operations, construct the adapter with `useMaster: true` which passes `useMaster` to all Sequelize `find` queries, ensuring they target the primary connection.
+
+```typescript
+const adapter = new SequelizeAdapter({
+  Feature: models.Feature,
+  Gate: models.Gate,
+  useMaster: true, // force reads to primary DB
+})
+```
+
+Default is `false`, allowing replicas to serve reads. Enable this only where strict consistency is required (e.g. synchronous feature toggling during a request lifecycle).
+
 ## API surface
 
 The adapter implements the full Flipper adapter contract:
