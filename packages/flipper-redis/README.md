@@ -34,7 +34,7 @@ console.log(isEnabled) // true
 
 ## Docs
 
-Looking for setup options, clustering, read-only mode, data structures, and best practices? See the full guide: [Redis adapter guide](../../docs/adapters/redis.md).
+Looking for setup options, clustering, read-only mode, and best practices? See the full guide: [Redis adapter guide](../../docs/adapters/redis.md).
 
 ## License
 

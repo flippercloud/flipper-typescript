@@ -1,38 +1,40 @@
-# Flipper TypeScript
+# @flippercloud/flipper
 
-A TypeScript implementation of [Flipper](https://github.com/flippercloud/flipper) - a feature flagging library.
+A TypeScript/JavaScript implementation of [Flipper](https://github.com/flippercloud/flipper) - a feature flagging library for controlling features and behavior.
 
 ## Installation
 
 ```bash
-bun add flipper-typescript
+bun add @flippercloud/flipper
 ```
 
-## Development
+## Quick usage
 
-### Prerequisites
+```typescript
+import Flipper from '@flippercloud/flipper'
+import { MemoryAdapter } from '@flippercloud/flipper'
 
-- Node.js >= 18.0.0
-- Bun >= 1.3.2
+const adapter = new MemoryAdapter()
+const flipper = new Flipper(adapter)
 
-### Setup
+// Enable a feature
+await flipper.enable('new-ui')
 
-```bash
-bun install
+// Check if a feature is enabled
+const isEnabled = await flipper.isEnabled('new-ui')
+console.log(isEnabled) // true
+
+// Enable for specific actors
+await flipper.enableActor('premium-feature', 'user-123')
+
+// Check if enabled for a specific actor
+const isPremiumEnabled = await flipper.isEnabledFor('premium-feature', 'user-123')
+console.log(isPremiumEnabled) // true
 ```
 
-### Scripts
+## Docs
 
-- `bun run build` - Build the TypeScript source
-- `bun test` - Run tests
-- `bun run test:watch` - Run tests in watch mode
-- `bun run test:coverage` - Run tests with coverage
-- `bun run lint` - Lint code with ESLint
-- `bun run lint:fix` - Lint and auto-fix issues
-- `bun run type-check` - Check TypeScript types
-- `bun run format` - Format code with Prettier
-- `bun run format:check` - Check code formatting
-- `bun run clean` - Remove build artifacts
+Looking for configuration, adapters, advanced usage, and best practices? See the full guide: [Flipper documentation](../../docs/README.md).
 
 ## License
 
