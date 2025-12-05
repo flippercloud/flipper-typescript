@@ -23,8 +23,14 @@ jobs:
       - name: Install Dependencies
         run: bun install --frozen-lockfile
 
-      - name: Build packages
-        run: bun run build
+      - name: Build main package
+        run: cd packages/flipper && bun run build
+
+      - name: Build dependent packages
+        run: |
+          cd packages/flipper-cache && bun run build
+          cd ../../packages/flipper-redis && bun run build
+          cd ../../packages/flipper-sequelize && bun run build
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
