@@ -1,7 +1,7 @@
 {
   "name": "@flippercloud/flipper-sequelize",
   "description": "Sequelize adapter for Flipper feature flags",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Jonathan Hoyt",
   "license": "MIT",
   "main": "./dist/cjs/index.js",

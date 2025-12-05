@@ -1,5 +1,12 @@
 # @flippercloud/flipper-sequelize
 
+## 1.0.1
+
+### Patch Changes
+
+- Updated dependencies [4c3298f]
+  - @flippercloud/flipper@1.0.1
+
 ## 1.0.0
 
 Initial release of Sequelize adapter for Flipper feature flags.
