@@ -19,12 +19,22 @@
     },
     "packages/flipper": {
       "name": "@flippercloud/flipper",
-      "version": "0.0.4",
+      "version": "1.0.0",
       "dependencies": {
         "crc": "^4.3.2",
       },
       "devDependencies": {
         "@types/crc": "^3.8.3",
+        "tsc-esm-fix": "^2.20.26",
+      },
+    },
+    "packages/flipper-cache": {
+      "name": "@flippercloud/flipper-cache",
+      "version": "0.0.1",
+      "dependencies": {
+        "@flippercloud/flipper": "workspace:*",
+      },
+      "devDependencies": {
         "tsc-esm-fix": "^2.20.26",
       },
     },
@@ -45,7 +55,7 @@
     },
     "packages/flipper-sequelize": {
       "name": "@flippercloud/flipper-sequelize",
-      "version": "0.0.5",
+      "version": "1.0.0",
       "dependencies": {
         "@flippercloud/flipper": "workspace:*",
       },
@@ -157,6 +167,8 @@
     "@eslint/plugin-kit": ["@eslint/plugin-kit@0.4.1", "", { "dependencies": { "@eslint/core": "^0.17.0", "levn": "^0.4.1" } }, "sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA=="],
 
     "@flippercloud/flipper": ["@flippercloud/flipper@workspace:packages/flipper"],
+
+    "@flippercloud/flipper-cache": ["@flippercloud/flipper-cache@workspace:packages/flipper-cache"],
 
     "@flippercloud/flipper-redis": ["@flippercloud/flipper-redis@workspace:packages/flipper-redis"],
 
