@@ -20,6 +20,13 @@ export interface SequelizeAdapterOptions {
    * Whether the adapter is read-only (default: false)
    */
   readOnly?: boolean
+  /**
+   * Force all read queries to use the primary database connection in a
+   * replicated setup (default: false). This passes `useMaster: true` to
+   * Sequelize find calls so they bypass replicas. Helpful when you have
+   * just written feature changes and need read-after-write consistency.
+   */
+  useMaster?: boolean
 }
 
 /**
@@ -62,10 +69,16 @@ class SequelizeAdapter implements IAdapter {
    */
   private _readOnly: boolean
 
+  /**
+   * Whether read queries should be forced to the primary (master) connection.
+   */
+  private _useMaster: boolean
+
   constructor(options: SequelizeAdapterOptions) {
     this.Feature = options.Feature
     this.Gate = options.Gate
     this._readOnly = options.readOnly ?? false
+    this._useMaster = options.useMaster ?? false
   }
 
   /**
@@ -73,7 +86,7 @@ class SequelizeAdapter implements IAdapter {
    * @returns Array of all Feature instances
    */
   async features(): Promise<FeatureClass[]> {
-    const features = await this.Feature.findAll({ raw: true })
+    const features = await this.Feature.findAll({ raw: true, useMaster: this._useMaster })
     // We need to import Feature dynamically to avoid circular dependencies
     const module = await import('@flippercloud/flipper')
     const Feature = module.Feature
@@ -132,6 +145,7 @@ class SequelizeAdapter implements IAdapter {
     const dbFeature = await this.Feature.findOne({
       where: { key: feature.key },
       raw: true,
+      useMaster: this._useMaster,
     })
 
     if (!dbFeature) {
@@ -142,6 +156,7 @@ class SequelizeAdapter implements IAdapter {
       where: { featureKey: feature.key },
       attributes: ['key', 'value'],
       raw: true,
+      useMaster: this._useMaster,
     })
 
     return this.resultForGates(feature, gates as Array<{ key: string | null; value: string | null }>)
@@ -186,12 +201,14 @@ class SequelizeAdapter implements IAdapter {
     // Ensure feature exists
     let dbFeature = await this.Feature.findOne({
       where: { key: feature.key },
+      useMaster: this._useMaster,
     })
 
     if (!dbFeature) {
       await this.add(feature)
       dbFeature = await this.Feature.findOne({
         where: { key: feature.key },
+        useMaster: this._useMaster,
       })
     }
 
@@ -234,6 +251,7 @@ class SequelizeAdapter implements IAdapter {
 
     const dbFeature = await this.Feature.findOne({
       where: { key: feature.key },
+      useMaster: this._useMaster,
     })
 
     if (!dbFeature) {
@@ -276,6 +294,7 @@ class SequelizeAdapter implements IAdapter {
 
     const dbFeature = await this.Feature.findOne({
       where: { key: feature.key },
+      useMaster: this._useMaster,
     })
 
     if (!dbFeature) {

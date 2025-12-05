@@ -313,6 +313,49 @@ describe('SequelizeAdapter', () => {
     })
   })
 
+  describe('useMaster option', () => {
+    it('passes useMaster to read queries when true', async () => {
+      // Spy on findAll and findOne
+      const spyFindAll = jest.spyOn(FeatureModel, 'findAll')
+      const spyFindOne = jest.spyOn(FeatureModel, 'findOne')
+
+      const masterAdapter = new SequelizeAdapter({
+        Feature: FeatureModel,
+        Gate: GateModel,
+        useMaster: true,
+      })
+
+      // Trigger reads
+      await masterAdapter.features()
+
+      // Add then get to trigger findOne path with useMaster
+      const feature = new Feature('master-read-feature', masterAdapter, {})
+      await masterAdapter.add(feature)
+      await masterAdapter.get(feature)
+
+      // Assertions
+      expect(spyFindAll).toHaveBeenCalled()
+      const findAllArgs = spyFindAll.mock.calls[0]?.[0]
+      expect(findAllArgs).toMatchObject({ useMaster: true })
+
+      // Ensure at least one findOne received useMaster true
+      const findOneCallWithUseMaster = spyFindOne.mock.calls.find(call => call[0]?.useMaster === true)
+      expect(findOneCallWithUseMaster).toBeTruthy()
+
+      // Cleanup spies
+      spyFindAll.mockRestore()
+      spyFindOne.mockRestore()
+    })
+
+    it('defaults to replica (no useMaster) when option not set', async () => {
+      const spyFindAll = jest.spyOn(FeatureModel, 'findAll')
+      await adapter.features()
+      const findAllArgs = spyFindAll.mock.calls[0]?.[0]
+      expect(findAllArgs?.useMaster).toBe(false)
+      spyFindAll.mockRestore()
+    })
+  })
+
   describe('isFeatureEnabled checks', () => {
     it('enabled feature returns true', async () => {
       await flipper.enable('enabled-feature')
