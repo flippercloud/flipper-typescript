@@ -5,6 +5,7 @@ Flipper TypeScript ships with an in-memory adapter out of the box and provides o
 ## Available Guides
 
 - [Cache](./cache.md)
+- [Cloud](./cloud.md)
 - [Redis](./redis.md)
 - [Sequelize](./sequelize.md)
 

@@ -39,6 +39,16 @@
         "tsc-esm-fix": "^2.20.26",
       },
     },
+    "packages/flipper-cloud": {
+      "name": "@flippercloud/flipper-cloud",
+      "version": "0.0.1",
+      "dependencies": {
+        "@flippercloud/flipper": "workspace:*",
+      },
+      "devDependencies": {
+        "tsc-esm-fix": "^2.20.26",
+      },
+    },
     "packages/flipper-redis": {
       "name": "@flippercloud/flipper-redis",
       "version": "0.0.1",
@@ -206,6 +216,8 @@
     "@flippercloud/flipper": ["@flippercloud/flipper@workspace:packages/flipper"],
 
     "@flippercloud/flipper-cache": ["@flippercloud/flipper-cache@workspace:packages/flipper-cache"],
+
+    "@flippercloud/flipper-cloud": ["@flippercloud/flipper-cloud@workspace:packages/flipper-cloud"],
 
     "@flippercloud/flipper-redis": ["@flippercloud/flipper-redis@workspace:packages/flipper-redis"],
 
