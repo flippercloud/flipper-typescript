@@ -260,11 +260,13 @@ class MemoryAdapter implements IAdapter {
   public async disable(feature: Feature, gate: IGate, thing: IType): Promise<boolean> {
     switch (gate.dataType) {
       case 'boolean': {
-        await this.clear(feature)
+        // For boolean gate, just delete the boolean key (don't clear entire feature)
+        this.delete(this.key(feature, gate))
         break
       }
       case 'number': {
-        await this.clear(feature)
+        // For number gate, just delete the number key (don't clear entire feature)
+        this.delete(this.key(feature, gate))
         break
       }
       case 'set': {
