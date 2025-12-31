@@ -374,7 +374,7 @@ class SequelizeAdapter implements IAdapter {
     try {
       await this.Gate.create({
         featureKey: feature.key,
-        key: gate.key,
+        key: this.storageKey(gate),
         value: String(thing.value),
       })
     } catch (error) {
@@ -412,7 +412,7 @@ class SequelizeAdapter implements IAdapter {
     try {
       await this.Gate.create({
         featureKey: feature.key,
-        key: gate.key,
+        key: this.storageKey(gate),
         value,
       })
     } catch (error) {
@@ -434,7 +434,7 @@ class SequelizeAdapter implements IAdapter {
     await this.Gate.destroy({
       where: {
         featureKey: feature.key,
-        key: gate.key,
+        key: this.storageKeys(gate),
       },
     })
   }
@@ -446,7 +446,7 @@ class SequelizeAdapter implements IAdapter {
     await this.Gate.destroy({
       where: {
         featureKey: feature.key,
-        key: gate.key,
+        key: this.storageKeys(gate),
         value,
       },
     })
@@ -465,7 +465,7 @@ class SequelizeAdapter implements IAdapter {
 
     for (const gate of feature.gates) {
       const gateKey = gate.key
-      const gateRows = validRows.filter(row => row.key === gateKey)
+      const gateRows = validRows.filter(row => this.storageKeys(gate).includes(row.key ?? ''))
 
       if (gateRows.length === 0) {
         continue
@@ -540,6 +540,32 @@ class SequelizeAdapter implements IAdapter {
       if (!isNaN(Number(value))) return Number(value)
       return value
     }
+  }
+
+  /**
+   * Return the primary storage key for a gate, using snake_case for cross-language compatibility.
+   * Ruby Flipper stores percentage gates as `percentage_of_actors`/`percentage_of_time`, so we
+   * mirror that format while still accepting camelCase keys that may already exist in the DB.
+   */
+  private storageKey(gate: IGate): string {
+    return this.toSnakeCase(gate.key)
+  }
+
+  /**
+   * Return all accepted storage keys for a gate (camelCase + snake_case) so we can read and clean
+   * up data regardless of which client wrote it.
+   */
+  private storageKeys(gate: IGate): string[] {
+    const keys = [gate.key]
+    const snake = this.toSnakeCase(gate.key)
+    if (!keys.includes(snake)) {
+      keys.push(snake)
+    }
+    return keys
+  }
+
+  private toSnakeCase(key: string): string {
+    return key.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase()
   }
 }
 
