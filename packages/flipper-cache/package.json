@@ -1,6 +1,6 @@
 {
   "name": "@flippercloud/flipper-cache",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Generic cache wrapper for Flipper TypeScript adapters (read-through/write-through).",
   "author": "Jonathan Hoyt",
   "license": "MIT",

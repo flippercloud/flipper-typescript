@@ -1,5 +1,11 @@
 # @flippercloud/flipper
 
+## 1.0.2
+
+### Patch Changes
+
+- 4c3298f: Update README.md for each package to standardize on same structure and style as @flippercloud/flipper-sequelize README.md
+
 ## 1.0.1
 
 ### Fixed
