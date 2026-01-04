@@ -253,12 +253,18 @@ class Feature {
    * @returns True if successful
    */
   async disableExpression(): Promise<boolean> {
-    const gate = this.gate('expression')
+    const gate = this.gates.find(g => g.name === 'expression')
     if (!gate) {
       throw new Error('Expression gate not found')
     }
+
     await this.adapter.add(this)
-    return this.adapter.clear(this)
+
+    // Adapter APIs require a "thing" value for disable(). For JSON gates (like
+    // expression), adapters should ignore the specific value and simply remove
+    // the stored gate key.
+    const placeholder = ExpressionType.wrap({ Constant: false })
+    return this.adapter.disable(this, gate, placeholder)
   }
 
   /**

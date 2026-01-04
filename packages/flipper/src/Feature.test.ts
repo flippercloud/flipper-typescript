@@ -76,6 +76,33 @@ describe('Feature', () => {
     expect(await feature.isEnabled(actor)).toEqual(false)
   })
 
+  describe('disableExpression', () => {
+    test('only clears the expression gate (does not clear other gate values)', async () => {
+      const { default: Flipper } = await import('./Flipper.js')
+
+      const enabledActor = makeActor(1)
+      const expressionActor = {
+        flipperId: 'actor:2',
+        flipperProperties: { admin: true },
+      }
+
+      await feature.enableActor(enabledActor)
+      await feature.enableExpression(Flipper.property('admin'))
+
+      // Expression is active pre-disable.
+      expect(await feature.isEnabled(expressionActor)).toEqual(true)
+
+      await feature.disableExpression()
+
+      // Actor enablement should remain.
+      expect(await feature.isEnabled(enabledActor)).toEqual(true)
+
+      // Expression should be removed.
+      expect(await feature.isEnabled(expressionActor)).toEqual(false)
+      expect(await feature.enabledGateNames()).toEqual(['actor'])
+    })
+  })
+
   describe('disablePercentageOfActors', () => {
     test('sets percentage to 0', async () => {
       await feature.enablePercentageOfActors(25)
