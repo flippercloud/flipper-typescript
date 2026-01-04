@@ -62,17 +62,20 @@ class ActorGate implements IGate {
    * @returns True if the actor is in the enabled set
    */
   public isOpen(context: FeatureCheckContext): boolean {
-    if (context.thing === 'undefined') {
+    if (!this.protectsThing(context.thing)) {
       return false
-    } else {
-      if (this.protectsThing(context.thing)) {
-        const enabledActors = context.actorsValue
-        const actorType = context.thing as ActorType
-        return enabledActors.has(String(actorType.value))
-      } else {
-        return false
-      }
     }
+
+    const enabledActors = context.actorsValue
+    const actorId = context.thing instanceof ActorType ? context.thing.value : (context.thing as any).flipperId
+
+    // Actor ids must be present and string-like (Ruby parity: a missing flipper_id
+    // is treated as no actor).
+    if (typeof actorId !== 'string' || actorId.length === 0) {
+      return false
+    }
+
+    return enabledActors.has(actorId)
   }
 
   /**

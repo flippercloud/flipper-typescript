@@ -79,24 +79,21 @@ class GroupGate implements IGate {
    * @returns True if the actor belongs to any enabled group
    */
   public isOpen(context: FeatureCheckContext): boolean {
-    if (context.thing === 'undefined') {
+    if (!(context.thing instanceof ActorType)) {
+      return false
+    }
+
+    // Actor ids must be present before group callbacks are evaluated (Ruby parity).
+    const actorId = context.thing.value
+    if (typeof actorId !== 'string' || actorId.length === 0) {
       return false
     }
 
     const groupNames = Array.from(context.groupsValue)
-    let groupMatch = false
-
-    groupNames.some(groupName => {
+    return groupNames.some(groupName => {
       const groupType = this.groups[groupName]
-
-      if (groupType && context.thing instanceof ActorType) {
-        groupMatch = groupType.isMatch(context.thing, context)
-      }
-
-      return groupMatch
+      return Boolean(groupType && groupType.isMatch(context.thing as ActorType, context))
     })
-
-    return groupMatch
   }
 
   /**
