@@ -124,6 +124,18 @@ describe('Feature', () => {
       await feature.disablePercentageOfActors()
       expect(await feature.percentageOfActorsValue()).toEqual(0)
     })
+
+    test('does not clear other gate values', async () => {
+      const actor = makeActor(5)
+
+      await feature.enableActor(actor)
+      await feature.enablePercentageOfActors(50)
+
+      await feature.disablePercentageOfActors()
+
+      // Actor enablement should remain after disabling the percentage gate.
+      expect(await feature.isEnabled(actor)).toEqual(true)
+    })
   })
 
   describe('disablePercentageOfTime', () => {
@@ -145,6 +157,18 @@ describe('Feature', () => {
       expect(await feature.percentageOfTimeValue()).toEqual(0)
       await feature.disablePercentageOfTime()
       expect(await feature.percentageOfTimeValue()).toEqual(0)
+    })
+
+    test('does not clear other gate values', async () => {
+      const actor = makeActor(5)
+
+      await feature.enableActor(actor)
+      await feature.enablePercentageOfTime(50)
+
+      await feature.disablePercentageOfTime()
+
+      // Actor enablement should remain after disabling the percentage gate.
+      expect(await feature.isEnabled(actor)).toEqual(true)
     })
   })
 
