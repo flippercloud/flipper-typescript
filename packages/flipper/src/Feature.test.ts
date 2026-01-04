@@ -32,6 +32,27 @@ describe('Feature', () => {
       const event = instrumenter.eventByName('feature_operation.flipper')
       expect(event?.payload.gate_name).toEqual('percentageOfTime')
     })
+
+    test('expression evaluates using actor properties', async () => {
+      const { default: Flipper } = await import('./Flipper.js')
+
+      const instrumenter = new MemoryInstrumenter()
+      const featureWithInstrumenter = new Feature('expression-actor-props', adapter, {}, {
+        instrumenter,
+      })
+
+      await featureWithInstrumenter.enableExpression(Flipper.property('admin'))
+
+      const actorWithProps = {
+        flipperId: 'actor:1',
+        flipperProperties: { admin: true },
+      }
+
+      instrumenter.reset()
+      expect(await featureWithInstrumenter.isEnabled(actorWithProps)).toEqual(true)
+      const event = instrumenter.eventByName('feature_operation.flipper')
+      expect(event?.payload.gate_name).toEqual('expression')
+    })
   })
 
   test('has name', () => {

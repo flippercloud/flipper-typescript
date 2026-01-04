@@ -277,10 +277,17 @@ class Feature {
 
       this.gates.some(gate => {
         let thingType: unknown = thing
-        const actorGate = this.gate('actor')
-        if (typeof thingType !== 'undefined' && actorGate) {
-          thingType = actorGate.wrap(thing)
+
+        // Only wrap the thing for gates that require ActorType.
+        // Wrapping everything breaks expression evaluation, which needs access
+        // to actor `flipperProperties`.
+        if (gate.name === 'actor' || gate.name === 'group') {
+          const actorGate = this.gate('actor')
+          if (actorGate && actorGate.protectsThing(thingType)) {
+            thingType = actorGate.wrap(thingType)
+          }
         }
+
         const context = new FeatureCheckContext(this.name, values, thingType)
         const isOpen = gate.isOpen(context)
         if (isOpen) {
