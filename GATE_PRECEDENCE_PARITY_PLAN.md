@@ -33,7 +33,7 @@
 
 These are the mismatches we intend to close, in this recommended order.
 
-### Gap A — Gate evaluation order differs
+### Gap A — Gate evaluation order differs (✅ completed)
 
 **Ruby gate order (highest precedence to lowest):**
 `boolean → expression → actor → percentage_of_actors → percentage_of_time → group`
@@ -43,13 +43,13 @@ These are the mismatches we intend to close, in this recommended order.
 
 **Risk:** changes which gate “wins” (short-circuit), changes instrumentation `gate_name`, can change outcomes.
 
-### Gap B — Expression gate cannot see actor properties
+### Gap B — Expression gate cannot see actor properties (✅ completed)
 
 `Feature.isEnabled()` currently wraps the `thing` using `ActorGate.wrap()` before evaluating gates, so `ExpressionGate` receives an `ActorType` wrapper that does **not** expose `flipperProperties`.
 
 **Risk:** expressions that depend on actor properties are effectively evaluated as “no actor” (properties `{}`), diverging from Ruby.
 
-### Gap C — Percentage-of-actors hashing semantics differ
+### Gap C — Percentage-of-actors hashing semantics differ (✅ completed)
 
 Ruby:
 - supports up to 3 decimal places (scaling factor)
@@ -61,21 +61,27 @@ TypeScript:
 
 **Risk:** rollout membership differs from Ruby; decimals are dropped.
 
-### Gap D — `disableExpression()` clears all gates
+### Gap D — `disableExpression()` clears all gates (✅ completed)
 
 TypeScript `Feature.disableExpression()` calls `adapter.clear(this)` which clears *everything*.
 
 Ruby disables only the expression gate.
 
-### Gap E — Typecasting numbers differs (floats)
+### Gap E — Typecasting numbers differs (floats) (✅ completed)
 
 Ruby `Typecast.to_number` parses floats from strings.
 
 TypeScript `Typecast.toNumber` uses `parseInt`, which truncates decimals.
 
-### Gap F — `'undefined'` string checks in gates
+### Gap F — `'undefined'` string checks in gates (✅ completed)
 
 `ActorGate.isOpen` and `GroupGate.isOpen` compare `context.thing === 'undefined'` (string), likely unintended.
+
+### Additional parity fix discovered during execution (✅ completed)
+
+**Numeric gate disabling cleared unrelated gate values** in `MemoryAdapter.disable()` for `number` dataType.
+
+Ruby only disables the specific percentage gate; it does not clear actor/group/other state.
 
 ---
 
@@ -160,10 +166,10 @@ Possible approaches (pick one and lock with tests):
 ### 6) Remove `'undefined'` string checks (Gap F)
 
 **RED (tests):**
-- Add a test that passes no actor and ensures `ActorGate` and `GroupGate` behave correctly (return false) without relying on string checks.
+- Add regression tests ensuring `ActorGate` and `GroupGate` treat an actor with a missing/invalid `flipperId` as "no actor" (Ruby parity).
 
 **GREEN (minimal fix):**
-- Replace string comparisons with proper `typeof context.thing === 'undefined'` checks.
+- Remove string comparisons and require a valid actor id before evaluating actor/group gate logic.
 
 **REFACTOR:** Simplify logic to be consistent across gates.
 
