@@ -253,6 +253,37 @@ describe('SequelizeAdapter', () => {
     })
   })
 
+  describe('Ruby compatibility for percentage gate keys', () => {
+    it('reads percentage gates stored in snake_case', async () => {
+      const featureKey = 'ruby-feature'
+      await FeatureModel.create({ key: featureKey })
+      await GateModel.create({ featureKey, key: 'percentage_of_actors', value: '10' })
+      await GateModel.create({ featureKey, key: 'percentage_of_time', value: '15' })
+
+      const feature = new Feature(featureKey, adapter, {})
+      const state = await adapter.get(feature)
+
+      expect(state.percentageOfActors).toBe(10)
+      expect(state.percentageOfTime).toBe(15)
+    })
+
+    it('writes percentage gates using snake_case for storage', async () => {
+      await flipper.enablePercentageOfActors('ts-feature', 20)
+      await flipper.enablePercentageOfTime('ts-feature', 30)
+
+      const gates = await GateModel.findAll({
+        where: { featureKey: 'ts-feature' },
+        order: [['key', 'ASC']],
+      })
+
+      const keys = gates.map((g: { key: string }) => g.key).sort()
+      expect(keys).toEqual(expect.arrayContaining(['percentage_of_actors', 'percentage_of_time']))
+      // Ensure we did not leave camelCase duplicates
+      expect(keys).not.toContain('percentageOfActors')
+      expect(keys).not.toContain('percentageOfTime')
+    })
+  })
+
   describe('export', () => {
     it('exports features as JSON', async () => {
       await flipper.enable('test-feature')
@@ -335,11 +366,14 @@ describe('SequelizeAdapter', () => {
 
       // Assertions
       expect(spyFindAll).toHaveBeenCalled()
-      const findAllArgs = spyFindAll.mock.calls[0]?.[0]
+      const findAllArgs = spyFindAll.mock.calls[0]?.[0] as { useMaster?: boolean } | undefined
       expect(findAllArgs).toMatchObject({ useMaster: true })
 
       // Ensure at least one findOne received useMaster true
-      const findOneCallWithUseMaster = spyFindOne.mock.calls.find(call => call[0]?.useMaster === true)
+      const findOneCallWithUseMaster = spyFindOne.mock.calls.find(call => {
+        const args = call[0] as { useMaster?: boolean } | undefined
+        return args?.useMaster === true
+      })
       expect(findOneCallWithUseMaster).toBeTruthy()
 
       // Cleanup spies
@@ -350,7 +384,7 @@ describe('SequelizeAdapter', () => {
     it('defaults to replica (no useMaster) when option not set', async () => {
       const spyFindAll = jest.spyOn(FeatureModel, 'findAll')
       await adapter.features()
-      const findAllArgs = spyFindAll.mock.calls[0]?.[0]
+      const findAllArgs = spyFindAll.mock.calls[0]?.[0] as { useMaster?: boolean } | undefined
       expect(findAllArgs?.useMaster).toBe(false)
       spyFindAll.mockRestore()
     })
