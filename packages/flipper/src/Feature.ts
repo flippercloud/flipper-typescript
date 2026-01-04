@@ -109,9 +109,9 @@ class Feature {
       new BooleanGate(),
       new ExpressionGate(),
       new ActorGate(),
-      new GroupGate(this.groups),
       new PercentageOfActorsGate(),
       new PercentageOfTimeGate(),
+      new GroupGate(this.groups),
     ]
   }
 

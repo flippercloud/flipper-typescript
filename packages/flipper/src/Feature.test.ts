@@ -1,5 +1,6 @@
 import Feature from './Feature'
 import MemoryAdapter from './MemoryAdapter'
+import MemoryInstrumenter from './instrumenters/MemoryInstrumenter'
 import { makeActor } from './testHelpers'
 
 let adapter: MemoryAdapter
@@ -9,6 +10,28 @@ describe('Feature', () => {
   beforeEach(() => {
     adapter = new MemoryAdapter()
     feature = new Feature('feature-1', adapter, {})
+  })
+
+  describe('gate precedence (Ruby parity)', () => {
+    test('percentage of time wins over group when both are enabled', async () => {
+      const { default: Dsl } = await import('./Dsl.js')
+      const dsl = new Dsl(adapter)
+      dsl.register('admins', (_actor: unknown) => true)
+
+      const instrumenter = new MemoryInstrumenter()
+      const featureWithGroups = new Feature('precedence-feature', adapter, dsl.groups, {
+        instrumenter,
+      })
+
+      const actor = makeActor(1)
+      await featureWithGroups.enableGroup('admins')
+      await featureWithGroups.enablePercentageOfTime(100)
+
+      instrumenter.reset()
+      expect(await featureWithGroups.isEnabled(actor)).toEqual(true)
+      const event = instrumenter.eventByName('feature_operation.flipper')
+      expect(event?.payload.gate_name).toEqual('percentageOfTime')
+    })
   })
 
   test('has name', () => {
