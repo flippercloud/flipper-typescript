@@ -264,7 +264,9 @@ class MemoryAdapter implements IAdapter {
         break
       }
       case 'number': {
-        await this.clear(feature)
+        // For numeric gates (percentage_of_actors/time), disabling should not
+        // clear unrelated gate values; it should only remove this gate's key.
+        this.delete(this.key(feature, gate))
         break
       }
       case 'set': {

@@ -109,9 +109,9 @@ class Feature {
       new BooleanGate(),
       new ExpressionGate(),
       new ActorGate(),
-      new GroupGate(this.groups),
       new PercentageOfActorsGate(),
       new PercentageOfTimeGate(),
+      new GroupGate(this.groups),
     ]
   }
 
@@ -253,12 +253,18 @@ class Feature {
    * @returns True if successful
    */
   async disableExpression(): Promise<boolean> {
-    const gate = this.gate('expression')
+    const gate = this.gates.find(g => g.name === 'expression')
     if (!gate) {
       throw new Error('Expression gate not found')
     }
+
     await this.adapter.add(this)
-    return this.adapter.clear(this)
+
+    // Adapter APIs require a "thing" value for disable(). For JSON gates (like
+    // expression), adapters should ignore the specific value and simply remove
+    // the stored gate key.
+    const placeholder = ExpressionType.wrap({ Constant: false })
+    return this.adapter.disable(this, gate, placeholder)
   }
 
   /**
@@ -277,10 +283,17 @@ class Feature {
 
       this.gates.some(gate => {
         let thingType: unknown = thing
-        const actorGate = this.gate('actor')
-        if (typeof thingType !== 'undefined' && actorGate) {
-          thingType = actorGate.wrap(thing)
+
+        // Only wrap the thing for gates that require ActorType.
+        // Wrapping everything breaks expression evaluation, which needs access
+        // to actor `flipperProperties`.
+        if (gate.name === 'actor' || gate.name === 'group') {
+          const actorGate = this.gate('actor')
+          if (actorGate && actorGate.protectsThing(thingType)) {
+            thingType = actorGate.wrap(thingType)
+          }
         }
+
         const context = new FeatureCheckContext(this.name, values, thingType)
         const isOpen = gate.isOpen(context)
         if (isOpen) {

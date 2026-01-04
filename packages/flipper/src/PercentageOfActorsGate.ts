@@ -82,8 +82,15 @@ class PercentageOfActorsGate implements IGate {
 
     const actorType = ActorType.wrap(context.thing)
     const percentage = context.percentageOfActorsValue
-    const id = `${context.featureName}${actorType.value}`
-    return crc32(id).valueOf() % 100 < percentage
+
+    // Ruby parity:
+    // - hash input is feature_name + sorted_join(actor_ids)
+    // - supports up to 3 decimal places via scaling factor
+    const scalingFactor = 1000
+    const id = `${context.featureName}${[actorType.value].sort().join('')}`
+    const hash = crc32(id).valueOf()
+
+    return hash % (100 * scalingFactor) < percentage * scalingFactor
   }
 
   /**

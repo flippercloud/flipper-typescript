@@ -56,7 +56,7 @@ class Typecast {
       return value
     }
     if (typeof value === 'string') {
-      const parsed = parseInt(value, 10)
+      const parsed = value.includes('.') ? parseFloat(value) : parseInt(value, 10)
       return isNaN(parsed) ? 0 : parsed
     }
     return 0

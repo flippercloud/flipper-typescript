@@ -1,5 +1,6 @@
 import Feature from './Feature'
 import MemoryAdapter from './MemoryAdapter'
+import MemoryInstrumenter from './instrumenters/MemoryInstrumenter'
 import { makeActor } from './testHelpers'
 
 let adapter: MemoryAdapter
@@ -9,6 +10,49 @@ describe('Feature', () => {
   beforeEach(() => {
     adapter = new MemoryAdapter()
     feature = new Feature('feature-1', adapter, {})
+  })
+
+  describe('gate precedence (Ruby parity)', () => {
+    test('percentage of time wins over group when both are enabled', async () => {
+      const { default: Dsl } = await import('./Dsl.js')
+      const dsl = new Dsl(adapter)
+      dsl.register('admins', (_actor: unknown) => true)
+
+      const instrumenter = new MemoryInstrumenter()
+      const featureWithGroups = new Feature('precedence-feature', adapter, dsl.groups, {
+        instrumenter,
+      })
+
+      const actor = makeActor(1)
+      await featureWithGroups.enableGroup('admins')
+      await featureWithGroups.enablePercentageOfTime(100)
+
+      instrumenter.reset()
+      expect(await featureWithGroups.isEnabled(actor)).toEqual(true)
+      const event = instrumenter.eventByName('feature_operation.flipper')
+      expect(event?.payload.gate_name).toEqual('percentageOfTime')
+    })
+
+    test('expression evaluates using actor properties', async () => {
+      const { default: Flipper } = await import('./Flipper.js')
+
+      const instrumenter = new MemoryInstrumenter()
+      const featureWithInstrumenter = new Feature('expression-actor-props', adapter, {}, {
+        instrumenter,
+      })
+
+      await featureWithInstrumenter.enableExpression(Flipper.property('admin'))
+
+      const actorWithProps = {
+        flipperId: 'actor:1',
+        flipperProperties: { admin: true },
+      }
+
+      instrumenter.reset()
+      expect(await featureWithInstrumenter.isEnabled(actorWithProps)).toEqual(true)
+      const event = instrumenter.eventByName('feature_operation.flipper')
+      expect(event?.payload.gate_name).toEqual('expression')
+    })
   })
 
   test('has name', () => {
@@ -32,6 +76,33 @@ describe('Feature', () => {
     expect(await feature.isEnabled(actor)).toEqual(false)
   })
 
+  describe('disableExpression', () => {
+    test('only clears the expression gate (does not clear other gate values)', async () => {
+      const { default: Flipper } = await import('./Flipper.js')
+
+      const enabledActor = makeActor(1)
+      const expressionActor = {
+        flipperId: 'actor:2',
+        flipperProperties: { admin: true },
+      }
+
+      await feature.enableActor(enabledActor)
+      await feature.enableExpression(Flipper.property('admin'))
+
+      // Expression is active pre-disable.
+      expect(await feature.isEnabled(expressionActor)).toEqual(true)
+
+      await feature.disableExpression()
+
+      // Actor enablement should remain.
+      expect(await feature.isEnabled(enabledActor)).toEqual(true)
+
+      // Expression should be removed.
+      expect(await feature.isEnabled(expressionActor)).toEqual(false)
+      expect(await feature.enabledGateNames()).toEqual(['actor'])
+    })
+  })
+
   describe('disablePercentageOfActors', () => {
     test('sets percentage to 0', async () => {
       await feature.enablePercentageOfActors(25)
@@ -52,6 +123,18 @@ describe('Feature', () => {
       expect(await feature.percentageOfActorsValue()).toEqual(0)
       await feature.disablePercentageOfActors()
       expect(await feature.percentageOfActorsValue()).toEqual(0)
+    })
+
+    test('does not clear other gate values', async () => {
+      const actor = makeActor(5)
+
+      await feature.enableActor(actor)
+      await feature.enablePercentageOfActors(50)
+
+      await feature.disablePercentageOfActors()
+
+      // Actor enablement should remain after disabling the percentage gate.
+      expect(await feature.isEnabled(actor)).toEqual(true)
     })
   })
 
@@ -74,6 +157,18 @@ describe('Feature', () => {
       expect(await feature.percentageOfTimeValue()).toEqual(0)
       await feature.disablePercentageOfTime()
       expect(await feature.percentageOfTimeValue()).toEqual(0)
+    })
+
+    test('does not clear other gate values', async () => {
+      const actor = makeActor(5)
+
+      await feature.enableActor(actor)
+      await feature.enablePercentageOfTime(50)
+
+      await feature.disablePercentageOfTime()
+
+      // Actor enablement should remain after disabling the percentage gate.
+      expect(await feature.isEnabled(actor)).toEqual(true)
     })
   })
 

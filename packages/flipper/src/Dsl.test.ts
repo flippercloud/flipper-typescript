@@ -1,6 +1,7 @@
 import Dsl from './Dsl'
 import { IActor } from './interfaces'
 import MemoryAdapter from './MemoryAdapter'
+import { crc32 } from 'crc'
 import { makeActor } from './testHelpers'
 
 let dsl: Dsl
@@ -30,8 +31,10 @@ describe('Dsl', () => {
   test('enables feature for percentage of actors', async () => {
     await dsl.enablePercentageOfActors('feature-1', 50)
 
-    expect(await dsl.isFeatureEnabled('feature-1', makeActor(5))).toBe(true)
-    expect(await dsl.isFeatureEnabled('feature-1', makeActor(8))).toBe(false)
+    const { enabledActor, disabledActor } = findEnabledAndDisabledActors('feature-1', 50)
+
+    expect(await dsl.isFeatureEnabled('feature-1', enabledActor)).toBe(true)
+    expect(await dsl.isFeatureEnabled('feature-1', disabledActor)).toBe(false)
   })
 
   test('enables feature for percentage of time', async () => {
@@ -61,10 +64,13 @@ describe('Dsl', () => {
 
   test('disables percentage of actors', async () => {
     await dsl.enablePercentageOfActors('feature-1', 50)
-    expect(await dsl.isFeatureEnabled('feature-1', makeActor(5))).toBe(true)
+
+    const { enabledActor } = findEnabledAndDisabledActors('feature-1', 50)
+    expect(await dsl.isFeatureEnabled('feature-1', enabledActor)).toBe(true)
 
     await dsl.disablePercentageOfActors('feature-1')
-    expect(await dsl.isFeatureEnabled('feature-1', makeActor(5))).toBe(false)
+
+    expect(await dsl.isFeatureEnabled('feature-1', enabledActor)).toBe(false)
     expect(await dsl.feature('feature-1').percentageOfActorsValue()).toBe(0)
   })
 
@@ -185,3 +191,39 @@ describe('Dsl', () => {
     })
   })
 })
+
+function rubyPercentageOfActorsOpen(featureName: string, actorId: string, percentage: number): boolean {
+  const scalingFactor = 1000
+  const id = `${featureName}${actorId}`
+  const hash = crc32(id).valueOf()
+  return hash % (100 * scalingFactor) < percentage * scalingFactor
+}
+
+function findEnabledAndDisabledActors(
+  featureName: string,
+  percentage: number
+): { enabledActor: IActor; disabledActor: IActor } {
+  let enabledActor: IActor | null = null
+  let disabledActor: IActor | null = null
+
+  for (let i = 0; i < 100_000; i++) {
+    const candidate = makeActor(i)
+    const open = rubyPercentageOfActorsOpen(featureName, candidate.flipperId, percentage)
+
+    if (!enabledActor && open) {
+      enabledActor = candidate
+    }
+    if (!disabledActor && !open) {
+      disabledActor = candidate
+    }
+    if (enabledActor && disabledActor) {
+      break
+    }
+  }
+
+  if (!enabledActor || !disabledActor) {
+    throw new Error('Failed to find both enabled and disabled actors for percentage-of-actors test')
+  }
+
+  return { enabledActor, disabledActor }
+}
